@@ -1,0 +1,2262 @@
+{
+  "metadata": {
+    "body": "Earth",
+    "schemaVersion": "2.0.0",
+    "regionCount": 24,
+    "coordinateSystem": "Planetocentric latitude; longitude east-positive in [-180, 180]",
+    "units": {
+      "elevationM": "meters relative to body datum",
+      "temperatureC": "degrees Celsius",
+      "surfacePressureKPa": "kilopascals",
+      "majorOxidesWtPercent": "weight percent",
+      "relativeHumidityPercent": "percent"
+    },
+    "dataQualityLevels": {
+      "measured-in-situ": "Measured by a lander, rover, crew or ground station at/near the site",
+      "orbital-remote-sensing": "Derived mainly from orbital instruments",
+      "estimated": "Representative value inferred from regional context"
+    },
+    "fieldConventions": {
+      "sources": "Citations for this region; 'supports' lists the fields each source backs up",
+      "estimatedFields": "Fields NOT confirmed by a cited source; treat them as representative estimates",
+      "majorOxidesWtPercent": "Always a representative template for the terrain class (mare, highland, basaltic soil, etc.), not a site measurement unless a source says otherwise"
+    },
+    "globalSources": [
+      {
+        "title": "Earth Fact Sheet",
+        "publisher": "NASA NSSDCA / Goddard",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+        "supports": [
+          "atmosphere.compositionPercent",
+          "surface pressure 1014 mb",
+          "scale height 8.5 km"
+        ]
+      }
+    ],
+    "datum": "Mean sea level",
+    "temperatureNote": "Near-surface air temperature",
+    "pressureModel": "International Standard Atmosphere from elevation"
+  },
+  "regions": [
+    {
+      "regionId": "EARTH-001",
+      "name": "Atacama Desert - Yungay (Mars analog)",
+      "coordinates": {
+        "latitude": -24.08,
+        "longitude": -70.02
+      },
+      "elevationM": 1000,
+      "terrainType": "Hyperarid desert plain with salt crusts",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Alluvial gravels",
+          "Halite flats",
+          "Sulfate and nitrate salts"
+        ],
+        "notableCompounds": [
+          "NaClO4 (perchlorate)",
+          "NaNO3",
+          "CaSO4",
+          "NaCl"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": 2,
+        "max": 38,
+        "mean": 16.5
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 89.87,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Intense UV. Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 3,
+          "max": 70,
+          "mean": 25
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "One of the driest places on Earth; hyperarid for at least 10-15 Myr"
+      },
+      "obstacles": [
+        "Salt crusts",
+        "Desert pavement",
+        "Strong winds",
+        "Extreme UV"
+      ],
+      "geology": {
+        "age": "Hyperarid for 10-15+ Myr",
+        "features": [
+          "Salars",
+          "Alluvial fans"
+        ],
+        "description": "NASA ARADS tested a 2 m rover drill here; the Phoenix-type Wet Chemistry Lab found perchlorate."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC.min",
+        "temperatureC.mean",
+        "humidity"
+      ],
+      "sources": [
+        {
+          "title": "NASA Tests Life-Detection Drill in the Mars-Like Atacama Desert (ARADS)",
+          "publisher": "NASA Astrobiology",
+          "url": "https://astrobiology.nasa.gov/news/nasa-tests-life-detection-drill-in-the-atacama-desert/",
+          "supports": [
+            "chemicalComposition",
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Mars rover tests driving, drilling and detecting life in Chile's high desert",
+          "publisher": "NASA Ames via Phys.org",
+          "url": "https://m.phys.org/news/2017-03-mars-rover-drilling-life-chile.html",
+          "supports": [
+            "geology.age",
+            "temperatureC.max"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-002",
+      "name": "McMurdo Dry Valleys - Wright Valley",
+      "coordinates": {
+        "latitude": -77.52,
+        "longitude": 161.6
+      },
+      "elevationM": 300,
+      "terrainType": "Ice-free polar desert valley with dry permafrost",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Granite and dolerite regolith",
+          "Sandstone",
+          "Dry and ice-cemented permafrost"
+        ],
+        "notableCompounds": [
+          "CaCl2 brines",
+          "Nitrates",
+          "Perchlorates"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": -65.7,
+        "max": 12.0,
+        "mean": -19.8
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 97.77,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Strong katabatic winds. Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 10,
+          "max": 90,
+          "mean": 45
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Among the coldest and most arid regions on Earth"
+      },
+      "obstacles": [
+        "Katabatic winds",
+        "Ice-cemented ground",
+        "Ventifacts",
+        "Polar night"
+      ],
+      "geology": {
+        "age": "Valleys carved over ~15 Ma",
+        "features": [
+          "Patterned ground",
+          "Hypersaline lakes and ponds"
+        ],
+        "description": "Best Earth analog for the Martian northern plains where Phoenix landed."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "humidity.relativeHumidityPercent",
+        "chemicalComposition",
+        "geology.age"
+      ],
+      "sources": [
+        {
+          "title": "Tamppari et al., McMurdo Dry Valleys, Antarctica - A Mars Phoenix Mission Analog",
+          "publisher": "NASA NTRS",
+          "url": "https://ntrs.nasa.gov/api/citations/20100003844/downloads/20100003844.pdf",
+          "supports": [
+            "geology.description",
+            "humidity.notes"
+          ]
+        },
+        {
+          "title": "McMurdo Dry Valleys - Climate",
+          "publisher": "Wikipedia",
+          "url": "https://wiki.krisyotam.com/content/wikipedia_en_all_nopic_2026-03/Dry_Valleys",
+          "supports": [
+            "temperatureC"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-003",
+      "name": "Devon Island - Haughton Impact Crater",
+      "coordinates": {
+        "latitude": 75.367,
+        "longitude": -89.683
+      },
+      "elevationM": 200,
+      "terrainType": "Polar desert impact crater",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Impact melt breccia",
+          "Dolomite",
+          "Limestone"
+        ],
+        "notableCompounds": [
+          "CaMg(CO3)2",
+          "CaCO3",
+          "Shocked quartz"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": -45,
+        "max": 5,
+        "mean": -17
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 98.95,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 40,
+          "max": 95,
+          "mean": 75
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Cold, dry polar desert"
+      },
+      "obstacles": [
+        "Permafrost",
+        "Rocky breccia slopes",
+        "High winds (up to ~70 km/h)",
+        "Polar bears"
+      ],
+      "geology": {
+        "age": "Impact ~23 Ma (Miocene)",
+        "features": [
+          "20 km crater",
+          "Valley networks",
+          "Gullies",
+          "Ancient lakebeds"
+        ],
+        "description": "Home of the NASA Haughton-Mars Project, a Mars and Moon analog."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC.min",
+        "humidity",
+        "chemicalComposition"
+      ],
+      "sources": [
+        {
+          "title": "NASA Haughton-Mars Project",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/analogs/hmp",
+          "supports": [
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Mars in Canada: the NASA Haughton-Mars Project",
+          "publisher": "CSEG Recorder",
+          "url": "https://csegrecorder.com/articles/view/mars-in-canada-the-nasa-haughton-mars-project-devon-island-nunavut",
+          "supports": [
+            "coordinates",
+            "temperatureC",
+            "geology",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-004",
+      "name": "Rio Tinto, Spain",
+      "coordinates": {
+        "latitude": 37.69,
+        "longitude": -6.59
+      },
+      "elevationM": 300,
+      "terrainType": "Acidic iron-rich river valley",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Massive iron sulfides (Iberian Pyrite Belt)",
+          "Iron oxyhydroxide sediments"
+        ],
+        "notableCompounds": [
+          "FeS2",
+          "Jarosite",
+          "Goethite",
+          "Hematite",
+          "Acidic water (pH ~2)"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": 2,
+        "max": 40,
+        "mean": 17
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 97.77,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 20,
+          "max": 95,
+          "mean": 60
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Mediterranean climate"
+      },
+      "obstacles": [
+        "Highly acidic water",
+        "Open-pit mine walls",
+        "Soft iron-oxide terraces"
+      ],
+      "geology": {
+        "age": "Iberian Pyrite Belt, Carboniferous",
+        "features": [
+          "Acid drainage",
+          "Iron terraces"
+        ],
+        "description": "NASA/CAB MARTE drilled here as an analog of Meridiani Planum's jarosite and hematite."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "geology.age"
+      ],
+      "sources": [
+        {
+          "title": "Red River Drills for Mars (MARTE)",
+          "publisher": "NASA Astrobiology",
+          "url": "https://astrobiology.nasa.gov/news/red-river-drills-for-mars/",
+          "supports": [
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Amils et al. 2014, Rio Tinto: A Geochemical and Mineralogical Terrestrial Analogue of Mars (Life)",
+          "publisher": "PMC",
+          "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4206857/",
+          "supports": [
+            "chemicalComposition",
+            "geology"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-005",
+      "name": "Holuhraun Lava Field, Iceland",
+      "coordinates": {
+        "latitude": 64.87,
+        "longitude": -16.83
+      },
+      "elevationM": 700,
+      "terrainType": "Young basaltic lava field",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Basalt",
+          "Volcanic glass"
+        ],
+        "notableCompounds": [
+          "SO2 (eruption plume)",
+          "Basaltic silicates"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": -25,
+        "max": 15,
+        "mean": -2
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 93.19,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 50,
+          "max": 100,
+          "mean": 80
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Subarctic highlands"
+      },
+      "obstacles": [
+        "Jagged lava",
+        "Glacial rivers",
+        "Residual heat"
+      ],
+      "geology": {
+        "age": "Erupted Aug 2014 - Feb 2015 (Bardarbunga system)",
+        "features": [
+          "85 km2 lava field",
+          "10-14 m average thickness",
+          "~1.4 km3 of lava"
+        ],
+        "description": "Iceland's largest basaltic flow since Laki (1783-84); analog for Martian flood lavas."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition.dominantMaterials"
+      ],
+      "sources": [
+        {
+          "title": "All Quiet at Holuhraun",
+          "publisher": "NASA Earth Observatory",
+          "url": "https://earthobservatory.nasa.gov/images/85655",
+          "supports": [
+            "geology"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-006",
+      "name": "Mauna Kea - PISCES lunar analog site",
+      "coordinates": {
+        "latitude": 19.76,
+        "longitude": -155.46
+      },
+      "elevationM": 2740,
+      "terrainType": "Volcanic slope with tephra and cinder cones",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Basaltic tephra",
+          "Cinders"
+        ],
+        "notableCompounds": [
+          "Plagioclase",
+          "Olivine",
+          "Fe-Ti oxides"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": 0,
+        "max": 20,
+        "mean": 8
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 72.46,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 5,
+          "max": 90,
+          "mean": 40
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "High, dry environment"
+      },
+      "obstacles": [
+        "Loose tephra slopes",
+        "Altitude",
+        "Wind"
+      ],
+      "geology": {
+        "age": "Shield volcano, Pleistocene",
+        "features": [
+          "Pu'u Haiwahini cinder cone"
+        ],
+        "description": "NASA/CSA/DLR tested lunar oxygen extraction (ISRU) using tephra that mimics lunar regolith."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition.notableCompounds",
+        "geology.age"
+      ],
+      "sources": [
+        {
+          "title": "Sanders et al. 2011, Use of Hawaii Analog Sites for Lunar Science and ISRU",
+          "publisher": "EPSC / NASA",
+          "url": "https://meetingorganizer.copernicus.org/EPSC-DPS2011/EPSC-DPS2011-1301.pdf",
+          "supports": [
+            "elevationM",
+            "geology.description"
+          ]
+        },
+        {
+          "title": "PISCES: A 'Stepping Stone' to International Space Exploration",
+          "publisher": "NASA NTRS",
+          "url": "https://ntrs.nasa.gov/citations/20070037451",
+          "supports": [
+            "chemicalComposition.dominantMaterials"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-007",
+      "name": "Hanksville, Utah (Mars Desert Research Station)",
+      "coordinates": {
+        "latitude": 38.4065,
+        "longitude": -110.7919
+      },
+      "elevationM": 1400,
+      "terrainType": "Badlands with eroded shale and sandstone",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Mancos Shale",
+          "Morrison Formation mudstone",
+          "Sandstone"
+        ],
+        "notableCompounds": [
+          "Clays",
+          "Gypsum",
+          "Hematite concretions"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": -7,
+        "max": 37,
+        "mean": 12
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 85.6,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 10,
+          "max": 80,
+          "mean": 35
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Arid"
+      },
+      "obstacles": [
+        "Steep badland slopes",
+        "Flash floods",
+        "Wind erosion"
+      ],
+      "geology": {
+        "age": "Jurassic-Cretaceous",
+        "features": [
+          "Badlands",
+          "Exhumed channels",
+          "Concretions"
+        ],
+        "description": "Mars analog with exhumed channels and concretions similar to Mars."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "humidity",
+        "chemicalComposition",
+        "geology.age"
+      ],
+      "sources": [
+        {
+          "title": "Foing et al. 2011, Utah Desert Analogue Sites for Mars Research and Missions",
+          "publisher": "ESA / NASA Ames (LPSC abstract)",
+          "url": "https://planete-mars.com/wp-content/uploads/2017/02/Utah-Desert-Analog-Sites-for-Mars-Research-and-Missions.pdf",
+          "supports": [
+            "coordinates",
+            "elevationM",
+            "temperatureC",
+            "geology.features"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-008",
+      "name": "Death Valley - Badwater Basin",
+      "coordinates": {
+        "latitude": 36.23,
+        "longitude": -116.77
+      },
+      "elevationM": -86,
+      "terrainType": "Below-sea-level salt pan",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Halite crust",
+          "Borate evaporites",
+          "Alluvial gravels"
+        ],
+        "notableCompounds": [
+          "NaCl",
+          "Borax",
+          "Gypsum"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": -2.6,
+        "max": 56.7,
+        "mean": 25
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 102.36,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Record 56.7 C (1913); 2024 summer average high 47.3 C. Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 3,
+          "max": 60,
+          "mean": 23
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Hyperarid"
+      },
+      "obstacles": [
+        "Extreme heat",
+        "Salt polygons",
+        "Flash floods"
+      ],
+      "geology": {
+        "age": "Pull-apart basin, Pliocene to present",
+        "features": [
+          "Lowest point in North America (-86 m)"
+        ],
+        "description": "Analog for Martian evaporites."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "temperatureC.min",
+        "temperatureC.mean",
+        "humidity",
+        "chemicalComposition",
+        "geology.age"
+      ],
+      "sources": [
+        {
+          "title": "Death Valley - Summer",
+          "publisher": "US National Park Service",
+          "url": "https://home.nps.gov/deva/planyourvisit/summer.htm",
+          "supports": [
+            "elevationM",
+            "temperatureC.max",
+            "atmosphere.notes"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-009",
+      "name": "Sahara - Erg Chebbi",
+      "coordinates": {
+        "latitude": 31.08,
+        "longitude": -3.99
+      },
+      "elevationM": 750,
+      "terrainType": "Sand sea with large star dunes",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Quartz sand",
+          "Iron-oxide coated grains"
+        ],
+        "notableCompounds": [
+          "SiO2",
+          "Fe2O3 coatings"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": 0,
+        "max": 45,
+        "mean": 22
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 92.63,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 5,
+          "max": 70,
+          "mean": 25
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Arid; shallow aquifers beneath the erg"
+      },
+      "obstacles": [
+        "Star dunes >150 m",
+        "Soft sand",
+        "Sandstorms"
+      ],
+      "geology": {
+        "age": "Star dunes formed over ~13,000 years",
+        "features": [
+          "About a dozen large star dunes"
+        ],
+        "description": "Star dunes like these also exist on Mars."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity.relativeHumidityPercent",
+        "chemicalComposition"
+      ],
+      "sources": [
+        {
+          "title": "The Shallow Aquifers of Erg Chebbi",
+          "publisher": "NASA Earth Observatory",
+          "url": "https://earthobservatory.nasa.gov/images/89181/the-shallow-aquifers-of-erg-chebbi",
+          "supports": [
+            "obstacles",
+            "geology.features",
+            "humidity.notes"
+          ]
+        },
+        {
+          "title": "PIA26287: Star Dunes, Morocco",
+          "publisher": "NASA JPL / Terra ASTER",
+          "url": "https://photojournal.jpl.nasa.gov/catalog/PIA26287",
+          "supports": [
+            "geology.age"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-010",
+      "name": "Amazon Rainforest - Manaus",
+      "coordinates": {
+        "latitude": -3.1,
+        "longitude": -60.0
+      },
+      "elevationM": 50,
+      "terrainType": "Tropical lowland rainforest and floodplain",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Oxisols (laterite)",
+          "River alluvium"
+        ],
+        "notableCompounds": [
+          "Kaolinite",
+          "Gibbsite",
+          "Goethite"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": 21,
+        "max": 35,
+        "mean": 27
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 100.73,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 60,
+          "max": 100,
+          "mean": 85
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Forest transpiration helps start the wet season; the air above the forest has dried over 20 years"
+      },
+      "obstacles": [
+        "Dense vegetation",
+        "Seasonal flooding",
+        "Wide rivers"
+      ],
+      "geology": {
+        "age": "Cenozoic basin sediments",
+        "features": [
+          "Confluence of Rio Negro and Rio Solimoes"
+        ],
+        "description": "Earth reference for maximum humidity and biomass."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC",
+        "humidity.relativeHumidityPercent",
+        "chemicalComposition",
+        "geology.age"
+      ],
+      "sources": [
+        {
+          "title": "Martin et al., GoAmazon2014/5 (Manaus coordinates)",
+          "publisher": "US DOE ASR",
+          "url": "https://asr.science.energy.gov/meetings/stm/2017/presentations/431.pdf",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "The Amazon Makes its Own Wet Season",
+          "publisher": "NASA Earth Observatory",
+          "url": "https://www.earthobservatory.nasa.gov/images/91161/the-amazon-makes-its-own-wet-season",
+          "supports": [
+            "humidity.notes"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-011",
+      "name": "Mount Everest Summit",
+      "coordinates": {
+        "latitude": 27.988,
+        "longitude": 86.925
+      },
+      "elevationM": 8849,
+      "terrainType": "Glaciated high-mountain summit",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Ordovician marine limestone",
+          "Snow and ice"
+        ],
+        "notableCompounds": [
+          "CaCO3",
+          "Dolomite"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": -60,
+        "max": -15,
+        "mean": -30
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 31.44,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Roughly one third of sea-level pressure. Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 10,
+          "max": 100,
+          "mean": 50
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": ""
+      },
+      "obstacles": [
+        "Hypoxia",
+        "Crevasses",
+        "Avalanches",
+        "Jet-stream winds"
+      ],
+      "geology": {
+        "age": "Rocks ~470 Ma; Himalayan uplift ~50 Ma to present",
+        "features": [
+          "Official height 8,848.86 m (2020 survey)"
+        ],
+        "description": "Highest point on Earth."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition",
+        "geology.age"
+      ],
+      "sources": [
+        {
+          "title": "Height of Mount Everest",
+          "publisher": "Britannica",
+          "url": "https://kids.britannica.com/students/article/John-Hunt-Baron-Hunt/41556",
+          "supports": [
+            "elevationM"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-012",
+      "name": "Siberian Permafrost - Batagaika Crater",
+      "coordinates": {
+        "latitude": 67.58,
+        "longitude": 134.77
+      },
+      "elevationM": 300,
+      "terrainType": "Thermokarst megaslump in ice-rich permafrost",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Ice-rich permafrost silt",
+          "Ground ice"
+        ],
+        "notableCompounds": [
+          "H2O ice",
+          "Organic carbon",
+          "CH4 and CO2 release"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": -50,
+        "max": 30,
+        "mean": -10
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 97.77,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 40,
+          "max": 95,
+          "mean": 70
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": ""
+      },
+      "obstacles": [
+        "Collapsing headwall >85 m",
+        "Thaw mud",
+        "Slumping"
+      ],
+      "geology": {
+        "age": "Permafrost up to ~650 ka; slump since clearing in the 1960s",
+        "features": [
+          "Largest permafrost crater on Earth (~1 km across)"
+        ],
+        "description": "Exposed ice and soil may hold up to 200,000 years of history; analog for exposed Martian ground ice."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "geology.age (650 ka from Popular Science)"
+      ],
+      "sources": [
+        {
+          "title": "Batagaika Crater Expands",
+          "publisher": "NASA Earth Observatory",
+          "url": "https://earthobservatory.nasa.gov/images/90104/batagaika-crater-expands",
+          "supports": [
+            "obstacles",
+            "geology"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-013",
+      "name": "Dead Sea Shore",
+      "coordinates": {
+        "latitude": 31.5,
+        "longitude": 35.5
+      },
+      "elevationM": -418,
+      "terrainType": "Hypersaline lakeshore and salt flats",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Halite",
+          "Carnallite",
+          "Marl"
+        ],
+        "notableCompounds": [
+          "MgCl2 (~53% of minerals)",
+          "KCl (~37%)",
+          "NaCl (~8%)",
+          "Bromine"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": 10,
+        "max": 42,
+        "mean": 25
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 106.45,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Highest natural air pressure on land. Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 20,
+          "max": 80,
+          "mean": 45
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Arid; salinity ~300 ppt (9x ocean)"
+      },
+      "obstacles": [
+        "Sinkholes",
+        "Hypersaline brine",
+        "Heat"
+      ],
+      "geology": {
+        "age": "Dead Sea Rift, Pliocene to present",
+        "features": [
+          "Lisan Peninsula",
+          "Evaporation pans"
+        ],
+        "description": "Lowest dry land on Earth; lake level dropping from water diversion."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "temperatureC",
+        "humidity.relativeHumidityPercent",
+        "geology.age"
+      ],
+      "sources": [
+        {
+          "title": "PIA01916: Dead Sea (ASTER)",
+          "publisher": "NASA JPL",
+          "url": "https://webarchive.library.unt.edu/eot2008/20081106091248/http://photojournal.jpl.nasa.gov/catalog/PIA01916",
+          "supports": [
+            "elevationM",
+            "chemicalComposition",
+            "humidity.notes"
+          ]
+        },
+        {
+          "title": "Dead Sea",
+          "publisher": "NASA Earth Observatory",
+          "url": "https://earthobservatory.nasa.gov/images/7115/dead-sea",
+          "supports": [
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-014",
+      "name": "Grand Canyon - South Rim",
+      "coordinates": {
+        "latitude": 36.06,
+        "longitude": -112.11
+      },
+      "elevationM": 2100,
+      "terrainType": "Deep canyon with layered sedimentary walls",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Kaibab Limestone",
+          "Coconino Sandstone",
+          "Vishnu Schist"
+        ],
+        "notableCompounds": [
+          "CaCO3",
+          "SiO2",
+          "Mica"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": -15,
+        "max": 33,
+        "mean": 9
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 78.51,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 10,
+          "max": 90,
+          "mean": 40
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": ""
+      },
+      "obstacles": [
+        "Cliffs ~1.6 km deep",
+        "Rockfall",
+        "Flash floods"
+      ],
+      "geology": {
+        "age": "Rocks ~1.7 Ga to ~270 Ma",
+        "features": [
+          "Nearly 40 rock layers",
+          "Great Unconformity (~1.2 Gyr missing)"
+        ],
+        "description": "Analog for Valles Marineris wall stratigraphy."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity"
+      ],
+      "sources": [
+        {
+          "title": "Grand Canyon Geologic Formations",
+          "publisher": "US National Park Service",
+          "url": "https://home.nps.gov/grca/learn/nature/geologicformations.htm",
+          "supports": [
+            "geology.features"
+          ]
+        },
+        {
+          "title": "Grand Canyon Geology",
+          "publisher": "USGS",
+          "url": "https://www.usgs.gov/geology-and-ecology-of-national-parks/grand-canyon-geology",
+          "supports": [
+            "geology.age"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-015",
+      "name": "Greenland Ice Sheet - Summit Station",
+      "coordinates": {
+        "latitude": 72.5805,
+        "longitude": -38.4587
+      },
+      "elevationM": 3210,
+      "terrainType": "Flat high-altitude ice sheet",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Snow and firn",
+          "Glacial ice"
+        ],
+        "notableCompounds": [
+          "H2O ice"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": -42,
+        "max": -13,
+        "mean": -31
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 68.26,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 50,
+          "max": 100,
+          "mean": 70
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Low water vapor; ~200 mm precipitation/yr"
+      },
+      "obstacles": [
+        "Whiteout",
+        "Extreme cold",
+        "Winds up to 36 m/s"
+      ],
+      "geology": {
+        "age": "Ice record >100 ka",
+        "features": [
+          "Ice sheet summit"
+        ],
+        "description": "Analog for Martian polar layered deposits."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "humidity.relativeHumidityPercent",
+        "geology.age"
+      ],
+      "sources": [
+        {
+          "title": "INTERACT station profile: Summit Station, Greenland",
+          "publisher": "EU INTERACT / NSF",
+          "url": "https://eu-interact.org/app/uploads/2017/08/SummitStation_15_June_2016.pdf",
+          "supports": [
+            "coordinates",
+            "elevationM",
+            "temperatureC",
+            "humidity.notes",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-016",
+      "name": "Yellowstone - Grand Prismatic Spring",
+      "coordinates": {
+        "latitude": 44.525,
+        "longitude": -110.838
+      },
+      "elevationM": 2150,
+      "terrainType": "Hydrothermal basin with hot springs",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Siliceous sinter",
+          "Rhyolite",
+          "Microbial mats"
+        ],
+        "notableCompounds": [
+          "Opaline silica",
+          "H2S",
+          "CO2"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": -35,
+        "max": 30,
+        "mean": 2
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 78.03,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 20,
+          "max": 100,
+          "mean": 55
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Steam plumes"
+      },
+      "obstacles": [
+        "Thin crust over boiling water",
+        "Spring center 87 C"
+      ],
+      "geology": {
+        "age": "Caldera ~640 ka",
+        "features": [
+          "Spring 90 m across and 50 m deep",
+          "Thermophile mats"
+        ],
+        "description": "NASA studies these springs as analogs for early-life environments on Earth, Mars and Europa."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition",
+        "geology.age"
+      ],
+      "sources": [
+        {
+          "title": "Grand Prismatic Spring, Yellowstone",
+          "publisher": "NASA Earth Observatory",
+          "url": "https://science.nasa.gov/earth/earth-observatory/grand-prismatic-spring-yellowstone-4523",
+          "supports": [
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Grand Prismatic Spring dimensions",
+          "publisher": "NASA Science",
+          "url": "https://science.nasa.gov/?p=1095061",
+          "supports": [
+            "geology.features",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-017",
+      "name": "Danakil Depression - Dallol",
+      "coordinates": {
+        "latitude": 14.24,
+        "longitude": 40.3
+      },
+      "elevationM": -120,
+      "terrainType": "Hyperacidic hydrothermal salt dome",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Halite and evaporite salts (>2 km thick)",
+          "Sulfur",
+          "Iron chlorides"
+        ],
+        "notableCompounds": [
+          "NaCl",
+          "KCl",
+          "Sulfur",
+          "Hyperacidic Fe-rich brines"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": 25,
+        "max": 48,
+        "mean": 35
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 102.77,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Toxic gases near vents. Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 10,
+          "max": 70,
+          "mean": 35
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Rain usually below 50 mm/yr"
+      },
+      "obstacles": [
+        "Toxic gases",
+        "Hyperacidic pools",
+        "Hot springs up to 108 C",
+        "Extreme heat"
+      ],
+      "geology": {
+        "age": "Active Afar rift",
+        "features": [
+          "Salt chimneys",
+          "Acid pools"
+        ],
+        "description": "One of the driest and hottest places on Earth (mean 35 C); analog for early Earth and Mars."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "temperatureC.min",
+        "temperatureC.max",
+        "humidity.relativeHumidityPercent"
+      ],
+      "sources": [
+        {
+          "title": "Kotopoulou et al. 2019, A Polyextreme Hydrothermal System Controlled by Iron: The Case of Dallol (ACS Earth Space Chem.)",
+          "publisher": "ACS",
+          "url": "https://digibug.ugr.es/bitstream/handle/10481/59480/acsearthspacechem.8b00141.pdf",
+          "supports": [
+            "elevationM",
+            "temperatureC.mean",
+            "humidity.notes",
+            "obstacles",
+            "chemicalComposition"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-018",
+      "name": "Pilbara - Dresser Formation",
+      "coordinates": {
+        "latitude": -21.2,
+        "longitude": 119.3
+      },
+      "elevationM": 300,
+      "terrainType": "Ancient craton hills and arid plains",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Chert",
+          "Stromatolites",
+          "Barite",
+          "Hematite replacement"
+        ],
+        "notableCompounds": [
+          "SiO2",
+          "BaSO4",
+          "Fe2O3"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": 8,
+        "max": 42,
+        "mean": 26
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 97.77,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 10,
+          "max": 80,
+          "mean": 30
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": ""
+      },
+      "obstacles": [
+        "Spinifex grass",
+        "Rocky ridges",
+        "Heat",
+        "Remote"
+      ],
+      "geology": {
+        "age": "About 3.48 Ga",
+        "features": [
+          "Stromatolites",
+          "Ancient caldera with hot seawater"
+        ],
+        "description": "Some of the oldest convincing evidence of life; Mars 2020 and ExoMars teams trained here."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition"
+      ],
+      "sources": [
+        {
+          "title": "Mars Scientists Investigate Ancient Life in Australia",
+          "publisher": "NASA JPL",
+          "url": "https://www.jpl.nasa.gov/news/mars-scientists-investigate-ancient-life-in-australia/",
+          "supports": [
+            "geology"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-019",
+      "name": "Kilauea Caldera, Hawaii",
+      "coordinates": {
+        "latitude": 19.41,
+        "longitude": -155.28
+      },
+      "elevationM": 1100,
+      "terrainType": "Active basaltic caldera",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Tholeiitic basalt",
+          "Tephra"
+        ],
+        "notableCompounds": [
+          "SO2 (vog)",
+          "Basaltic silicates"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": 10,
+        "max": 27,
+        "mean": 16
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 88.79,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 50,
+          "max": 100,
+          "mean": 75
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": ""
+      },
+      "obstacles": [
+        "Collapse pits",
+        "Active lava",
+        "Toxic gas"
+      ],
+      "geology": {
+        "age": "Active; 2018 summit collapse",
+        "features": [
+          "Halema'uma'u 2.5 km wide, 500 m deep after 2018"
+        ],
+        "description": "Analog for lunar and Martian lava tubes and collapse pits."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition"
+      ],
+      "sources": [
+        {
+          "title": "New insights gained from Kilauea Volcano's 2018 summit collapses",
+          "publisher": "USGS",
+          "url": "https://www.usgs.gov/media/images/new-insights-gained-kilauea-volcanos-2018-summit-collapses",
+          "supports": [
+            "geology.features",
+            "geology.age"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-020",
+      "name": "Cuatro Cienegas, Coahuila, Mexico",
+      "coordinates": {
+        "latitude": 26.93,
+        "longitude": -102.07
+      },
+      "elevationM": 740,
+      "terrainType": "Desert basin with spring-fed pools and gypsum soils",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Gypsum soils",
+          "Limestone",
+          "Microbialites / stromatolites"
+        ],
+        "notableCompounds": [
+          "CaSO4·2H2O",
+          "CaCO3",
+          "Very low phosphorus water"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": 0,
+        "max": 40,
+        "mean": 21
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 92.75,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 10,
+          "max": 80,
+          "mean": 45
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": ""
+      },
+      "obstacles": [
+        "Protected ecosystem",
+        "Pools and wetlands"
+      ],
+      "geology": {
+        "age": "Mesozoic limestone; Quaternary springs",
+        "features": [
+          "Pozas (pools)",
+          "Living stromatolites"
+        ],
+        "description": "NASA Astrobiology studies its phosphorus-poor, Mars-like aquatic habitats; analog for Olympia Undae gypsum dunes and Gale crater."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "geology.age"
+      ],
+      "sources": [
+        {
+          "title": "Stoichiometry of Life, Task 2b: Field Studies - Cuatro Cienegas (2012 Annual Report)",
+          "publisher": "NASA Astrobiology Institute",
+          "url": "https://astrobiology.nasa.gov/nai/annual-reports/2012/asu/stoichiometry-of-life-task-2b-field-studies-cuatro-cienegas/index.html",
+          "supports": [
+            "geology.description",
+            "chemicalComposition.notableCompounds"
+          ]
+        },
+        {
+          "title": "Bonilla-Rosso et al. 2012, Comparative Metagenomics of Two Microbial Mats at Cuatro Cienegas (Astrobiology)",
+          "publisher": "PMC",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3426889",
+          "supports": [
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-021",
+      "name": "El Pinacate - Crater Elegante, Sonora, Mexico",
+      "coordinates": {
+        "latitude": 31.86,
+        "longitude": -113.51
+      },
+      "elevationM": 250,
+      "terrainType": "Volcanic field with maar craters and dunes",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Basalt",
+          "Scoria cinders",
+          "Sand dunes"
+        ],
+        "notableCompounds": [
+          "Olivine",
+          "Pyroxene",
+          "Plagioclase"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": 2,
+        "max": 46,
+        "mean": 23
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 98.36,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 5,
+          "max": 70,
+          "mean": 35
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": ""
+      },
+      "obstacles": [
+        "Jagged lava",
+        "Steep crater walls (~1.5 km wide maar)",
+        "Extreme heat"
+      ],
+      "geology": {
+        "age": "Most recent activity ~11,000 years ago",
+        "features": [
+          "Maar craters",
+          "Cinder cones",
+          "Dunes"
+        ],
+        "description": "NASA trained Apollo astronauts in field geology here in the late 1960s."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition"
+      ],
+      "sources": [
+        {
+          "title": "Pinacate Biosphere Reserve",
+          "publisher": "NASA Earth Observatory",
+          "url": "https://earthobservatory.nasa.gov/images/3923/pinacate-biosphere-reserve",
+          "supports": [
+            "geology.description"
+          ]
+        },
+        {
+          "title": "What a Wonderful World: Pinacate Peaks",
+          "publisher": "NASA Earth Observatory",
+          "url": "https://earthobservatory.nasa.gov/blogs/earthmatters/2017/11/10/what-a-wonderful-world-pinacate-peaks/",
+          "supports": [
+            "geology.age",
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Crater Elegante (Pinacates Biosphere Reserve)",
+          "publisher": "NASA Science / Earth Observatory",
+          "url": "https://science.nasa.gov/earth/earth-observatory/pinacates-biosphere-reserve-4552/",
+          "supports": [
+            "geology.features",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-022",
+      "name": "Chicxulub Crater - Yucatan, Mexico",
+      "coordinates": {
+        "latitude": 21.4,
+        "longitude": -89.5
+      },
+      "elevationM": 10,
+      "terrainType": "Flat karst plain over a buried impact basin",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Tertiary limestone (~1 km cover)",
+          "Buried impact melt and breccia"
+        ],
+        "notableCompounds": [
+          "CaCO3",
+          "Shocked quartz"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": 16,
+        "max": 38,
+        "mean": 26
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 101.2,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 50,
+          "max": 100,
+          "mean": 75
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": ""
+      },
+      "obstacles": [
+        "Sinkholes (cenotes)",
+        "Dense dry forest",
+        "Hurricanes"
+      ],
+      "geology": {
+        "age": "Impact ~65-66 Ma (K-Pg)",
+        "features": [
+          "Cenote Ring ~165 km",
+          "Crater possibly ~240 km"
+        ],
+        "description": "NASA researchers spotted the ring of cenotes in satellite images; impact linked to the dinosaur extinction."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity"
+      ],
+      "sources": [
+        {
+          "title": "A Smoking Gun for Dinosaur Extinction",
+          "publisher": "NASA JPL",
+          "url": "https://www.jpl.nasa.gov/news/a-smoking-gun-for-dinosaur-extinction/",
+          "supports": [
+            "geology.description",
+            "chemicalComposition.dominantMaterials"
+          ]
+        },
+        {
+          "title": "Pope, Ocampo & Duller 1993, Surficial Geology of the Chicxulub Impact Crater",
+          "publisher": "NASA NTRS",
+          "url": "https://ntrs.nasa.gov/api/citations/19980211540/downloads/19980211540.pdf",
+          "supports": [
+            "geology"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-023",
+      "name": "Meteor Crater (Barringer), Arizona",
+      "coordinates": {
+        "latitude": 35.03,
+        "longitude": -111.02
+      },
+      "elevationM": 1700,
+      "terrainType": "Simple bowl-shaped impact crater",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Kaibab Limestone",
+          "Coconino Sandstone",
+          "Impact ejecta"
+        ],
+        "notableCompounds": [
+          "Coesite",
+          "Iron-nickel meteorite fragments",
+          "CaCO3"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": -15,
+        "max": 35,
+        "mean": 12
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 82.5,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 10,
+          "max": 85,
+          "mean": 40
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": ""
+      },
+      "obstacles": [
+        "Crater ~180 m deep",
+        "Ejecta boulders",
+        "Wind"
+      ],
+      "geology": {
+        "age": "About 50,000 years",
+        "features": [
+          "1.2 km diameter",
+          "~30 m iron-nickel impactor"
+        ],
+        "description": "Eugene Shoemaker trained Apollo astronauts here; still a NASA-sponsored training site."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity"
+      ],
+      "sources": [
+        {
+          "title": "Arizona's Meteor Crater",
+          "publisher": "NASA Earth Observatory",
+          "url": "https://www.earthobservatory.nasa.gov/images/148384/arizonas-meteor-crater",
+          "supports": [
+            "geology",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Meteor Crater Sample Collection",
+          "publisher": "USGS Astrogeology",
+          "url": "https://www.usgs.gov/centers/astrogeo-sc/science/meteor-crater-sample-collection",
+          "supports": [
+            "geology.features",
+            "chemicalComposition.notableCompounds"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "EARTH-024",
+      "name": "East Antarctic Plateau - Vostok Station",
+      "coordinates": {
+        "latitude": -78.46,
+        "longitude": 106.84
+      },
+      "elevationM": 3488,
+      "terrainType": "High polar ice plateau",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Snow and firn",
+          "Glacial ice over subglacial lake"
+        ],
+        "notableCompounds": [
+          "H2O ice"
+        ],
+        "majorOxidesWtPercent": null
+      },
+      "temperatureC": {
+        "min": -89.2,
+        "max": -20,
+        "mean": -55
+      },
+      "atmosphere": {
+        "type": "dense N2-O2",
+        "surfacePressureKPa": 65.87,
+        "compositionPercent": {
+          "N2": 78.08,
+          "O2": 20.95,
+          "Ar": 0.934,
+          "CO2": 0.042
+        },
+        "notes": "Composition from NSSDC Earth Fact Sheet (dry air, CO2 420 ppm); pressure from ISA model by elevation."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 40,
+          "max": 100,
+          "mean": 70
+        },
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Extremely low absolute humidity"
+      },
+      "obstacles": [
+        "Extreme cold",
+        "Hypoxia",
+        "Polar night"
+      ],
+      "geology": {
+        "age": "Ice record >400 ka",
+        "features": [
+          "Subglacial Lake Vostok"
+        ],
+        "description": "Record low air temperature -89.2 C (21 July 1983)."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC.max",
+        "temperatureC.mean",
+        "humidity",
+        "geology.age"
+      ],
+      "sources": [
+        {
+          "title": "Coldest Place on Earth (Vostok record -89.2 C)",
+          "publisher": "NASA Goddard SVS",
+          "url": "https://svs.gsfc.nasa.gov/old/11432",
+          "supports": [
+            "temperatureC.min"
+          ]
+        },
+        {
+          "title": "Earth Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    }
+  ]
+}
