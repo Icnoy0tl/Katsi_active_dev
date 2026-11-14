@@ -1,0 +1,2641 @@
+{
+  "metadata": {
+    "body": "Moon",
+    "schemaVersion": "2.0.0",
+    "regionCount": 22,
+    "coordinateSystem": "Planetocentric latitude; longitude east-positive in [-180, 180]",
+    "units": {
+      "elevationM": "meters relative to body datum",
+      "temperatureC": "degrees Celsius",
+      "surfacePressureKPa": "kilopascals",
+      "majorOxidesWtPercent": "weight percent",
+      "relativeHumidityPercent": "percent"
+    },
+    "dataQualityLevels": {
+      "measured-in-situ": "Measured by a lander, rover, crew or ground station at/near the site",
+      "orbital-remote-sensing": "Derived mainly from orbital instruments",
+      "estimated": "Representative value inferred from regional context"
+    },
+    "fieldConventions": {
+      "sources": "Citations for this region; 'supports' lists the fields each source backs up",
+      "estimatedFields": "Fields NOT confirmed by a cited source; treat them as representative estimates",
+      "majorOxidesWtPercent": "Always a representative template for the terrain class (mare, highland, basaltic soil, etc.), not a site measurement unless a source says otherwise"
+    },
+    "globalSources": [
+      {
+        "title": "Moon Fact Sheet",
+        "publisher": "NASA NSSDCA / Goddard",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+        "supports": [
+          "atmosphere"
+        ]
+      },
+      {
+        "title": "LRO: Temperature Variation on the Moon (lithograph)",
+        "publisher": "NASA Goddard",
+        "url": "https://science.nasa.gov/wp-content/uploads/2024/01/lrolitho7temperaturevariation27may2014.pdf",
+        "supports": [
+          "temperatureC"
+        ]
+      },
+      {
+        "title": "Diviner Lunar Radiometer - Science",
+        "publisher": "UCLA / NASA LRO",
+        "url": "https://www.diviner.ucla.edu/science",
+        "supports": [
+          "temperatureC"
+        ]
+      }
+    ],
+    "datum": "LOLA sphere, radius 1737.4 km",
+    "temperatureNote": "Surface (regolith) temperature over a lunar day",
+    "pressureModel": "Exosphere, effectively vacuum"
+  },
+  "regions": [
+    {
+      "regionId": "MOON-001",
+      "name": "Mare Tranquillitatis - Tranquility Base (Apollo 11)",
+      "coordinates": {
+        "latitude": 0.6742,
+        "longitude": 23.4731
+      },
+      "elevationM": -1900,
+      "terrainType": "Flat mare basalt plain",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "High-Ti mare basalt",
+          "Regolith with impact glass",
+          "Ilmenite"
+        ],
+        "notableCompounds": [
+          "FeTiO3 (ilmenite)",
+          "Pyroxene",
+          "Plagioclase",
+          "Solar-wind He-3"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 41.0,
+          "TiO2": 8.0,
+          "Al2O3": 11.0,
+          "FeO": 17.0,
+          "MgO": 8.0,
+          "CaO": 11.0,
+          "Na2O": 0.4
+        }
+      },
+      "temperatureC": {
+        "min": -130,
+        "max": 120,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Small craters",
+        "Scattered boulders",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Basalts 3.6-3.8 Ga",
+        "features": [
+          "Mare plains",
+          "Wrinkle ridges",
+          "Nearby 100 m deep pit crater"
+        ],
+        "description": "First crewed lunar landing (1969)."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "elevationM",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Table of Anthropogenic Impacts and Spacecraft on the Moon",
+          "publisher": "NASA NSSDCA",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "Absolute Time (Apollo basalt ages)",
+          "publisher": "NASA / ASU LROC",
+          "url": "https://www.lroc.asu.edu/images/480",
+          "supports": [
+            "geology.age"
+          ]
+        },
+        {
+          "title": "LRO: Temperature Variation on the Moon (lithograph)",
+          "publisher": "NASA Goddard",
+          "url": "https://science.nasa.gov/wp-content/uploads/2024/01/lrolitho7temperaturevariation27may2014.pdf",
+          "supports": [
+            "temperatureC"
+          ]
+        },
+        {
+          "title": "NASA's LRO Finds Lunar Pits Harbor Comfortable Temperatures",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/solar-system/moon/nasas-lro-finds-lunar-pits-harbor-comfortable-temperatures/",
+          "supports": [
+            "geology.features"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-002",
+      "name": "Oceanus Procellarum - Apollo 12 site",
+      "coordinates": {
+        "latitude": -3.0128,
+        "longitude": -23.4219
+      },
+      "elevationM": -1423,
+      "terrainType": "Mare basalt plain with Copernicus ray material",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Low-Ti mare basalt",
+          "KREEP-rich ray material"
+        ],
+        "notableCompounds": [
+          "Olivine",
+          "Pyroxene",
+          "Plagioclase",
+          "KREEP glass"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 3.0,
+          "Al2O3": 12.0,
+          "FeO": 17.0,
+          "MgO": 10.0,
+          "CaO": 10.5,
+          "Na2O": 0.4
+        }
+      },
+      "temperatureC": {
+        "min": -130,
+        "max": 120,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Crater clusters",
+        "Loose regolith",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Basalts ~3.2 Ga",
+        "features": [
+          "Surveyor crater",
+          "Copernicus ray"
+        ],
+        "description": "Pinpoint landing next to Surveyor 3; samples likely include Copernicus ejecta (~800 Ma)."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Apollo Landing Site Coordinates",
+          "publisher": "NASA NSSDCA",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "LROC Coordinates of Human Features on the Moon (2016)",
+          "publisher": "NASA / Arizona State University LROC",
+          "url": "https://www.lroc.asu.edu/data/support/downloads/2016_LROC_Coordinates_of_Human_Features.pdf",
+          "supports": [
+            "elevationM"
+          ]
+        },
+        {
+          "title": "Absolute Time (Apollo basalt ages)",
+          "publisher": "NASA / ASU LROC",
+          "url": "https://www.lroc.asu.edu/images/480",
+          "supports": [
+            "geology.age"
+          ]
+        },
+        {
+          "title": "Copernicus Central Peak",
+          "publisher": "NASA / ASU LROC",
+          "url": "https://www.lroc.asu.edu/images/675",
+          "supports": [
+            "geology.description"
+          ]
+        },
+        {
+          "title": "LRO: Temperature Variation on the Moon (lithograph)",
+          "publisher": "NASA Goddard",
+          "url": "https://science.nasa.gov/wp-content/uploads/2024/01/lrolitho7temperaturevariation27may2014.pdf",
+          "supports": [
+            "temperatureC"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-003",
+      "name": "Fra Mauro Highlands (Apollo 14)",
+      "coordinates": {
+        "latitude": -3.6459,
+        "longitude": -17.4719
+      },
+      "elevationM": -1062,
+      "terrainType": "Hilly terrain of basin ejecta",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Fragmental breccia",
+          "KREEP basalt",
+          "Imbrium ejecta"
+        ],
+        "notableCompounds": [
+          "KREEP",
+          "Plagioclase",
+          "Pyroxene"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 48.0,
+          "TiO2": 1.7,
+          "Al2O3": 17.0,
+          "FeO": 10.0,
+          "MgO": 10.0,
+          "CaO": 11.0,
+          "Na2O": 0.7,
+          "K2O": 0.5,
+          "P2O5": 0.5
+        }
+      },
+      "temperatureC": {
+        "min": -130,
+        "max": 120,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Rolling ridges",
+        "Cone Crater slopes",
+        "Boulders",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Imbrium ejecta ~3.85-3.9 Ga",
+        "features": [
+          "Cone Crater",
+          "Ejecta ridges"
+        ],
+        "description": "Samples of Imbrium basin ejecta."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Apollo Landing Site Coordinates",
+          "publisher": "NASA NSSDCA",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "LROC Coordinates of Human Features on the Moon (2016)",
+          "publisher": "NASA / Arizona State University LROC",
+          "url": "https://www.lroc.asu.edu/data/support/downloads/2016_LROC_Coordinates_of_Human_Features.pdf",
+          "supports": [
+            "coordinates",
+            "elevationM"
+          ]
+        },
+        {
+          "title": "LRO: Temperature Variation on the Moon (lithograph)",
+          "publisher": "NASA Goddard",
+          "url": "https://science.nasa.gov/wp-content/uploads/2024/01/lrolitho7temperaturevariation27may2014.pdf",
+          "supports": [
+            "temperatureC"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-004",
+      "name": "Hadley-Apennine (Apollo 15)",
+      "coordinates": {
+        "latitude": 26.1324,
+        "longitude": 3.6333
+      },
+      "elevationM": -1931,
+      "terrainType": "Mare plain at the foot of mountains next to a sinuous rille",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Low-Ti mare basalt",
+          "Highland anorthosite",
+          "Green volcanic glass"
+        ],
+        "notableCompounds": [
+          "Olivine",
+          "Plagioclase",
+          "Green pyroclastic glass"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 3.0,
+          "Al2O3": 12.0,
+          "FeO": 17.0,
+          "MgO": 10.0,
+          "CaO": 10.5,
+          "Na2O": 0.4
+        }
+      },
+      "temperatureC": {
+        "min": -180,
+        "max": 90,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Hadley Rille",
+        "Mountain slopes",
+        "Boulders",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Mare basalts ~3.3 Ga; Apennines ~3.9 Ga",
+        "features": [
+          "Hadley Rille",
+          "Montes Apenninus"
+        ],
+        "description": "First mission with a Lunar Roving Vehicle."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "temperatureC",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Table of Anthropogenic Impacts and Spacecraft on the Moon",
+          "publisher": "NASA NSSDCA",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "LROC Coordinates of Human Features on the Moon (2016)",
+          "publisher": "NASA / Arizona State University LROC",
+          "url": "https://www.lroc.asu.edu/data/support/downloads/2016_LROC_Coordinates_of_Human_Features.pdf",
+          "supports": [
+            "elevationM"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-005",
+      "name": "Descartes Highlands (Apollo 16)",
+      "coordinates": {
+        "latitude": -8.9734,
+        "longitude": 15.5011
+      },
+      "elevationM": 8,
+      "terrainType": "Rolling anorthositic highlands",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Anorthosite",
+          "Impact melt breccia"
+        ],
+        "notableCompounds": [
+          "Anorthite CaAl2Si2O8",
+          "Low-Fe pyroxene"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 0.6,
+          "Al2O3": 27.0,
+          "FeO": 5.0,
+          "MgO": 6.0,
+          "CaO": 15.5,
+          "Na2O": 0.5
+        }
+      },
+      "temperatureC": {
+        "min": -130,
+        "max": 120,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Large boulders",
+        "Slopes",
+        "North Ray crater",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "About 3.9-4.0 Ga",
+        "features": [
+          "North Ray Crater",
+          "Stone Mountain"
+        ],
+        "description": "Only Apollo mission to the central highlands."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "LROC Coordinates of Human Features on the Moon (2016)",
+          "publisher": "NASA / Arizona State University LROC",
+          "url": "https://www.lroc.asu.edu/data/support/downloads/2016_LROC_Coordinates_of_Human_Features.pdf",
+          "supports": [
+            "coordinates",
+            "elevationM"
+          ]
+        },
+        {
+          "title": "Apollo Landing Site Coordinates",
+          "publisher": "NASA NSSDCA",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "LRO: Temperature Variation on the Moon (lithograph)",
+          "publisher": "NASA Goddard",
+          "url": "https://science.nasa.gov/wp-content/uploads/2024/01/lrolitho7temperaturevariation27may2014.pdf",
+          "supports": [
+            "temperatureC"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-006",
+      "name": "Taurus-Littrow Valley (Apollo 17)",
+      "coordinates": {
+        "latitude": 20.1911,
+        "longitude": 30.7723
+      },
+      "elevationM": -2626,
+      "terrainType": "Valley floor between massifs",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "High-Ti mare basalt",
+          "Orange pyroclastic glass",
+          "Massif breccias"
+        ],
+        "notableCompounds": [
+          "Ilmenite",
+          "Orange glass beads"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 41.0,
+          "TiO2": 8.0,
+          "Al2O3": 11.0,
+          "FeO": 17.0,
+          "MgO": 8.0,
+          "CaO": 11.0,
+          "Na2O": 0.4
+        }
+      },
+      "temperatureC": {
+        "min": -180,
+        "max": 90,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Steep massifs",
+        "Landslide deposit",
+        "Large boulders",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Basalts 3.6-3.8 Ga",
+        "features": [
+          "North and South Massifs",
+          "Tycho-related secondary material"
+        ],
+        "description": "Last crewed lunar landing (1972); samples thought to include Tycho ejecta."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "temperatureC",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Table of Anthropogenic Impacts and Spacecraft on the Moon",
+          "publisher": "NASA NSSDCA",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "LROC Coordinates of Human Features on the Moon (2016)",
+          "publisher": "NASA / Arizona State University LROC",
+          "url": "https://www.lroc.asu.edu/data/support/downloads/2016_LROC_Coordinates_of_Human_Features.pdf",
+          "supports": [
+            "elevationM"
+          ]
+        },
+        {
+          "title": "Absolute Time (Apollo basalt ages)",
+          "publisher": "NASA / ASU LROC",
+          "url": "https://www.lroc.asu.edu/images/480",
+          "supports": [
+            "geology.age"
+          ]
+        },
+        {
+          "title": "Tycho Crater on the Moon (Labeled)",
+          "publisher": "NASA Science",
+          "url": "https://science.nasa.gov/resource/tycho-crater-on-the-moon-labeled/",
+          "supports": [
+            "geology.features"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-007",
+      "name": "Shackleton Crater Interior (PSR)",
+      "coordinates": {
+        "latitude": -89.67,
+        "longitude": 129.78
+      },
+      "elevationM": -2500,
+      "terrainType": "Permanently shadowed crater floor",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Highland regolith",
+          "Possible water ice"
+        ],
+        "notableCompounds": [
+          "H2O ice (LRO data suggested up to ~22% of surface material)",
+          "Plagioclase"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 0.6,
+          "Al2O3": 27.0,
+          "FeO": 5.0,
+          "MgO": 6.0,
+          "CaO": 15.5,
+          "Na2O": 0.5
+        }
+      },
+      "temperatureC": {
+        "min": -248,
+        "max": -183,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No vapor; water ice cold-trapped in permanently shadowed regions."
+      },
+      "obstacles": [
+        "Total darkness",
+        "~30 degree walls",
+        "Boulders and hummocks from wall slumping",
+        "No direct Earth line of sight"
+      ],
+      "geology": {
+        "age": "More than 3 Ga",
+        "features": [
+          "21 km wide",
+          "~4 km deep",
+          "Permanently shadowed floor"
+        ],
+        "description": "Well-preserved bowl-shaped crater at the south pole; floor deposits nearly as old as the rim."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates (from IAU nomenclature, not a NASA page)",
+        "elevationM",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Visualizing Shackleton Crater",
+          "publisher": "NASA Goddard Scientific Visualization Studio",
+          "url": "https://svs.gsfc.nasa.gov/4716/",
+          "supports": [
+            "geology.features",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Detailed Characterization of Shackleton Crater",
+          "publisher": "NASA Lunar Science Institute",
+          "url": "https://webarchive.library.unt.edu/web/20130317133030/http://lunarscience.nasa.gov/articles/detailed-characterization-of-shackleton-crater",
+          "supports": [
+            "chemicalComposition.notableCompounds",
+            "geology.age"
+          ]
+        },
+        {
+          "title": "Diviner Lunar Radiometer - Science",
+          "publisher": "UCLA / NASA LRO",
+          "url": "https://www.diviner.ucla.edu/science",
+          "supports": [
+            "temperatureC"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-008",
+      "name": "Shackleton-de Gerlache Connecting Ridge",
+      "coordinates": {
+        "latitude": -89.45,
+        "longitude": -137.0
+      },
+      "elevationM": 1900,
+      "terrainType": "Near-permanently illuminated polar ridge",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Highland regolith",
+          "Anorthosite"
+        ],
+        "notableCompounds": [
+          "Plagioclase"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 0.6,
+          "Al2O3": 27.0,
+          "FeO": 5.0,
+          "MgO": 6.0,
+          "CaO": 15.5,
+          "Na2O": 0.5
+        }
+      },
+      "temperatureC": {
+        "min": -53,
+        "max": -53,
+        "mean": -53
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No vapor; water ice cold-trapped in permanently shadowed regions."
+      },
+      "obstacles": [
+        "Long shadows from low Sun angle",
+        "Slopes",
+        "Adjacent cold traps",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Pre-Nectarian",
+        "features": [
+          "Illuminated ridge",
+          "Adjacent PSRs"
+        ],
+        "description": "Crater rims next to PSRs can receive near-continuous sunlight and stay near 220 K (Diviner)."
+      },
+      "dataQuality": "estimated",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Diviner Lunar Radiometer - Science",
+          "publisher": "UCLA / NASA LRO",
+          "url": "https://www.diviner.ucla.edu/science",
+          "supports": [
+            "temperatureC"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-009",
+      "name": "Malapert Massif (Artemis III candidate)",
+      "coordinates": {
+        "latitude": -86.0,
+        "longitude": 0.0
+      },
+      "elevationM": 5000,
+      "terrainType": "Polar mountain with high illumination",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Highland anorthosite",
+          "Impact breccia"
+        ],
+        "notableCompounds": [
+          "Plagioclase",
+          "Pyroxene"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 0.6,
+          "Al2O3": 27.0,
+          "FeO": 5.0,
+          "MgO": 6.0,
+          "CaO": 15.5,
+          "Na2O": 0.5
+        }
+      },
+      "temperatureC": {
+        "min": -53,
+        "max": -53,
+        "mean": -53
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No vapor; water ice cold-trapped in permanently shadowed regions."
+      },
+      "obstacles": [
+        "Steep slopes descending ~8 km toward PSRs",
+        "Low Sun angle",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Pre-Nectarian",
+        "features": [
+          "Rises ~5,000 m",
+          "Near-perpetual sunlight on summit"
+        ],
+        "description": "One of NASA's nine Artemis III candidate landing regions."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "NASA Provides Update on Artemis III Moon Landing Regions",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/",
+          "supports": [
+            "name"
+          ]
+        },
+        {
+          "title": "Here are the nine sites where Artemis 3 might land on the Moon",
+          "publisher": "Astronomy Magazine",
+          "url": "https://www.astronomy.com/space-exploration/here-are-the-nine-sites-where-artemis-3-might-land-on-the-moon/",
+          "supports": [
+            "elevationM",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Diviner Lunar Radiometer - Science",
+          "publisher": "UCLA / NASA LRO",
+          "url": "https://www.diviner.ucla.edu/science",
+          "supports": [
+            "temperatureC"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-010",
+      "name": "Mons Mouton (IM-2 Athena / Artemis III candidate)",
+      "coordinates": {
+        "latitude": -84.7906,
+        "longitude": 29.1957
+      },
+      "elevationM": 6000,
+      "terrainType": "High polar plateau and peak",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Highland regolith",
+          "Anorthosite"
+        ],
+        "notableCompounds": [
+          "Plagioclase",
+          "Possible subsurface ice"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 0.6,
+          "Al2O3": 27.0,
+          "FeO": 5.0,
+          "MgO": 6.0,
+          "CaO": 15.5,
+          "Na2O": 0.5
+        }
+      },
+      "temperatureC": {
+        "min": -53,
+        "max": -53,
+        "mean": -53
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No vapor; water ice cold-trapped in permanently shadowed regions."
+      },
+      "obstacles": [
+        "Small shadowed craters (Athena tipped over in a 20 m crater)",
+        "Uneven terrain",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Pre-Nectarian",
+        "features": [
+          "Peak rises ~6,000 m",
+          "Plateau 5,000-6,000 m"
+        ],
+        "description": "Southernmost landing to date (March 2025), ~160 km from the south pole; mission ended in ~13 h."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates (from IM-2 mission records, not a NASA page)",
+        "temperatureC",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "NASA Provides Update on Artemis III Moon Landing Regions",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/",
+          "supports": [
+            "name"
+          ]
+        },
+        {
+          "title": "Here are the nine sites where Artemis 3 might land on the Moon",
+          "publisher": "Astronomy Magazine",
+          "url": "https://www.astronomy.com/space-exploration/here-are-the-nine-sites-where-artemis-3-might-land-on-the-moon/",
+          "supports": [
+            "elevationM"
+          ]
+        },
+        {
+          "title": "Dead Athena moon lander seen inside its crater (LRO images)",
+          "publisher": "Space.com",
+          "url": "https://www.space.com/the-universe/moon/dead-athena-moon-lander-seen-inside-its-crater-grave-from-lunar-orbit-photos",
+          "supports": [
+            "obstacles",
+            "geology.description"
+          ]
+        },
+        {
+          "title": "IM-2 Mission Ends Less Than A Day After Lunar Landing",
+          "publisher": "SpacePolicyOnline",
+          "url": "https://spacepolicyonline.com/news/im-2-mission-ends-one-day-after-lunar-landing/",
+          "supports": [
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-011",
+      "name": "Cabeus Crater (LCROSS impact site)",
+      "coordinates": {
+        "latitude": -84.68,
+        "longitude": -48.71
+      },
+      "elevationM": -3900,
+      "terrainType": "Permanently shadowed crater floor",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Highland regolith",
+          "Water ice",
+          "Volatiles"
+        ],
+        "notableCompounds": [
+          "H2O ice (5.6 +/- 2.9 wt%)",
+          "CO",
+          "NH3",
+          "CH4",
+          "H2S",
+          "SO2",
+          "CO2",
+          "Hg",
+          "Ag"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 0.6,
+          "Al2O3": 27.0,
+          "FeO": 5.0,
+          "MgO": 6.0,
+          "CaO": 15.5,
+          "Na2O": 0.5
+        }
+      },
+      "temperatureC": {
+        "min": -235,
+        "max": -235,
+        "mean": -235
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "Water ice confirmed by LCROSS (2009): ~155 kg of water seen in the plume."
+      },
+      "obstacles": [
+        "Total darkness",
+        "Extreme cold",
+        "No Earth line of sight"
+      ],
+      "geology": {
+        "age": "Pre-Nectarian",
+        "features": [
+          "Permanently shadowed floor",
+          "Impact crater from Centaur stage"
+        ],
+        "description": "LCROSS crashed a Centaur stage into Cabeus; water ice estimated at 5.6% by mass plus many other volatiles."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Colaprete et al. 2010, Detection of Water in the LCROSS Ejecta Plume (Science)",
+          "publisher": "Science / NASA Ames",
+          "url": "https://www.chem.uci.edu/~unicorn/old/H2A/handouts/PDFs/LCROSSPaper.pdf",
+          "supports": [
+            "chemicalComposition.notableCompounds",
+            "humidity.notes"
+          ]
+        },
+        {
+          "title": "LCROSS results: water, mercury, silver (Diviner 38 K)",
+          "publisher": "Spaceflight Now",
+          "url": "https://spaceflightnow.com/news/n1010/21lcross/",
+          "supports": [
+            "temperatureC",
+            "chemicalComposition.notableCompounds"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-012",
+      "name": "Peary Crater (North Pole)",
+      "coordinates": {
+        "latitude": 88.6,
+        "longitude": 33.0
+      },
+      "elevationM": -1800,
+      "terrainType": "Polar crater with illuminated rims",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Highland regolith",
+          "Possible ice in shadowed floor"
+        ],
+        "notableCompounds": [
+          "Plagioclase",
+          "H2O ice (possible)"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 0.6,
+          "Al2O3": 27.0,
+          "FeO": 5.0,
+          "MgO": 6.0,
+          "CaO": 15.5,
+          "Na2O": 0.5
+        }
+      },
+      "temperatureC": {
+        "min": -53,
+        "max": -53,
+        "mean": -53
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No vapor; water ice cold-trapped in permanently shadowed regions."
+      },
+      "obstacles": [
+        "Long shadows",
+        "Crater walls",
+        "Cold traps",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Nectarian",
+        "features": [
+          "Illuminated rim",
+          "Shadowed floor"
+        ],
+        "description": "Candidate north polar outpost site."
+      },
+      "dataQuality": "estimated",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "chemicalComposition",
+        "geology",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Diviner Lunar Radiometer - Science",
+          "publisher": "UCLA / NASA LRO",
+          "url": "https://www.diviner.ucla.edu/science",
+          "supports": [
+            "temperatureC"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-013",
+      "name": "Aristarchus Plateau (Cobra Head)",
+      "coordinates": {
+        "latitude": 24.82,
+        "longitude": -49.12
+      },
+      "elevationM": -1000,
+      "terrainType": "Elevated volcanic plateau with pyroclastic mantle",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Pyroclastic glass",
+          "Mare basalt",
+          "Anorthositic crust fragments"
+        ],
+        "notableCompounds": [
+          "Volcanic glass",
+          "Fe, Ti, O, H resources in pyroclastics"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 40.0,
+          "TiO2": 5.0,
+          "Al2O3": 12.0,
+          "FeO": 20.0,
+          "MgO": 10.0,
+          "CaO": 10.0,
+          "Na2O": 0.4
+        }
+      },
+      "temperatureC": {
+        "min": -180,
+        "max": 90,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Vallis Schroteri (largest sinuous rille)",
+        "Boulder-rich slopes",
+        "Landslides",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Pyroclastics 1.5-2.5 Ga; Aristarchus crater ~175 Ma",
+        "features": [
+          "Cobra Head vent",
+          "Vallis Schroteri",
+          "Aristarchus crater (40 km, 3.5 km deep)"
+        ],
+        "description": "One of the largest volcanic centers on the Moon, almost fully covered by a regional pyroclastic deposit."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Aristarchus Plateau (1): Amazing Geologic Diversity",
+          "publisher": "NASA / ASU LROC",
+          "url": "https://www.lroc.asu.edu/posts/34",
+          "supports": [
+            "coordinates",
+            "obstacles",
+            "chemicalComposition"
+          ]
+        },
+        {
+          "title": "Dramatic Contrast (Aristarchus crater and plateau)",
+          "publisher": "NASA / ASU LROC",
+          "url": "https://www.lroc.asu.edu/posts/1277",
+          "supports": [
+            "geology.age"
+          ]
+        },
+        {
+          "title": "Striated blocks in Aristarchus crater",
+          "publisher": "NASA / ASU LROC",
+          "url": "https://www.lroc.asu.edu/posts/291",
+          "supports": [
+            "geology.features",
+            "geology.age"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-014",
+      "name": "Marius Hills Skylight",
+      "coordinates": {
+        "latitude": 14.09,
+        "longitude": -56.77
+      },
+      "elevationM": -1800,
+      "terrainType": "Volcanic domes with a lava-tube pit",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Mare basalt",
+          "Volcanic domes"
+        ],
+        "notableCompounds": [
+          "Pyroxene",
+          "Olivine",
+          "Plagioclase"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 3.0,
+          "Al2O3": 12.0,
+          "FeO": 17.0,
+          "MgO": 10.0,
+          "CaO": 10.5,
+          "Na2O": 0.4
+        }
+      },
+      "temperatureC": {
+        "min": -130,
+        "max": 120,
+        "mean": 17
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Pit ~34 m deep, 65 x 90 m wide",
+        "Domes",
+        "Rilles",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Eratosthenian",
+        "features": [
+          "Lava tube skylight",
+          "Volcanic domes"
+        ],
+        "description": "Shaded parts of lunar pits stay near 17 C; pits may lead to caves sheltering from radiation and micrometeorites."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "NASA's LRO Finds Lunar Pits Harbor Comfortable Temperatures",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/solar-system/moon/nasas-lro-finds-lunar-pits-harbor-comfortable-temperatures/",
+          "supports": [
+            "obstacles",
+            "temperatureC.mean",
+            "geology.description"
+          ]
+        },
+        {
+          "title": "LRO: Temperature Variation on the Moon (lithograph)",
+          "publisher": "NASA Goddard",
+          "url": "https://science.nasa.gov/wp-content/uploads/2024/01/lrolitho7temperaturevariation27may2014.pdf",
+          "supports": [
+            "temperatureC"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-015",
+      "name": "Tycho Crater",
+      "coordinates": {
+        "latitude": -43.31,
+        "longitude": -11.36
+      },
+      "elevationM": -1500,
+      "terrainType": "Young complex crater with central peak",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Impact melt",
+          "Highland anorthosite"
+        ],
+        "notableCompounds": [
+          "Plagioclase",
+          "Impact melt glass"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 0.6,
+          "Al2O3": 27.0,
+          "FeO": 5.0,
+          "MgO": 6.0,
+          "CaO": 15.5,
+          "Na2O": 0.5
+        }
+      },
+      "temperatureC": {
+        "min": -180,
+        "max": 90,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Fresh steep walls",
+        "Melt pools",
+        "Boulders",
+        "Central peak ~2 km tall",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "About 108 Ma",
+        "features": [
+          "85 km diameter",
+          "Ray system"
+        ],
+        "description": "Age from Apollo 17 samples thought to be Tycho ejecta collected >1,000 km away."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates (from IAU nomenclature)",
+        "elevationM",
+        "temperatureC",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Tycho Crater on the Moon (Labeled)",
+          "publisher": "NASA Science",
+          "url": "https://science.nasa.gov/resource/tycho-crater-on-the-moon-labeled/",
+          "supports": [
+            "geology"
+          ]
+        },
+        {
+          "title": "Copernicus Central Peak",
+          "publisher": "NASA / ASU LROC",
+          "url": "https://www.lroc.asu.edu/images/675",
+          "supports": [
+            "geology.features",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-016",
+      "name": "Copernicus Crater",
+      "coordinates": {
+        "latitude": 9.62,
+        "longitude": -20.08
+      },
+      "elevationM": -3800,
+      "terrainType": "Complex crater with terraced walls",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Impact melt",
+          "Mixed mare/highland rocks",
+          "Olivine (central peaks)"
+        ],
+        "notableCompounds": [
+          "Olivine",
+          "Pyroxene",
+          "Plagioclase"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 2.0,
+          "Al2O3": 17.0,
+          "FeO": 12.0,
+          "MgO": 9.0,
+          "CaO": 12.0,
+          "Na2O": 0.5
+        }
+      },
+      "temperatureC": {
+        "min": -130,
+        "max": 120,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Terraced walls",
+        "Central peaks",
+        "Rough melt floor",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "About 800 Ma",
+        "features": [
+          "93 km diameter",
+          "Central peaks",
+          "Rays"
+        ],
+        "description": "Candidate site for the cancelled Apollo 18 and a Constellation region of interest."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "elevationM",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Copernicus Central Peak",
+          "publisher": "NASA / ASU LROC",
+          "url": "https://www.lroc.asu.edu/images/675",
+          "supports": [
+            "coordinates",
+            "geology"
+          ]
+        },
+        {
+          "title": "LRO: Temperature Variation on the Moon (lithograph)",
+          "publisher": "NASA Goddard",
+          "url": "https://science.nasa.gov/wp-content/uploads/2024/01/lrolitho7temperaturevariation27may2014.pdf",
+          "supports": [
+            "temperatureC"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-017",
+      "name": "Von Karman Crater (Chang'e 4)",
+      "coordinates": {
+        "latitude": -45.4446,
+        "longitude": 177.5991
+      },
+      "elevationM": -5935,
+      "terrainType": "Far-side crater floor within the South Pole-Aitken basin",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Mare basalt fill",
+          "SPA ejecta"
+        ],
+        "notableCompounds": [
+          "Low-Ca pyroxene",
+          "Olivine",
+          "Plagioclase"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "TiO2": 0.8,
+          "Al2O3": 18.0,
+          "FeO": 10.0,
+          "MgO": 12.0,
+          "CaO": 11.0,
+          "Na2O": 0.4
+        }
+      },
+      "temperatureC": {
+        "min": -180,
+        "max": 90,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "No direct Earth communication (relay needed)",
+        "Small craters",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Von Karman pre-Nectarian; SPA ~4.2-4.3 Ga",
+        "features": [
+          "Crater floor",
+          "SPA basin"
+        ],
+        "description": "First landing on the lunar far side (3 January 2019)."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "temperatureC",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Liu et al. 2019, Descent trajectory reconstruction and landing site positioning of Chang'E-4 (Nature Communications)",
+          "publisher": "Nature Communications",
+          "url": "https://doi.org/10.1038/s41467-019-12278-3",
+          "supports": [
+            "coordinates",
+            "elevationM"
+          ]
+        },
+        {
+          "title": "Chang'e 4 Lander Coordinates",
+          "publisher": "NASA / ASU LROC",
+          "url": "https://www.lroc.asu.edu/posts/1087",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-018",
+      "name": "Mare Imbrium (Chang'e 3 / Yutu)",
+      "coordinates": {
+        "latitude": 44.1214,
+        "longitude": -19.5117
+      },
+      "elevationM": -2640,
+      "terrainType": "Northern mare basalt plain",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Mare basalt",
+          "Regolith"
+        ],
+        "notableCompounds": [
+          "Pyroxene",
+          "Olivine",
+          "Ilmenite"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 3.0,
+          "Al2O3": 12.0,
+          "FeO": 17.0,
+          "MgO": 10.0,
+          "CaO": 10.5,
+          "Na2O": 0.4
+        }
+      },
+      "temperatureC": {
+        "min": -180,
+        "max": 90,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Small craters",
+        "Rocks",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Eratosthenian-Imbrian",
+        "features": [
+          "Mare plain",
+          "Layered subsurface (radar)"
+        ],
+        "description": "Chang'e 3 landed 14 December 2013."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Table of Anthropogenic Impacts and Spacecraft on the Moon",
+          "publisher": "NASA NSSDCA",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-019",
+      "name": "Northern Oceanus Procellarum (Chang'e 5)",
+      "coordinates": {
+        "latitude": 43.06,
+        "longitude": -51.92
+      },
+      "elevationM": -2000,
+      "terrainType": "Young mare basalt plain ~170 km ENE of Mons Rumker",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Young intermediate-Ti mare basalt",
+          "Regolith"
+        ],
+        "notableCompounds": [
+          "Clinopyroxene",
+          "Plagioclase",
+          "Ilmenite",
+          "Th 5-8.5 ppm"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 42.0,
+          "TiO2": 6.5,
+          "Al2O3": 11.0,
+          "FeO": 22.0,
+          "MgO": 6.0,
+          "CaO": 11.0,
+          "Na2O": 0.4
+        }
+      },
+      "temperatureC": {
+        "min": -180,
+        "max": 90,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Rima Sharp rille ~15 km east",
+        "Small craters",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Basalts 1,963 +/- 57 Ma",
+        "features": [
+          "Em4/P58 mare unit",
+          "Rima Sharp"
+        ],
+        "description": "Samples (1,731 g) returned in December 2020 proved volcanism lasted until ~2 Ga."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Li et al. / Snape et al. 2021, Age and composition of the youngest basalts on the Moon returned by Chang'e-5 (Science)",
+          "publisher": "Science",
+          "url": "https://core.ac.uk/download/479416188.pdf",
+          "supports": [
+            "coordinates",
+            "geology.age",
+            "chemicalComposition"
+          ]
+        },
+        {
+          "title": "Qian et al. 2021, China's Chang'e-5 landing site: Geology, stratigraphy, and provenance (EPSL)",
+          "publisher": "Earth and Planetary Science Letters",
+          "url": "https://cris-portal.uni-muenster.de/portal/en/publication/77549177",
+          "supports": [
+            "coordinates",
+            "geology"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-020",
+      "name": "Mare Crisium - Mons Latreille (Blue Ghost 1)",
+      "coordinates": {
+        "latitude": 18.56,
+        "longitude": 61.81
+      },
+      "elevationM": -2600,
+      "terrainType": "Heavily cratered mare plain in an impact basin",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Mare basalt",
+          "Regolith"
+        ],
+        "notableCompounds": [
+          "Pyroxene",
+          "Olivine"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 3.0,
+          "Al2O3": 12.0,
+          "FeO": 17.0,
+          "MgO": 10.0,
+          "CaO": 10.5,
+          "Na2O": 0.4
+        }
+      },
+      "temperatureC": {
+        "min": -180,
+        "max": 90,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Craters",
+        "Volcanic cone ~4 km away",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Surface >3 Ga; basin ~4 Ga",
+        "features": [
+          "Mons Latreille volcanic cone",
+          "Crisium basin (>500 km)"
+        ],
+        "description": "First fully successful commercial Moon landing (2 March 2025) with 10 NASA instruments."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Firefly Blue Ghost Landing Region",
+          "publisher": "NASA / ASU LROC",
+          "url": "https://www.lroc.im-ldi.com/images/1400",
+          "supports": [
+            "coordinates",
+            "geology"
+          ]
+        },
+        {
+          "title": "Touchdown! Carrying NASA Science, Firefly's Blue Ghost Lands on Moon",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/news-release/touchdown-carrying-nasa-science-fireflys-blue-ghost-lands-on-moon/",
+          "supports": [
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-021",
+      "name": "Reiner Gamma Swirl",
+      "coordinates": {
+        "latitude": 7.5,
+        "longitude": -59.0
+      },
+      "elevationM": -1700,
+      "terrainType": "Mare plain with a bright albedo swirl",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Mare basalt",
+          "Less space-weathered regolith"
+        ],
+        "notableCompounds": [
+          "Pyroxene",
+          "Nanophase iron (reduced)"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 45.0,
+          "TiO2": 3.0,
+          "Al2O3": 12.0,
+          "FeO": 17.0,
+          "MgO": 10.0,
+          "CaO": 10.5,
+          "Na2O": 0.4
+        }
+      },
+      "temperatureC": {
+        "min": -130,
+        "max": 120,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components. Crustal magnetic anomaly creates a mini-magnetosphere that deflects solar wind."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Fine dust",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Mare Imbrian; swirl age unknown",
+        "features": [
+          "Lunar swirl",
+          "Magnetic anomaly"
+        ],
+        "description": "Type example of lunar swirls; target of NASA's Lunar Vertex (PRISM) mission."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "chemicalComposition.notableCompounds",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Lunar Vertex: a PRISM science investigation of the Reiner Gamma magnetic anomaly",
+          "publisher": "EGU / Johns Hopkins APL",
+          "url": "https://essopenarchive.org/doi/full/10.1002/essoar.10509480.2",
+          "supports": [
+            "geology",
+            "atmosphere.notes"
+          ]
+        },
+        {
+          "title": "LRO: Temperature Variation on the Moon (lithograph)",
+          "publisher": "NASA Goddard",
+          "url": "https://science.nasa.gov/wp-content/uploads/2024/01/lrolitho7temperaturevariation27may2014.pdf",
+          "supports": [
+            "temperatureC"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MOON-022",
+      "name": "Gruithuisen Domes",
+      "coordinates": {
+        "latitude": 36.3,
+        "longitude": -40.5
+      },
+      "elevationM": -500,
+      "terrainType": "Steep silicic volcanic domes on the Imbrium rim",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Silicic volcanic rock (inferred)",
+          "Highland regolith"
+        ],
+        "notableCompounds": [
+          "Si- and Th-enriched, Fe-depleted material"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 65.0,
+          "TiO2": 0.5,
+          "Al2O3": 14.0,
+          "FeO": 3.0,
+          "MgO": 1.5,
+          "CaO": 3.0,
+          "Na2O": 2.0,
+          "K2O": 4.0
+        }
+      },
+      "temperatureC": {
+        "min": -180,
+        "max": 90,
+        "mean": null
+      },
+      "atmosphere": {
+        "type": "exosphere",
+        "surfacePressureKPa": 3e-13,
+        "compositionPercent": null,
+        "exosphereNumberDensityPerCm3": {
+          "He4": 40000,
+          "Ne20": 40000,
+          "H2": 35000,
+          "Ar40": 30000,
+          "Ne22": 5000,
+          "Ar36": 2000,
+          "CH4": 1000,
+          "NH3": 1000,
+          "CO2": 1000
+        },
+        "notes": "NSSDC: night surface pressure 3e-15 bar; total mass ~25,000 kg; densities are upper-limit night estimates. LADEE confirmed He, Ne and Ar as the main components."
+      },
+      "humidity": {
+        "relativeHumidityPercent": null,
+        "waterVaporColumnPrMicrons": null,
+        "notes": "No liquid water or vapor; only trace bound OH/H2O in regolith."
+      },
+      "obstacles": [
+        "Steep dome slopes",
+        "Boulders",
+        "Abrasive electrostatic dust",
+        "~14-15 Earth-day lunar night",
+        "Radiation and micrometeorites"
+      ],
+      "geology": {
+        "age": "Imbrian",
+        "features": [
+          "Gamma and Delta domes"
+        ],
+        "description": "Rare silica-rich volcanism; target of NASA's Lunar-VISE investigation (CLPS)."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Lunar-VISE: About the Gruithuisen Domes / Objectives",
+          "publisher": "University of Central Florida (NASA PRISM)",
+          "url": "https://sciences.ucf.edu/lunarvise/objectives/",
+          "supports": [
+            "chemicalComposition",
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Moon Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+          "supports": [
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "What is LADEE, the Lunar Atmosphere and Dust Environment Explorer?",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=263214",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        }
+      ]
+    }
+  ]
+}

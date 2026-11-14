@@ -1,0 +1,2696 @@
+{
+  "metadata": {
+    "body": "Mars",
+    "schemaVersion": "2.0.0",
+    "regionCount": 22,
+    "coordinateSystem": "Planetocentric latitude; longitude east-positive in [-180, 180]",
+    "units": {
+      "elevationM": "meters relative to body datum",
+      "temperatureC": "degrees Celsius",
+      "surfacePressureKPa": "kilopascals",
+      "majorOxidesWtPercent": "weight percent",
+      "relativeHumidityPercent": "percent"
+    },
+    "dataQualityLevels": {
+      "measured-in-situ": "Measured by a lander, rover, crew or ground station at/near the site",
+      "orbital-remote-sensing": "Derived mainly from orbital instruments",
+      "estimated": "Representative value inferred from regional context"
+    },
+    "fieldConventions": {
+      "sources": "Citations for this region; 'supports' lists the fields each source backs up",
+      "estimatedFields": "Fields NOT confirmed by a cited source; treat them as representative estimates",
+      "majorOxidesWtPercent": "Always a representative template for the terrain class (mare, highland, basaltic soil, etc.), not a site measurement unless a source says otherwise"
+    },
+    "globalSources": [
+      {
+        "title": "Mars Fact Sheet",
+        "publisher": "NASA NSSDCA / Goddard",
+        "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+        "supports": [
+          "atmosphere.surfacePressureKPa",
+          "scale height"
+        ]
+      },
+      {
+        "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+        "publisher": "NASA Goddard / AGU",
+        "url": "https://doi.org/10.1029/2019JE006175",
+        "supports": [
+          "atmosphere.compositionPercent"
+        ]
+      }
+    ],
+    "datum": "MOLA areoid",
+    "temperatureNote": "Near-surface air temperature",
+    "pressureModel": "P = 0.636 kPa * exp(-h / 11.0 km) (NSSDC values)"
+  },
+  "regions": [
+    {
+      "regionId": "MARS-001",
+      "name": "Jezero Crater (Perseverance)",
+      "coordinates": {
+        "latitude": 18.44,
+        "longitude": 77.45
+      },
+      "elevationM": -2600,
+      "terrainType": "Crater floor with ancient river delta",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Olivine-rich cumulate (Seitah)",
+          "Basaltic lava (Maaz)",
+          "Delta sediments"
+        ],
+        "notableCompounds": [
+          "Fe-Mg carbonates",
+          "Sulfates",
+          "Perchlorates",
+          "Hydrated silicates",
+          "Iron oxides"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 42.0,
+          "FeO": 20.0,
+          "MgO": 16.0,
+          "Al2O3": 5.0,
+          "CaO": 5.0,
+          "Na2O": 1.5,
+          "SO3": 3.0,
+          "CO2_carbonate": 3.0
+        }
+      },
+      "temperatureC": {
+        "min": -88,
+        "max": -22,
+        "mean": -55
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.806,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "MEDA measured ~718 Pa shortly after landing. Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": "Liquid water unstable at the surface"
+      },
+      "obstacles": [
+        "Boulder fields",
+        "Delta scarps",
+        "Sand ripples",
+        "Frequent dust devils (most of any Mars landing site)"
+      ],
+      "geology": {
+        "age": "Lake and delta ~3.5-3.8 Ga",
+        "features": [
+          "Western delta",
+          "Seitah olivine unit",
+          "Maaz lava unit"
+        ],
+        "description": "Crater floor of igneous rocks altered by water; Fe-Mg carbonates indicate reaction with CO2-rich water; voids hold sulfates and perchlorates."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "elevationM",
+        "humidity",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Rodriguez-Manfredi et al. 2023, The diverse meteorology of Jezero crater (Nature Geoscience)",
+          "publisher": "Nature Geoscience / NASA Mars 2020",
+          "url": "https://link.springer.com/article/10.1038/s41561-022-01084-0",
+          "supports": [
+            "coordinates",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Perseverance MEDA weather instrument overview",
+          "publisher": "NASA",
+          "url": "https://www.nasa.gov/?p=71176",
+          "supports": [
+            "temperatureC.min",
+            "temperatureC.max"
+          ]
+        },
+        {
+          "title": "Mars 2020 Perseverance Landing Press Kit - Quick Facts",
+          "publisher": "NASA JPL",
+          "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/quick_facts",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "Farley et al. 2022, Aqueously altered igneous rocks sampled on the floor of Jezero crater (Science)",
+          "publisher": "Science / USGS",
+          "url": "https://doi.org/10.1126/science.abo2196",
+          "supports": [
+            "chemicalComposition",
+            "geology"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-002",
+      "name": "Gale Crater - Aeolis Mons base (Curiosity)",
+      "coordinates": {
+        "latitude": -4.59,
+        "longitude": 137.44
+      },
+      "elevationM": -4501,
+      "terrainType": "Crater floor and layered central mound",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Lacustrine mudstone",
+          "Sandstone",
+          "Sulfate-bearing layers",
+          "Hematite ridge"
+        ],
+        "notableCompounds": [
+          "Ca-sulfate veins",
+          "Smectite",
+          "Hematite",
+          "Methane (trace, ~0.4 ppb average; spike to ~7 ppb)"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 38.0,
+          "FeO": 16.0,
+          "SO3": 20.0,
+          "MgO": 7.0,
+          "CaO": 5.0,
+          "Al2O3": 6.0,
+          "Na2O": 2.0,
+          "Cl": 0.6
+        }
+      },
+      "temperatureC": {
+        "min": -100,
+        "max": 15.9,
+        "mean": -45
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.958,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Largest diurnal pressure variations seen by any lander (REMS). Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": "REMS: very dry, never reached saturation; RH up to 70% on winter nights; vapor 1,000-10,000x less than Earth"
+      },
+      "obstacles": [
+        "Sharp ventifact rocks (wheel damage)",
+        "Bagnold dunes",
+        "Steep layered slopes"
+      ],
+      "geology": {
+        "age": "About 3.6-3.8 Ga",
+        "features": [
+          "Aeolis Mons (Mount Sharp)",
+          "Bagnold dunes",
+          "Vera Rubin ridge"
+        ],
+        "description": "Ancient lake basin recording a habitable environment; Curiosity climbed ~740 m up Mount Sharp by sol 3967."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "temperatureC.mean",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Gomez-Elvira et al. 2014, Curiosity's REMS: Overview of the first 100 sols (JGR Planets)",
+          "publisher": "AGU / NASA MSL",
+          "url": "https://doi.org/10.1002/2013JE004576",
+          "supports": [
+            "coordinates",
+            "humidity",
+            "atmosphere"
+          ]
+        },
+        {
+          "title": "Second Cycle of Martian Seasons Completing for Curiosity Rover",
+          "publisher": "NASA JPL",
+          "url": "https://www.jpl.nasa.gov/news/second-cycle-of-martian-seasons-completing-for-curiosity-rover/",
+          "supports": [
+            "temperatureC.min",
+            "temperatureC.max",
+            "humidity",
+            "chemicalComposition.notableCompounds"
+          ]
+        },
+        {
+          "title": "Ruiz et al. 2025, Meteorological Changes Across Curiosity's Traverse Using REMS (Remote Sensing)",
+          "publisher": "MDPI",
+          "url": "https://doaj.org/article/23276ef14a04425698349fef3377174a",
+          "supports": [
+            "elevationM"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-003",
+      "name": "Olympus Mons Summit Caldera",
+      "coordinates": {
+        "latitude": 18.65,
+        "longitude": -133.8
+      },
+      "elevationM": 21000,
+      "terrainType": "Shield volcano summit with nested calderas",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Basaltic lava flows",
+          "Dust mantle"
+        ],
+        "notableCompounds": [
+          "Pyroxene",
+          "Plagioclase",
+          "Fe-oxides"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -130,
+        "max": -60,
+        "mean": -95
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.094,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Lowest surface pressure on Mars. Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 40,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 1,
+          "max": 5
+        },
+        "notes": "Orographic water-ice clouds form on the flanks"
+      },
+      "obstacles": [
+        "Summit caldera ~3 km deep",
+        "Basal scarp up to 6 km high",
+        "Very low pressure",
+        "Thick dust"
+      ],
+      "geology": {
+        "age": "Young surface flows (Amazonian)",
+        "features": [
+          "27 km above surrounding plains",
+          ">600 km base",
+          "Caldera ~25 km across"
+        ],
+        "description": "Largest known volcano in the Solar System; highest point on Mars ~21 km above the reference level."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "temperatureC",
+        "humidity",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "PIA00300: Olympus Mons",
+          "publisher": "NASA JPL Photojournal",
+          "url": "https://www.jpl.nasa.gov/images/pia00300-olympus-mons/",
+          "supports": [
+            "geology.features",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Olympus Mons caldera (PIA00300 detail)",
+          "publisher": "NASA Science",
+          "url": "https://science.nasa.gov/image-detail/amf-pia00300/",
+          "supports": [
+            "obstacles",
+            "geology.features"
+          ]
+        },
+        {
+          "title": "Mars - Character of the surface",
+          "publisher": "Encyclopaedia Britannica",
+          "url": "https://www.britannica.com/place/Mars-planet/Character-of-the-surface",
+          "supports": [
+            "elevationM"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-004",
+      "name": "Valles Marineris - Coprates Chasma",
+      "coordinates": {
+        "latitude": -13.0,
+        "longitude": -61.0
+      },
+      "elevationM": -5000,
+      "terrainType": "Deep canyon floor with layered walls",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Layered basalt walls",
+          "Interior layered deposits",
+          "Landslide debris"
+        ],
+        "notableCompounds": [
+          "Phyllosilicates in wall layers",
+          "Hydrated sulfates",
+          "Hematite"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 38.0,
+          "FeO": 16.0,
+          "SO3": 20.0,
+          "MgO": 7.0,
+          "CaO": 5.0,
+          "Al2O3": 6.0,
+          "Na2O": 2.0,
+          "Cl": 0.6
+        }
+      },
+      "temperatureC": {
+        "min": -90,
+        "max": 10,
+        "mean": -45
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 1.002,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 80,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 25
+        },
+        "notes": "Morning haze in canyon"
+      },
+      "obstacles": [
+        "Walls up to 7 km (locally 9 km) deep",
+        "Giant landslides",
+        "Talus slopes"
+      ],
+      "geology": {
+        "age": "Noachian-Hesperian",
+        "features": [
+          "4,000 km long system",
+          "Up to 600 km wide",
+          "7 km thick exposed layer sequence"
+        ],
+        "description": "Canyon formed mainly by faulting; CRISM shows multiple phyllosilicate-bearing layers in a 7 km thick wall section of Coprates Chasma."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "A small planet with dramatic landscapes (Valles Marineris)",
+          "publisher": "ESA Mars Express",
+          "url": "https://esa.int/Science_Exploration/Space_Science/Mars_Express/A_small_planet_with_dramatic_landscapes",
+          "supports": [
+            "geology.features",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "PIA11732: Four Types of Deposits From Wet Conditions on Early Mars",
+          "publisher": "NASA JPL / MRO CRISM",
+          "url": "https://science.nasa.gov/photojournal/four-types-of-deposits-from-wet-conditions-on-early-mars/",
+          "supports": [
+            "chemicalComposition",
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-005",
+      "name": "Hellas Planitia Floor",
+      "coordinates": {
+        "latitude": -42.4,
+        "longitude": 70.5
+      },
+      "elevationM": -7152,
+      "terrainType": "Deep impact basin floor",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Basin-fill sediments",
+          "Possible buried ice (lobate debris aprons)"
+        ],
+        "notableCompounds": [
+          "Phyllosilicates",
+          "Pyroxene",
+          "H2O ice (subsurface)"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -120,
+        "max": 10,
+        "mean": -55
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 1.219,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Modelled maximum ~1.24 kPa at basin bottom (Haberle et al. 2001); above water triple point. Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 90,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 30
+        },
+        "notes": "Liquid water could be transiently stable under some conditions"
+      },
+      "obstacles": [
+        "Dust storms (global dust source)",
+        "Ice-rich debris aprons",
+        "Cold winters"
+      ],
+      "geology": {
+        "age": "Ancient impact (Noachian, >3.9 Ga)",
+        "features": [
+          "~2,000-2,300 km basin",
+          ">7 km deep",
+          "Lowest point ~8.2 km below datum"
+        ],
+        "description": "Largest impact feature on Mars; ovoid landforms suggest past ice or water in the deposits."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "temperatureC",
+        "humidity",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "PIA04044: Floor of Hellas Basin",
+          "publisher": "NASA JPL / Mars Odyssey THEMIS",
+          "url": "https://pds-rings.seti.org/press_releases/pages/PIA04xxx/PIA04044.html",
+          "supports": [
+            "geology.features",
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Explorer's Guide to Impact Craters - Hellas",
+          "publisher": "Planetary Science Institute",
+          "url": "https://www.psi.edu/epo/resources/impact-craters/virtual-tours/hellas/directions",
+          "supports": [
+            "geology.features"
+          ]
+        },
+        {
+          "title": "Hellas Planitia (citing USGS Gazetteer and Haberle et al. 2001, JGR)",
+          "publisher": "Wikipedia",
+          "url": "https://www.wikipedia.com/wiki/Hellas_Basin",
+          "supports": [
+            "coordinates",
+            "elevationM",
+            "atmosphere.notes"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-006",
+      "name": "Utopia Planitia (Zhurong)",
+      "coordinates": {
+        "latitude": 25.066,
+        "longitude": 109.925
+      },
+      "elevationM": -4099,
+      "terrainType": "Smooth northern lowland plains",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Basaltic regolith",
+          "Duricrust"
+        ],
+        "notableCompounds": [
+          "Hydrated minerals",
+          "Sulfates"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -95,
+        "max": -5,
+        "mean": -55
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.923,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 80,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": "Suspected subsurface ice in Utopia Planitia"
+      },
+      "obstacles": [
+        "Troughs",
+        "Pitted cones",
+        "Raised ridges",
+        "Sand dunes",
+        "Crater ejecta"
+      ],
+      "geology": {
+        "age": "Hesperian-Amazonian",
+        "features": [
+          "Pitted cones",
+          "Troughs",
+          "Mesas"
+        ],
+        "description": "Zhurong landed near the highland-lowland boundary and suspected ancient shorelines."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "temperatureC",
+        "humidity",
+        "chemicalComposition",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Liu et al. 2022, Geomorphic contexts and science focus of the Zhurong landing site (Nature Astronomy)",
+          "publisher": "Nature Astronomy / CNSA",
+          "url": "https://link.springer.com/10.1038/s41550-021-01519-5",
+          "supports": [
+            "coordinates",
+            "elevationM",
+            "obstacles",
+            "geology"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-007",
+      "name": "Meridiani Planum (Opportunity)",
+      "coordinates": {
+        "latitude": -1.9462,
+        "longitude": -5.5266
+      },
+      "elevationM": -1400,
+      "terrainType": "Flat plains of sulfate-rich sandstone",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Sulfate-rich sandstone",
+          "Basaltic sand",
+          "Hematite spherules ('blueberries')"
+        ],
+        "notableCompounds": [
+          "Hematite Fe2O3",
+          "Jarosite",
+          "Mg/Ca sulfates"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 40.0,
+          "FeO_total": 22.0,
+          "SO3": 12.0,
+          "Al2O3": 7.0,
+          "MgO": 6.0,
+          "CaO": 5.0,
+          "Na2O": 2.0,
+          "Cl": 0.5
+        }
+      },
+      "temperatureC": {
+        "min": -90,
+        "max": 5,
+        "mean": -50
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.722,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": "Evidence of ancient acidic groundwater"
+      },
+      "obstacles": [
+        "Sand ripples (wheel entrapment)",
+        "Crater rims"
+      ],
+      "geology": {
+        "age": "About 3.5-3.7 Ga",
+        "features": [
+          "Eagle, Endurance, Victoria, Endeavour craters"
+        ],
+        "description": "Chosen because orbital TES data showed hematite, which on Earth often forms in water; Opportunity operated ~15 years until the 2018 dust storm."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "MER mission description (landing coordinates, MOLA IAU 2000 frame)",
+          "publisher": "NASA PDS Geosciences Node",
+          "url": "https://pds-geosciences.wustl.edu/mer/urn-nasa-pds-mer_documentation/document/mission/mer_mission.txt",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "Mars Exploration Rovers - Opportunity at Meridiani Planum",
+          "publisher": "NASA JSC ARES",
+          "url": "https://ares.jsc.nasa.gov/missions/mer/",
+          "supports": [
+            "chemicalComposition",
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-008",
+      "name": "Gusev Crater - Columbia Hills (Spirit)",
+      "coordinates": {
+        "latitude": -14.5692,
+        "longitude": 175.4729
+      },
+      "elevationM": -1940,
+      "terrainType": "Crater floor with volcanic plains and hills",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Olivine basalt",
+          "Opaline silica",
+          "Altered volcanic rocks"
+        ],
+        "notableCompounds": [
+          "Olivine",
+          "Opaline silica",
+          "Fe-sulfates",
+          "Goethite"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -95,
+        "max": 0,
+        "mean": -55
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.759,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": "Silica deposits suggest past hydrothermal activity"
+      },
+      "obstacles": [
+        "Soft soil traps (Spirit stuck at 'Troy', 2009)",
+        "Rocky hills"
+      ],
+      "geology": {
+        "age": "About 3.7 Ga",
+        "features": [
+          "Columbia Hills",
+          "Home Plate",
+          "Bonneville crater"
+        ],
+        "description": "Spirit landed 13.4 km from its target inside Gusev; floor basalts are olivine-rich."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition.notableCompounds",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Spirit (MER-A) mission page",
+          "publisher": "NASA Science",
+          "url": "https://science.nasa.gov/mission/mer-spirit/",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "Spirit becomes stuck at Troy, Home Plate",
+          "publisher": "NASA Science",
+          "url": "https://science.nasa.gov/?p=106398",
+          "supports": [
+            "obstacles"
+          ]
+        },
+        {
+          "title": "MER mission description (landing coordinates, MOLA IAU 2000 frame)",
+          "publisher": "NASA PDS Geosciences Node",
+          "url": "https://pds-geosciences.wustl.edu/mer/urn-nasa-pds-mer_documentation/document/mission/mer_mission.txt",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-009",
+      "name": "Elysium Planitia (InSight)",
+      "coordinates": {
+        "latitude": 4.5024,
+        "longitude": 135.6234
+      },
+      "elevationM": -2613,
+      "terrainType": "Smooth plains of lava flows",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Basaltic lava",
+          "Sandy, granule- and pebble-rich regolith"
+        ],
+        "notableCompounds": [
+          "Pyroxene",
+          "Olivine"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -100,
+        "max": -15,
+        "mean": -60
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.807,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": ""
+      },
+      "obstacles": [
+        "Hard duricrust (blocked heat probe)",
+        "Dust",
+        "Few rocks"
+      ],
+      "geology": {
+        "age": "Hesperian plains",
+        "features": [
+          "Degraded impact crater ('Homestead hollow')"
+        ],
+        "description": "Selected as flat, smooth, low and sunny enough for a stationary solar lander."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "temperatureC",
+        "humidity",
+        "obstacles",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Parker et al. 2020, Precise location of the InSight lander (Earth and Space Science)",
+          "publisher": "AGU / NASA JPL (PMC)",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7583488",
+          "supports": [
+            "coordinates",
+            "elevationM"
+          ]
+        },
+        {
+          "title": "InSight Landing Press Kit - Landing Site",
+          "publisher": "NASA JPL",
+          "url": "https://www.jpl.nasa.gov/news/press_kits/insight/landing/mission/landing-site",
+          "supports": [
+            "terrainType",
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-010",
+      "name": "Arsia Mons Summit",
+      "coordinates": {
+        "latitude": -9.0,
+        "longitude": -121.0
+      },
+      "elevationM": 17700,
+      "terrainType": "Shield volcano summit with large caldera",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Basaltic lava",
+          "Dust mantle"
+        ],
+        "notableCompounds": [
+          "Pyroxene",
+          "Plagioclase"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -125,
+        "max": -50,
+        "mean": -90
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.127,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 50,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 1,
+          "max": 5
+        },
+        "notes": ""
+      },
+      "obstacles": [
+        "Possible cave skylights 100-250 m wide",
+        "Pit chains",
+        "Steep flanks"
+      ],
+      "geology": {
+        "age": "Amazonian",
+        "features": [
+          "Summit caldera",
+          "'Seven Sisters' cave skylights"
+        ],
+        "description": "Southernmost Tharsis Montes volcano; THEMIS found seven possible cave entrances on its flanks."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "PIA09929: Seven Possible Cave Skylights on Mars",
+          "publisher": "NASA JPL / Mars Odyssey THEMIS",
+          "url": "https://photojournal.jpl.nasa.gov/catalog/PIA09929",
+          "supports": [
+            "coordinates",
+            "geology.features"
+          ]
+        },
+        {
+          "title": "Heat-sensing camera finds 'skylights' on Mars",
+          "publisher": "Arizona State University (NASA Mars Odyssey)",
+          "url": "https://news.asu.edu/content/heat-sensing-camera-finds-skylights-mars",
+          "supports": [
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-011",
+      "name": "North Polar Cap (Planum Boreum)",
+      "coordinates": {
+        "latitude": 87.0,
+        "longitude": 0.0
+      },
+      "elevationM": -2000,
+      "terrainType": "Polar water-ice cap with spiral troughs",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Water ice",
+          "Dust layers",
+          "Seasonal CO2 frost (~1 m)"
+        ],
+        "notableCompounds": [
+          "H2O ice",
+          "CO2 frost (winter)"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -150,
+        "max": -35,
+        "mean": -90
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.763,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 100,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 20,
+          "max": 100
+        },
+        "notes": ""
+      },
+      "obstacles": [
+        "Spiral troughs",
+        "Chasma Boreale",
+        "Polar night"
+      ],
+      "geology": {
+        "age": "Layers ~1-5 Ma",
+        "features": [
+          "~1,100 km diameter",
+          "Water ice up to ~3 km thick"
+        ],
+        "description": "Mostly water ice; the ~1 m seasonal dry-ice layer sublimates completely each northern summer."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC.max",
+        "temperatureC.mean",
+        "humidity",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Martian polar caps are almost entirely water ice (Byrne & Ingersoll 2003, Science)",
+          "publisher": "Caltech",
+          "url": "https://www.caltech.edu/news/martian-polar-caps-are-almost-entirelywater-ice-caltech-research-shows-660",
+          "supports": [
+            "chemicalComposition"
+          ]
+        },
+        {
+          "title": "Mars Polar Regions",
+          "publisher": "Windows to the Universe (NESTA, NASA-supported)",
+          "url": "https://windows2universe.org/mars/places/mars_polar_regions.html",
+          "supports": [
+            "geology.features",
+            "temperatureC.min"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-012",
+      "name": "South Polar Cap (Planum Australe)",
+      "coordinates": {
+        "latitude": -86.5,
+        "longitude": -5.0
+      },
+      "elevationM": 3200,
+      "terrainType": "Polar cap with residual CO2 ice over water ice",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Water ice",
+          "Residual CO2 ice (~8 m)",
+          "Dust layers"
+        ],
+        "notableCompounds": [
+          "CO2 ice",
+          "H2O ice"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -150,
+        "max": -50,
+        "mean": -100
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.475,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 100,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 1,
+          "max": 10
+        },
+        "notes": ""
+      },
+      "obstacles": [
+        "Swiss-cheese pits ~8 m deep",
+        "Polar night",
+        "Extreme cold"
+      ],
+      "geology": {
+        "age": "Residual cap young; underlying layers older",
+        "features": [
+          "~350 km diameter",
+          "Water ice up to ~3 km thick"
+        ],
+        "description": "Caltech/MGS/Odyssey showed the cap is mostly water ice under an ~8 m dry-ice layer that survives the summer."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC.max",
+        "temperatureC.mean",
+        "humidity",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Martian polar caps are almost entirely water ice (Byrne & Ingersoll 2003, Science)",
+          "publisher": "Caltech",
+          "url": "https://www.caltech.edu/news/martian-polar-caps-are-almost-entirelywater-ice-caltech-research-shows-660",
+          "supports": [
+            "chemicalComposition",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Mars Polar Regions",
+          "publisher": "Windows to the Universe (NESTA, NASA-supported)",
+          "url": "https://windows2universe.org/mars/places/mars_polar_regions.html",
+          "supports": [
+            "geology.features",
+            "temperatureC.min"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-013",
+      "name": "Vastitas Borealis (Phoenix)",
+      "coordinates": {
+        "latitude": 68.22,
+        "longitude": -125.75
+      },
+      "elevationM": -4100,
+      "terrainType": "Polygonal arctic plains with shallow ice",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Alkaline soil",
+          "Water ice a few cm below surface"
+        ],
+        "notableCompounds": [
+          "H2O ice",
+          "Perchlorate",
+          "CaCO3 (~3-5 wt%)",
+          "Na, Mg, Cl, K salts"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -100,
+        "max": -20,
+        "mean": -65
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.923,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 100,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 10,
+          "max": 50
+        },
+        "notes": "Night frost"
+      },
+      "obstacles": [
+        "Polygonal ground",
+        "Ice near surface",
+        "Winter CO2 frost (ended mission)"
+      ],
+      "geology": {
+        "age": "Amazonian",
+        "features": [
+          "Polygons",
+          "Shallow ground ice"
+        ],
+        "description": "Phoenix verified subsurface water ice and found perchlorate and calcium carbonate in the soil."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Phoenix mission page",
+          "publisher": "NASA Science",
+          "url": "https://science.nasa.gov/mission/phoenix",
+          "supports": [
+            "coordinates",
+            "chemicalComposition"
+          ]
+        },
+        {
+          "title": "Boynton et al. 2009, Evidence for Calcium Carbonate at the Mars Phoenix Landing Site (Science)",
+          "publisher": "Science",
+          "url": "https://planetary.chem.tufts.edu/Boynton%20etal%20Science%202009v325p61.pdf",
+          "supports": [
+            "chemicalComposition.notableCompounds"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-014",
+      "name": "Chryse Planitia (Viking 1)",
+      "coordinates": {
+        "latitude": 22.48,
+        "longitude": -49.97
+      },
+      "elevationM": -3600,
+      "terrainType": "Rocky lowland plains at the end of outflow channels",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Basaltic rocks",
+          "Fine dust",
+          "Iron-rich clay"
+        ],
+        "notableCompounds": [
+          "Fe-oxides",
+          "Sulfates",
+          "Chlorides"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -107,
+        "max": -17,
+        "mean": -60
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.882,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Viking 1 measured 6.9-9 mb over the year. Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": ""
+      },
+      "obstacles": [
+        "Boulder-strewn surface",
+        "Wrinkle ridges",
+        "Small craters"
+      ],
+      "geology": {
+        "age": "Hesperian",
+        "features": [
+          "Wrinkle ridges",
+          "Outflow channel termini"
+        ],
+        "description": "First successful Mars landing (20 July 1976); THEMIS daytime surface temps -34 to -22 C."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "elevationM (Viking-era datum gave -1.5 km; MOLA value estimated)",
+        "temperatureC.mean",
+        "humidity",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "PIA03901: Viking 1 Landing Site in Chryse Planitia - Infrared Image",
+          "publisher": "NASA JPL / ASU THEMIS",
+          "url": "https://photojournal.jpl.nasa.gov/catalog/PIA03901",
+          "supports": [
+            "coordinates",
+            "geology.features"
+          ]
+        },
+        {
+          "title": "Viking Mission to Mars (summarised from NSSDC)",
+          "publisher": "University of Washington",
+          "url": "https://atmos.washington.edu/~mars/viking/lander/viking_lander/node24.html",
+          "supports": [
+            "coordinates",
+            "chemicalComposition.dominantMaterials"
+          ]
+        },
+        {
+          "title": "Mars Meteorological Data: Pathfinder and Viking (J. Tillman)",
+          "publisher": "University of Washington",
+          "url": "https://www-k12.atmos.washington.edu/k12/resources/mars_data-information/mars_overview.html",
+          "supports": [
+            "temperatureC.min",
+            "temperatureC.max"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.notes"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-015",
+      "name": "Ares Vallis (Mars Pathfinder)",
+      "coordinates": {
+        "latitude": 19.13,
+        "longitude": -33.22
+      },
+      "elevationM": -3700,
+      "terrainType": "Ancient flood plain",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Flood-deposited rocks",
+          "Conglomerates",
+          "Dust"
+        ],
+        "notableCompounds": [
+          "SiO2-rich rocks",
+          "Fe-oxides"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -76,
+        "max": -27,
+        "mean": -50
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.89,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": "Atmosphere completely dry during the mission"
+      },
+      "obstacles": [
+        "Among the rockiest parts of Mars",
+        "Rounded boulders"
+      ],
+      "geology": {
+        "age": "Flood ~1-3 Ga",
+        "features": [
+          "Twin Peaks",
+          "Imbricated flood rocks"
+        ],
+        "description": "Pathfinder/Sojourner (1997) landed in the boulder-strewn Ares Vallis flood plain."
+      },
+      "dataQuality": "measured-in-situ",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC.mean",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "NASA Facts: Mars Pathfinder",
+          "publisher": "NASA JPL",
+          "url": "https://webarchive.library.unt.edu/web/20090813031850/http:/jpl.nasa.gov/news/fact_sheets/mpf.pdf",
+          "supports": [
+            "coordinates",
+            "obstacles"
+          ]
+        },
+        {
+          "title": "Mars Pathfinder Preliminary Results",
+          "publisher": "NASA NSSDCA",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/marspath_results.html",
+          "supports": [
+            "geology.age"
+          ]
+        },
+        {
+          "title": "Pathfinder (weather summary)",
+          "publisher": "Britannica Kids",
+          "url": "https://kids.britannica.com/students/article/Pathfinder/341235",
+          "supports": [
+            "temperatureC.min",
+            "temperatureC.max",
+            "humidity.notes"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-016",
+      "name": "Mawrth Vallis",
+      "coordinates": {
+        "latitude": 24.0,
+        "longitude": -19.0
+      },
+      "elevationM": -2200,
+      "terrainType": "Ancient channel with layered clay-rich outcrops",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Fe/Mg smectite",
+          "Al-clays",
+          "Layered sediments"
+        ],
+        "notableCompounds": [
+          "Nontronite",
+          "Kaolinite",
+          "Montmorillonite"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 50.0,
+          "FeO": 15.0,
+          "Al2O3": 12.0,
+          "MgO": 9.0,
+          "CaO": 3.0,
+          "Na2O": 2.5,
+          "SO3": 3.0,
+          "H2O_bound": 4.0
+        }
+      },
+      "temperatureC": {
+        "min": -95,
+        "max": 0,
+        "mean": -55
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.777,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": ""
+      },
+      "obstacles": [
+        "Layered cliffs",
+        "Channel walls"
+      ],
+      "geology": {
+        "age": "Noachian",
+        "features": [
+          "Layered Al-clays over Fe/Mg clays",
+          "Clay exposures across ~300 x 400 km"
+        ],
+        "description": "Among the largest clay exposures on Mars, seen by CRISM and HiRISE."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Mustard et al. 2008, Hydrated silicate minerals on Mars observed by MRO CRISM (Nature)",
+          "publisher": "Nature / Smithsonian repository",
+          "url": "https://repository.si.edu/bitstream/handle/10088/7098/200818.pdf",
+          "supports": [
+            "chemicalComposition",
+            "geology.features"
+          ]
+        },
+        {
+          "title": "PIA11732: Four Types of Deposits From Wet Conditions on Early Mars",
+          "publisher": "NASA JPL / MRO CRISM",
+          "url": "https://science.nasa.gov/photojournal/four-types-of-deposits-from-wet-conditions-on-early-mars/",
+          "supports": [
+            "geology.age"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-017",
+      "name": "Nili Fossae",
+      "coordinates": {
+        "latitude": 20.4,
+        "longitude": 78.5
+      },
+      "elevationM": -700,
+      "terrainType": "Fractured terrain with ancient troughs",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Olivine-bearing layers",
+          "Carbonates",
+          "Fe/Mg smectite clays"
+        ],
+        "notableCompounds": [
+          "MgCO3",
+          "Olivine",
+          "Fe/Mg smectite",
+          "Kaolinite"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 42.0,
+          "FeO": 20.0,
+          "MgO": 16.0,
+          "Al2O3": 5.0,
+          "CaO": 5.0,
+          "Na2O": 1.5,
+          "SO3": 3.0,
+          "CO2_carbonate": 3.0
+        }
+      },
+      "temperatureC": {
+        "min": -95,
+        "max": 0,
+        "mean": -55
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.678,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": ""
+      },
+      "obstacles": [
+        "Deep troughs",
+        "Rough eroded outcrops"
+      ],
+      "geology": {
+        "age": "Noachian",
+        "features": [
+          "Carbonate over clay stratigraphy"
+        ],
+        "description": "CRISM shows carbonate formed by water altering olivine-rich rock, over older Fe/Mg clays."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "PIA11730: Carbonate-Olivine Relationship in Nili Fossae, Mars",
+          "publisher": "NASA JPL / MRO CRISM",
+          "url": "https://photojournal.jpl.nasa.gov/catalog/PIA11730",
+          "supports": [
+            "chemicalComposition",
+            "geology.description"
+          ]
+        },
+        {
+          "title": "PIA09093: Clay at Nili Fossae",
+          "publisher": "NASA JPL / MRO",
+          "url": "https://photojournal.jpl.nasa.gov/catalog/PIA09093",
+          "supports": [
+            "coordinates"
+          ]
+        },
+        {
+          "title": "Mustard et al. 2008, Hydrated silicate minerals on Mars observed by MRO CRISM (Nature)",
+          "publisher": "Nature / Smithsonian repository",
+          "url": "https://repository.si.edu/bitstream/handle/10088/7098/200818.pdf",
+          "supports": [
+            "chemicalComposition.notableCompounds"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-018",
+      "name": "Arabia Terra",
+      "coordinates": {
+        "latitude": 20.0,
+        "longitude": 5.0
+      },
+      "elevationM": 0,
+      "terrainType": "Heavily cratered highlands with layered deposits",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Equatorial layered deposits",
+          "Dust"
+        ],
+        "notableCompounds": [
+          "Polyhydrated sulfates",
+          "Fe/Mg smectite (McLaughlin crater)"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -95,
+        "max": 0,
+        "mean": -55
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.636,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": "Possible former groundwater upwelling"
+      },
+      "obstacles": [
+        "Thick dust",
+        "Layered mesas",
+        "Craters"
+      ],
+      "geology": {
+        "age": "Late Noachian plateau with younger layered deposits",
+        "features": [
+          "Firsoff crater mounds",
+          "Possible spring deposits"
+        ],
+        "description": "Layered deposits interpreted as spring, playa and dune deposits controlled by groundwater."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Pondrelli et al. 2015, Equatorial layered deposits in Arabia Terra (GSA Bulletin)",
+          "publisher": "Geological Society of America",
+          "url": "https://doi.org/10.1130/B31225.1",
+          "supports": [
+            "chemicalComposition",
+            "geology"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-019",
+      "name": "Medusae Fossae Formation",
+      "coordinates": {
+        "latitude": -5.0,
+        "longitude": -147.0
+      },
+      "elevationM": -1000,
+      "terrainType": "Wind-eroded friable deposits",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Volcanic ash / pyroclastic deposits",
+          "Dust",
+          "Buried water ice"
+        ],
+        "notableCompounds": [
+          "Volcanic glass",
+          "H2O ice (layered, beneath dry cover)"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -95,
+        "max": 5,
+        "mean": -50
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.697,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "May be the biggest single dust source on Mars. Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": "Ice would cover Mars 1.5-2.7 m deep if melted"
+      },
+      "obstacles": [
+        "Yardangs",
+        "Soft friable surfaces",
+        "Dust storms"
+      ],
+      "geology": {
+        "age": "Hesperian-Amazonian",
+        "features": [
+          "Yardangs",
+          "Deposits up to ~3.7 km thick"
+        ],
+        "description": "MARSIS radar indicates ice-rich layered deposits beneath a thick dry layer of dust or ash."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "elevationM",
+        "temperatureC",
+        "humidity.relativeHumidityPercent",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "The Medusa Fossae formation on Mars",
+          "publisher": "ESA Mars Express",
+          "url": "https://www.esa.int/Science_Exploration/Space_Science/Mars_Express/The_Medusa_Fossae_formation_on_Mars",
+          "supports": [
+            "coordinates",
+            "chemicalComposition"
+          ]
+        },
+        {
+          "title": "Mars Express radar data indicating heaps of water ice at Mars's equator (Watters et al. 2024)",
+          "publisher": "ESA",
+          "url": "https://esa.int/ESA_Multimedia/Images/2024/01/Mars_Express_radar_data_indicating_heaps_of_water_ice_at_Mars_s_equator",
+          "supports": [
+            "chemicalComposition.notableCompounds",
+            "humidity.notes",
+            "atmosphere.notes"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-020",
+      "name": "Noctis Labyrinthus",
+      "coordinates": {
+        "latitude": -7.0,
+        "longitude": -102.0
+      },
+      "elevationM": 5500,
+      "terrainType": "Maze of intersecting canyons on a high plateau",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Basaltic plateau rocks",
+          "Light-toned layered deposits"
+        ],
+        "notableCompounds": [
+          "Fe-bearing sulfates",
+          "Clays",
+          "Hydrated silica"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 38.0,
+          "FeO": 16.0,
+          "SO3": 20.0,
+          "MgO": 7.0,
+          "CaO": 5.0,
+          "Al2O3": 6.0,
+          "Na2O": 2.0,
+          "Cl": 0.6
+        }
+      },
+      "temperatureC": {
+        "min": -110,
+        "max": -10,
+        "mean": -65
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.386,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 80,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 3,
+          "max": 15
+        },
+        "notes": ""
+      },
+      "obstacles": [
+        "Steep canyon walls",
+        "Collapse pits",
+        "Dune fields"
+      ],
+      "geology": {
+        "age": "Noachian-Amazonian deposits",
+        "features": [
+          "Graben canyons",
+          ">300 m of layered beds in troughs"
+        ],
+        "description": "Western end of Valles Marineris; varied hydrated minerals suggest groundwater from Tharsis volcanism."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "PIA12260: Light-Toned Deposits in Noctis Labyrinthus",
+          "publisher": "NASA JPL / MRO",
+          "url": "https://www.jpl.nasa.gov/images/pia12260-light-toned-deposits-in-noctis-labyrinthus/",
+          "supports": [
+            "chemicalComposition"
+          ]
+        },
+        {
+          "title": "PIA14455: Light-Toned Layering in a Labyrinthus Noctis Pit",
+          "publisher": "NASA JPL / MRO HiRISE",
+          "url": "https://www.jpl.nasa.gov/images/pia14455-light-toned-layering-in-a-labyrinthus-noctis-pit/",
+          "supports": [
+            "geology"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-021",
+      "name": "Isidis Planitia (Beagle 2)",
+      "coordinates": {
+        "latitude": 11.53,
+        "longitude": 90.43
+      },
+      "elevationM": -3367,
+      "terrainType": "Smooth sedimentary basin floor",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Amazonian sediments over Hesperian volcanic basement",
+          "Dust"
+        ],
+        "notableCompounds": [
+          "Mg-carbonate (basin rim)",
+          "Olivine"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 42.0,
+          "FeO": 20.0,
+          "MgO": 16.0,
+          "Al2O3": 5.0,
+          "CaO": 5.0,
+          "Na2O": 1.5,
+          "SO3": 3.0,
+          "CO2_carbonate": 3.0
+        }
+      },
+      "temperatureC": {
+        "min": -90,
+        "max": 5,
+        "mean": -50
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.864,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": ""
+      },
+      "obstacles": [
+        "Flat with no major hazards",
+        "Small cones"
+      ],
+      "geology": {
+        "age": "Basin ~3.9 Ga",
+        "features": [
+          "Pitted cones",
+          "Infilled craters"
+        ],
+        "description": "Beagle 2 found by HiRISE in 2015, partly deployed, close to its target."
+      },
+      "dataQuality": "orbital-remote-sensing",
+      "estimatedFields": [
+        "temperatureC",
+        "humidity",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Bridges et al. 2017, Identification of the Beagle 2 lander on Mars (Royal Society Open Science)",
+          "publisher": "Royal Society / PMC",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5666264",
+          "supports": [
+            "coordinates",
+            "elevationM (planned site, MOLA)",
+            "chemicalComposition.dominantMaterials"
+          ]
+        },
+        {
+          "title": "'Lost' 2003 Mars Lander Found by Mars Reconnaissance Orbiter",
+          "publisher": "NASA JPL",
+          "url": "https://www.jpl.nasa.gov/news/lost-2003-mars-lander-found-by-mars-reconnaissance-orbiter",
+          "supports": [
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    },
+    {
+      "regionId": "MARS-022",
+      "name": "Syrtis Major Planum",
+      "coordinates": {
+        "latitude": 8.4,
+        "longitude": 69.5
+      },
+      "elevationM": 1300,
+      "terrainType": "Low-relief volcanic plateau",
+      "chemicalComposition": {
+        "dominantMaterials": [
+          "Dark basalt",
+          "Pyroxene-rich sand"
+        ],
+        "notableCompounds": [
+          "Pyroxene",
+          "Olivine",
+          "Plagioclase"
+        ],
+        "majorOxidesWtPercent": {
+          "SiO2": 46.0,
+          "FeO": 17.0,
+          "Al2O3": 10.0,
+          "MgO": 8.5,
+          "CaO": 6.5,
+          "Na2O": 3.0,
+          "SO3": 5.5,
+          "TiO2": 0.9,
+          "Cl": 0.7
+        }
+      },
+      "temperatureC": {
+        "min": -95,
+        "max": 5,
+        "mean": -50
+      },
+      "atmosphere": {
+        "type": "thin CO2",
+        "surfacePressureKPa": 0.565,
+        "compositionPercent": {
+          "CO2": 95.1,
+          "N2": 2.59,
+          "Ar": 1.94,
+          "O2": 0.161,
+          "CO": 0.058
+        },
+        "notes": "Pressure computed from elevation with NSSDC values (6.36 mb at mean radius, scale height 11.0 km); global pressure varies 4.0-8.7 mb with season."
+      },
+      "humidity": {
+        "relativeHumidityPercent": {
+          "min": 0,
+          "max": 70,
+          "mean": null
+        },
+        "waterVaporColumnPrMicrons": {
+          "min": 5,
+          "max": 20
+        },
+        "notes": ""
+      },
+      "obstacles": [
+        "Dunes",
+        "Lava flow fronts"
+      ],
+      "geology": {
+        "age": "Hesperian",
+        "features": [
+          "Nili and Meroe Paterae"
+        ],
+        "description": "Low-relief shield volcano west of Isidis; formed after the basin."
+      },
+      "dataQuality": "estimated",
+      "estimatedFields": [
+        "coordinates",
+        "elevationM",
+        "temperatureC",
+        "humidity",
+        "chemicalComposition",
+        "geology.age",
+        "chemicalComposition.majorOxidesWtPercent"
+      ],
+      "sources": [
+        {
+          "title": "Bridges et al. 2017, Identification of the Beagle 2 lander on Mars (Royal Society Open Science)",
+          "publisher": "Royal Society / PMC",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5666264",
+          "supports": [
+            "geology.description"
+          ]
+        },
+        {
+          "title": "Mars Fact Sheet",
+          "publisher": "NASA NSSDCA / Goddard",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+          "supports": [
+            "atmosphere.surfacePressureKPa"
+          ]
+        },
+        {
+          "title": "Seasonal Variations in Atmospheric Composition as Measured in Gale Crater, Mars (Trainer et al. 2019, JGR Planets)",
+          "publisher": "NASA Goddard / AGU",
+          "url": "https://doi.org/10.1029/2019JE006175",
+          "supports": [
+            "atmosphere.compositionPercent"
+          ]
+        }
+      ]
+    }
+  ]
+}
