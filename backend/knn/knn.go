@@ -1,5 +1,9 @@
 package main
 
+import (
+	"math"
+)
+
 type Features struct {
 
 	Foo	float64
@@ -35,4 +39,32 @@ func GetWeights(filter string) FilterWeights {
 		default: 
 			return FilterWeights{Foo: 0.3, Faa: 0.1, Fii: 0.4}
 		}
+}
+
+func WeightedEuclideanDistance(f1, f2 Features, w FilterWeights) float64 {
+	//calculates euclidean distance
+	sum := w.Fii * math.Pow(f1.Foo - f2.Foo, 2 ) + w.Faa * math.Pow(f1.Fii - f2.Fii, 2) + w.Foo * math.Pow(f1.Faa - f2.Faa,2 ) // Mock values, to be changed when final characteristic decided
+	
+	return math.Sqrt(sum) 
+}
+
+func FindMostSimilar(targetFeatures Features, earthRegions []Region, filter string)(Region, float64){
+
+	
+
+	weights := GetWeights(filter)
+	
+	var bestMatches Region //TODO caping bestMatches to 1 rn, change for a queue to have 3 options of matches 
+	minDistance := math.MaxFloat64 
+
+	for _, region := range earthRegions{
+		dist := WeightedEuclideanDistance(targetFeatures, region.Features, weights)
+		if dist < minDistance {
+			minDistance = dist 
+			bestMatches = region
+		}
+	}
+	
+	return bestMatches, minDistance
+
 }
