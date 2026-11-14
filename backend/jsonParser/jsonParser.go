@@ -1,0 +1,8 @@
+package jsonParser
+
+
+func Parser(){
+
+	
+
+}
