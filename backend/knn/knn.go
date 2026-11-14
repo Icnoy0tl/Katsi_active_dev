@@ -99,21 +99,21 @@ func WeightedEuclideanDistance(f1, f2 Features, w FilterWeights) float64 {
 	return math.Sqrt(sum) 
 }
 
-func FindMostSimilar(targetFeatures Features, earthRegions []Region, filter string)(Region, float64){
+func FindMostSimilar(targetFeatures Features, earthRegions []Region, filter string)(RecentStack[Region], float64){
 
 	weights := GetWeights(filter)
 	
-	var bestMatches Region //TODO caping bestMatches to 1 rn, change for a queue to have 3 options of matches 
+	bestMatches := NewRecentStack[Region](3)  //TODO caping bestMatches to 1 rn, change for a queue to have 3 options of matches 
 	minDistance := math.MaxFloat64 
 
 	for _, region := range earthRegions{
 		dist := WeightedEuclideanDistance(targetFeatures, region.Features, weights)
 		if dist < minDistance {
 			minDistance = dist 
-			bestMatches = region
+			bestMatches.Push(region)
 		}
 	}
 	
-	return bestMatches, minDistance
+	return *bestMatches, minDistance
 
 }
