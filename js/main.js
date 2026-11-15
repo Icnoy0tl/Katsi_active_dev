@@ -292,6 +292,10 @@ function goToMission(region) {
     earthHologram.show(analog.region, earthMarkers.outline(analogRegionId), EARTH.realRadiusKm, {
       kicker: `Análogo terrestre · ${analogRegionId}`,
       tag: `${Math.round(analog.similarity * 100)}\u00a0%` // espacio sin salto: "59 %" no se parte
+    }, {
+      // La forma del análogo se adapta hacia la del terreno de la misión según la similitud
+      target: mission.markers.outline(region.regionId),
+      similarity: analog.similarity
     });
   }
 

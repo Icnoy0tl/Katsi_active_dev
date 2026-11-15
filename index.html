@@ -752,6 +752,14 @@
       stroke-linejoin: round;
       filter: drop-shadow(0 0 6px rgba(103, 232, 249, 0.7));
     }
+    /* Fantasma del terreno de la misión: la forma del análogo se acerca a él según la similitud */
+    .holo-target {
+      fill: none;
+      stroke: rgba(165, 243, 252, 0.55);
+      stroke-width: 0.012;
+      stroke-dasharray: 0.04 0.035;
+      stroke-linejoin: round;
+    }
     .holo-badge-ring {
       fill: none;
       stroke: #a5f3fc;
@@ -762,15 +770,24 @@
       stroke: #a5f3fc;
       stroke-width: 0.012;
     }
-    .holo-scale line {
-      stroke: #a5f3fc;
-      stroke-width: 0.014;
-    }
-    .holo-scale text {
-      fill: rgba(165, 243, 252, 0.9);
+    /* Escala justo encima del nombre (el ancho de la barra lo fija JS en % de la tarjeta) */
+    .holo-scale {
+      position: absolute;
+      left: 10px;
+      bottom: 26px;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
       font-family: 'Montserrat', 'Inter', sans-serif;
-      font-size: 0.085px;
-      letter-spacing: 0.01px;
+      font-size: 0.56rem;
+      letter-spacing: 0.06em;
+      color: rgba(165, 243, 252, 0.9);
+    }
+    .holo-scale-bar {
+      height: 1.5px;
+      background: #a5f3fc;
     }
     .holo-header,
     .holo-name {

@@ -3,10 +3,67 @@ import * as THREE from 'three';
 /** Composición en pantalla (px): separación cuerpo → holograma y margen con el borde */
 const LAYOUT = { gapMin: 70, gapFraction: 0.06, margin: 16 };
 
+/**
+ * Recuadro del dibujo (unidades SVG; la forma ocupa [-1, 1]). Desplazado hacia abajo para dejar
+ * más hueco inferior, donde van la escala y el nombre (HTML, tamaño fijo en px).
+ */
+const VIEW = { x: -1.45, y: -1.35, size: 2.9 };
+
 const projected = new THREE.Vector3();
 const edgePoint = new THREE.Vector3();
 const toCamera = new THREE.Vector3();
 const areaNormal = new THREE.Vector3();
+
+/**
+ * Transformación del análogo hacia el terreno de la misión: muestras angulares del contorno y
+ * tiempos (ms). El inicio espera a que termine la animación de apertura (0.35 s + 0.7 s en CSS).
+ */
+const MORPH = { samples: 96, delay: 1050, duration: 1400 };
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+/**
+ * Radio del contorno (estrellado respecto al centro) en `samples` ángulos fijos: así dos contornos
+ * cualesquiera se interpolan punto a punto sin cruces. Rayo desde el origen contra cada lado.
+ */
+function polarProfile(points, samples) {
+  const radii = new Float32Array(samples);
+  for (let i = 0; i < samples; i++) {
+    const angle = (i / samples) * Math.PI * 2;
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+    let best = 0;
+    for (let j = 0; j < points.length; j++) {
+      const a = points[j];
+      const b = points[(j + 1) % points.length];
+      const ex = b.x - a.x;
+      const ey = b.y - a.y;
+      const denom = dx * ey - dy * ex;
+      if (Math.abs(denom) < 1e-12) continue;
+      const t = (a.x * ey - a.y * ex) / denom; // distancia sobre el rayo
+      const u = (a.x * dy - a.y * dx) / denom; // posición sobre el lado [0, 1]
+      if (t > best && u >= 0 && u <= 1) best = t;
+    }
+    radii[i] = best;
+  }
+  return radii;
+}
+
+/** Puntos SVG de un perfil polar mezclado: (1 − mix)·from + mix·to (y de SVG invertida) */
+function profileToPoints(from, to, mix) {
+  let out = '';
+  for (let i = 0; i < from.length; i++) {
+    const angle = (i / from.length) * Math.PI * 2;
+    const r = from[i] + (to[i] - from[i]) * mix;
+    out += `${(Math.cos(angle) * r).toFixed(3)},${(-Math.sin(angle) * r).toFixed(3)} `;
+  }
+  return out;
+}
+
+/** Contorno normalizado al recuadro [-1, 1] por su mayor coordenada */
+function normalizeOutline(outline) {
+  const extent = Math.max(...outline.map((p) => Math.max(Math.abs(p.x), Math.abs(p.y))));
+  return { extent, points: outline.map((p) => ({ x: p.x / extent, y: p.y / extent })) };
+}
 
 /** Longitud "redonda" para la barra de escala (≈ 40 % del ancho del dibujo) */
 function niceLength(maxKm) {
@@ -35,23 +92,21 @@ function buildDom(container, id) {
   card.setAttribute('aria-hidden', 'true');
   card.innerHTML = `
     <div class="holo-inner">
-      <svg class="holo-svg" viewBox="-1.3 -1.3 2.6 2.6">
+      <svg class="holo-svg" viewBox="${VIEW.x} ${VIEW.y} ${VIEW.size} ${VIEW.size}">
         <defs>
           <pattern id="${id}-grid" width="0.26" height="0.26" patternUnits="userSpaceOnUse">
             <path d="M0.26 0H0V0.26" fill="none" stroke="rgba(103, 232, 249, 0.16)" stroke-width="0.006" />
           </pattern>
         </defs>
-        <rect x="-1.3" y="-1.3" width="2.6" height="2.6" fill="url(#${id}-grid)" />
+        <rect x="${VIEW.x}" y="${VIEW.y}" width="${VIEW.size}" height="${VIEW.size}" fill="url(#${id}-grid)" />
+        <polygon class="holo-target" />
         <polygon class="holo-shape" />
         <circle r="0.2" class="holo-badge-ring" />
         <circle r="0.12" class="holo-badge" />
-        <g class="holo-scale">
-          <line x1="-1" y1="1.08" x2="-0.5" y2="1.08" />
-          <text x="-1" y="1.03"></text>
-        </g>
       </svg>
       <div class="holo-scan"></div>
       <p class="holo-header"><span class="holo-kicker"></span><span class="holo-tag"></span></p>
+      <p class="holo-scale"><span class="holo-scale-label"></span><span class="holo-scale-bar"></span></p>
       <p class="holo-name"></p>
     </div>`;
 
@@ -62,8 +117,9 @@ function buildDom(container, id) {
     beamShape: beam.querySelector('.hologram-beam-shape'),
     beamEdges: beam.querySelector('.hologram-beam-edges'),
     shape: card.querySelector('.holo-shape'),
-    scaleBar: card.querySelector('.holo-scale line'),
-    scaleLabel: card.querySelector('.holo-scale text'),
+    target: card.querySelector('.holo-target'),
+    scaleBar: card.querySelector('.holo-scale-bar'),
+    scaleLabel: card.querySelector('.holo-scale-label'),
     kicker: card.querySelector('.holo-kicker'),
     tag: card.querySelector('.holo-tag'),
     name: card.querySelector('.holo-name')
@@ -77,7 +133,7 @@ function buildDom(container, id) {
  *
  * @param container  elemento donde se insertan el haz y la tarjeta
  * @param id         prefijo único para los ids internos del SVG (degradado y cuadrícula)
- * @returns { show(region, outline, realRadiusKm, labels), hide(), update(camera, bodyCenter, bodyRadius, areaPosition) }
+ * @returns { show(region, outline, realRadiusKm, labels, morph?), hide(), update(camera, bodyCenter, bodyRadius, areaPosition) }
  */
 export function createHologram({ container, id }) {
   const dom = buildDom(container, id);
@@ -85,6 +141,32 @@ export function createHologram({ container, id }) {
   let visible = false;
   let size = 0; // lado de la tarjeta (px), se mide al mostrar y al cambiar el tamaño de ventana
   const measure = () => (size = dom.card.offsetWidth);
+  let morphFrame = 0;
+  const stopMorph = () => cancelAnimationFrame(morphFrame);
+
+  /**
+   * Anima la forma del análogo desde su contorno propio hasta `similarity` del camino hacia el
+   * contorno de la misión (el fantasma discontinuo). Solo dura `MORPH.duration`: después no
+   * queda ningún trabajo por fotograma.
+   */
+  function startMorph(from, to, similarity) {
+    const finalMix = THREE.MathUtils.clamp(similarity, 0, 1);
+    if (reducedMotion.matches) {
+      dom.shape.setAttribute('points', profileToPoints(from, to, finalMix));
+      return;
+    }
+    dom.shape.setAttribute('points', profileToPoints(from, to, 0));
+    const start = performance.now() + MORPH.delay;
+    const step = (now) => {
+      const t = THREE.MathUtils.clamp((now - start) / MORPH.duration, 0, 1);
+      if (now >= start) {
+        const eased = 1 - (1 - t) ** 3; // ease-out cúbico
+        dom.shape.setAttribute('points', profileToPoints(from, to, finalMix * eased));
+      }
+      if (t < 1) morphFrame = requestAnimationFrame(step);
+    };
+    morphFrame = requestAnimationFrame(step);
+  }
   window.addEventListener('resize', () => visible && measure());
 
   /** Proyecta un punto de mundo a píxeles de pantalla (en `projected`) */
@@ -100,16 +182,29 @@ export function createHologram({ container, id }) {
      * @param outline       contorno en el plano tangente (fracciones del radio del cuerpo)
      * @param realRadiusKm  radio real del cuerpo, para la barra de escala
      * @param labels        { kicker, tag }: textos superiores izquierdo y derecho
+     * @param morph         opcional { target, similarity }: contorno del terreno comparado y
+     *                      similitud (0–1). La forma se adapta hacia `target` en esa proporción
+     *                      (100 % = misma forma) y `target` se dibuja como fantasma discontinuo.
      */
-    show(region, outline, realRadiusKm, { kicker, tag }) {
+    show(region, outline, realRadiusKm, { kicker, tag }, morph = null) {
+      stopMorph();
       // Contorno normalizado al recuadro [-1, 1] (x = este, y = norte → y de SVG invertida)
-      const extent = Math.max(...outline.map((p) => Math.max(Math.abs(p.x), Math.abs(p.y))));
-      dom.shape.setAttribute('points', outline.map((p) => `${(p.x / extent).toFixed(3)},${(-p.y / extent).toFixed(3)}`).join(' '));
+      const { extent, points } = normalizeOutline(outline);
+      if (morph?.target) {
+        const own = polarProfile(points, MORPH.samples);
+        const goal = polarProfile(normalizeOutline(morph.target).points, MORPH.samples);
+        dom.target.setAttribute('points', profileToPoints(goal, goal, 0));
+        dom.target.style.display = '';
+        startMorph(own, goal, morph.similarity);
+      } else {
+        dom.target.style.display = 'none';
+        dom.shape.setAttribute('points', points.map((p) => `${p.x.toFixed(3)},${(-p.y).toFixed(3)}`).join(' '));
+      }
 
       // Escala: 1 unidad del dibujo = extent · radio real (km)
       const kmPerUnit = extent * realRadiusKm;
       const barKm = niceLength(kmPerUnit * 2);
-      dom.scaleBar.setAttribute('x2', String(-1 + barKm / kmPerUnit));
+      dom.scaleBar.style.width = `${((barKm / kmPerUnit / VIEW.size) * 100).toFixed(2)}%`;
       dom.scaleLabel.textContent = `${barKm} km`;
 
       dom.kicker.textContent = kicker;
@@ -123,6 +218,7 @@ export function createHologram({ container, id }) {
     },
 
     hide() {
+      stopMorph();
       visible = false;
       dom.card.classList.add('is-hidden');
       dom.beam.classList.add('is-hidden');
