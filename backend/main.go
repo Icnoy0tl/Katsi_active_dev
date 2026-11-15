@@ -138,7 +138,6 @@ func analogHandler(parser *jsonParser.Parser) http.HandlerFunc {
 		for _, c := range pool {
 			candByID[c.ID] = c
 		}
-		resp := AnalogResponse{Planet: info.Planet, Filter: filter, SelectedRegion: selected}
 		resp := AnalogResponse{Planet: info.Planet, Filter: filter, SelectedRegion: selected, Robustness: rob, Extrapolation: extra}
 		for _, m := range matches {
 			features, err := knn.CompareFeatures(selected, byID[m.RegionID], target, candByID[m.RegionID], stats, weights)

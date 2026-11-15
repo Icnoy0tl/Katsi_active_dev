@@ -100,11 +100,11 @@ func TestBreakdownChangesWithFilter(t *testing.T) {
 	cand := pool[0]
 	reg := byID(earth)[cand.ID]
 	ws := allWeights(t)
-	rover, err := CompareFeatures(sel, reg, target, cand, stats, ws["rover"])
+	rover, err := CompareFeatures(sel, reg, target, cand, stats, ws["mobility"])
 	if err != nil {
 		t.Fatal(err)
 	}
-	edl, err := CompareFeatures(sel, reg, target, cand, stats, ws["edl"])
+	edl, err := CompareFeatures(sel, reg, target, cand, stats, ws["perception"])
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -124,12 +124,12 @@ func TestBreakdownChangesWithFilter(t *testing.T) {
 		}
 	}
 	if !wDiff || !lDiff {
-		t.Errorf("rover and edl must give different weights (%v) and loss shares (%v)", wDiff, lDiff)
+		t.Errorf("mobility and perception must give different weights (%v) and loss shares (%v)", wDiff, lDiff)
 	}
-	mr, _ := FindMostSimilar(target, []Candidate{cand}, ws["rover"], 1)
-	me, _ := FindMostSimilar(target, []Candidate{cand}, ws["edl"], 1)
+	mr, _ := FindMostSimilar(target, []Candidate{cand}, ws["mobility"], 1)
+	me, _ := FindMostSimilar(target, []Candidate{cand}, ws["perception"], 1)
 	if math.Abs(mr[0].Similarity-me[0].Similarity) < 1e-9 {
-		t.Error("the overall index of this pair should differ between rover and edl")
+		t.Error("the overall index of this pair should differ between mobility and perception")
 	}
 }
 
@@ -146,7 +146,7 @@ func TestBreakdownMissingIsNullInJSON(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	w, _ := WeightsFor("rover", FeatureNames())
+	w, _ := WeightsFor("mobility", FeatureNames())
 	fs, err := CompareFeatures(sel, byID(earth)[pool[0].ID], target, pool[0], stats, w)
 	if err != nil {
 		t.Fatal(err)

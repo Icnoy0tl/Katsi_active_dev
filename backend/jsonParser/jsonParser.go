@@ -49,7 +49,6 @@ type AuditVariables struct {
 	WindTypicalMs      *float64 `json:"wind_typical_ms"`
 	WindGustMs         *float64 `json:"wind_gust_ms"`
 	AbrasiveMohs       *float64 `json:"abrasive_mohs"`
-	GroundIceIndex     *float64 `json:"ground_ice_index"`
 	GroundIceIndex     *float64 `json:"ground_ice_index"` // 1 low, 2 medium, 3 high; null = no data
 }
 

@@ -316,7 +316,7 @@ func WeightsFor(filter string, names []string) (Vector, error) {
 	if !ok {
 		return nil, ErrUnknownFilter
 	}
-	return expand(reportPerVar(rep), names)
+	return Default.expand(reportPerVar(rep), names)
 }
 
 // MissionReport returns the precomputed weight report of a predefined mission.
@@ -333,11 +333,9 @@ func WeightsForProfile(profile map[string]float64, names []string) (Vector, Weig
 	if err != nil {
 		return nil, WeightReport{}, err
 	}
-	w, err := expand(reportPerVar(rep), names)
+	w, err := Default.expand(reportPerVar(rep), names)
 	if err != nil {
 		return nil, WeightReport{}, err
 	}
 	return w, rep, nil
-}
-	return Default.expand(reportPerVar(rep), names)
 }

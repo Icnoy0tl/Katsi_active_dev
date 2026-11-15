@@ -4,72 +4,57 @@
   "EARTH-004",
   "EARTH-005"
  ],
- "MARS-001/agua_bio": [
+ "MARS-001/environmental_survival": [
   "EARTH-003",
   "EARTH-006",
-  "EARTH-005"
+  "EARTH-004"
  ],
- "MARS-001/edl": [
-  "EARTH-003",
+ "MARS-001/mobility": [
   "EARTH-004",
-  "EARTH-005"
- ],
- "MARS-001/habitat": [
-  "EARTH-003",
-  "EARTH-004",
-  "EARTH-005"
- ],
- "MARS-001/rover": [
   "EARTH-005",
-  "EARTH-004",
   "EARTH-003"
+ ],
+ "MARS-001/perception": [
+  "EARTH-004",
+  "EARTH-003",
+  "EARTH-005"
  ],
  "MARS-002/(uniform)": [
   "EARTH-005",
   "EARTH-003",
   "EARTH-004"
  ],
- "MARS-002/agua_bio": [
-  "EARTH-005",
+ "MARS-002/environmental_survival": [
   "EARTH-003",
-  "EARTH-001"
- ],
- "MARS-002/edl": [
-  "EARTH-003",
-  "EARTH-004",
+  "EARTH-001",
   "EARTH-005"
  ],
- "MARS-002/habitat": [
-  "EARTH-003",
+ "MARS-002/mobility": [
   "EARTH-005",
-  "EARTH-004"
+  "EARTH-004",
+  "EARTH-003"
  ],
- "MARS-002/rover": [
-  "EARTH-005",
+ "MARS-002/perception": [
+  "EARTH-004",
   "EARTH-003",
-  "EARTH-004"
+  "EARTH-005"
  ],
  "MARS-003/(uniform)": [
   "EARTH-001",
   "EARTH-002",
   "EARTH-005"
  ],
- "MARS-003/agua_bio": [
+ "MARS-003/environmental_survival": [
   "EARTH-001",
-  "EARTH-006",
-  "EARTH-005"
- ],
- "MARS-003/edl": [
-  "EARTH-001",
-  "EARTH-002",
-  "EARTH-004"
- ],
- "MARS-003/habitat": [
-  "EARTH-001",
-  "EARTH-002",
+  "EARTH-003",
   "EARTH-006"
  ],
- "MARS-003/rover": [
+ "MARS-003/mobility": [
+  "EARTH-001",
+  "EARTH-005",
+  "EARTH-002"
+ ],
+ "MARS-003/perception": [
   "EARTH-001",
   "EARTH-002",
   "EARTH-005"
@@ -79,74 +64,59 @@
   "EARTH-006",
   "EARTH-003"
  ],
- "MOON-001/agua_bio": [
-  "EARTH-005",
-  "EARTH-006",
-  "EARTH-003"
- ],
- "MOON-001/edl": [
+ "MOON-001/environmental_survival": [
+  "EARTH-001",
   "EARTH-003",
-  "EARTH-004",
   "EARTH-005"
  ],
- "MOON-001/habitat": [
+ "MOON-001/mobility": [
   "EARTH-005",
   "EARTH-006",
-  "EARTH-003"
+  "EARTH-004"
  ],
- "MOON-001/rover": [
-  "EARTH-005",
+ "MOON-001/perception": [
   "EARTH-006",
-  "EARTH-003"
+  "EARTH-005",
+  "EARTH-004"
  ],
  "MOON-002/(uniform)": [
   "EARTH-001",
   "EARTH-005",
   "EARTH-003"
  ],
- "MOON-002/agua_bio": [
+ "MOON-002/environmental_survival": [
   "EARTH-005",
   "EARTH-001",
   "EARTH-003"
  ],
- "MOON-002/edl": [
-  "EARTH-001",
-  "EARTH-002",
-  "EARTH-005"
- ],
- "MOON-002/habitat": [
-  "EARTH-001",
-  "EARTH-005",
-  "EARTH-003"
- ],
- "MOON-002/rover": [
+ "MOON-002/mobility": [
   "EARTH-001",
   "EARTH-005",
   "EARTH-002"
+ ],
+ "MOON-002/perception": [
+  "EARTH-001",
+  "EARTH-002",
+  "EARTH-005"
  ],
  "MOON-003/(uniform)": [
   "EARTH-005",
   "EARTH-003",
   "EARTH-001"
  ],
- "MOON-003/agua_bio": [
-  "EARTH-005",
+ "MOON-003/environmental_survival": [
+  "EARTH-001",
   "EARTH-003",
-  "EARTH-006"
- ],
- "MOON-003/edl": [
-  "EARTH-003",
-  "EARTH-004",
   "EARTH-005"
  ],
- "MOON-003/habitat": [
+ "MOON-003/mobility": [
   "EARTH-005",
   "EARTH-003",
-  "EARTH-001"
+  "EARTH-004"
  ],
- "MOON-003/rover": [
-  "EARTH-005",
+ "MOON-003/perception": [
   "EARTH-003",
-  "EARTH-006"
+  "EARTH-005",
+  "EARTH-004"
  ]
 }
