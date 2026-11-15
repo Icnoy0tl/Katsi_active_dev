@@ -4,36 +4,36 @@ const $ = (id) => document.getElementById(id);
 
 /** Etiqueta y unidad de cada variable del JSON (las no listadas se muestran con su clave) */
 const CORE_VARIABLES = {
-  slope: ['Pendiente', '°'],
-  radar_roughness: ['Rugosidad de radar', ''],
-  apparent_thermal_inertia: ['Inercia térmica aparente', 'TIU'],
-  soil_moisture: ['Humedad del suelo', ''],
-  visual_texture: ['Textura visual', ''],
-  low_sun_shadows: ['Sombras con sol bajo', '%'],
-  line_of_sight: ['Línea de visión', '%'],
-  diurnal_thermal_range: ['Rango térmico diurno', 'K'],
-  dust_aerosols: ['Polvo y aerosoles', ''],
-  insolation: ['Insolación', 'W/m²']
+  slope: ['Slope', '°'],
+  radar_roughness: ['Radar roughness', ''],
+  apparent_thermal_inertia: ['Apparent thermal inertia', 'TIU'],
+  soil_moisture: ['Soil moisture', ''],
+  visual_texture: ['Visual texture', ''],
+  low_sun_shadows: ['Low-sun shadows', '%'],
+  line_of_sight: ['Line of sight', '%'],
+  diurnal_thermal_range: ['Diurnal thermal range', 'K'],
+  dust_aerosols: ['Dust and aerosols', ''],
+  insolation: ['Insolation', 'W/m²']
 };
 
 const AUDIT_VARIABLES = {
-  rock_abundance_pct: ['Abundancia de rocas', '%'],
-  grain_size_um: ['Tamaño de grano', 'µm'],
-  angle_of_repose_deg: ['Ángulo de reposo', '°'],
-  depth_to_bedrock: ['Profundidad a roca madre', 'm'], // combina _min_m y _max_m
-  vrm_microrelief: ['Microrrelieve (VRM)', ''],
-  dielectric_constant: ['Constante dieléctrica', ''],
-  salinity_wt_pct: ['Salinidad', 'wt%'],
-  diffuse_ratio: ['Razón difusa', ''],
+  rock_abundance_pct: ['Rock abundance', '%'],
+  grain_size_um: ['Grain size', 'µm'],
+  angle_of_repose_deg: ['Angle of repose', '°'],
+  depth_to_bedrock: ['Depth to bedrock', 'm'], // combina _min_m y _max_m
+  vrm_microrelief: ['Microrelief (VRM)', ''],
+  dielectric_constant: ['Dielectric constant', ''],
+  salinity_wt_pct: ['Salinity', 'wt%'],
+  diffuse_ratio: ['Diffuse ratio', ''],
   albedo: ['Albedo', ''],
-  vegetation_ndvi: ['Vegetación (NDVI)', ''],
-  surface_pressure_kpa: ['Presión superficial', 'kPa'],
-  wind_typical_ms: ['Viento típico', 'm/s'],
-  wind_gust_ms: ['Ráfagas de viento', 'm/s'],
-  abrasive_mohs: ['Abrasividad (Mohs)', '']
+  vegetation_ndvi: ['Vegetation (NDVI)', ''],
+  surface_pressure_kpa: ['Surface pressure', 'kPa'],
+  wind_typical_ms: ['Typical wind', 'm/s'],
+  wind_gust_ms: ['Wind gusts', 'm/s'],
+  abrasive_mohs: ['Abrasiveness (Mohs)', '']
 };
 
-const BODY_LABELS = { moon: 'Luna', mars: 'Marte' };
+const BODY_LABELS = { moon: 'Moon', mars: 'Mars' };
 
 const formatCoord = (value, pos, neg) => `${Math.abs(value).toFixed(2)}° ${value >= 0 ? pos : neg}`;
 const formatValue = (value) => (value === null || value === undefined ? '<span class="cmp-empty">—</span>' : value);
@@ -100,9 +100,9 @@ function analogCard(analog, index) {
         <span class="menu-divider"></span>
         <span class="menu-label">
           <span>${name}</span>
-          <span class="mission-meta">${regionId} · ${formatCoord(coordinates.latitude, 'N', 'S')}, ${formatCoord(coordinates.longitude, 'E', 'O')}</span>
+          <span class="mission-meta">${regionId} · ${formatCoord(coordinates.latitude, 'N', 'S')}, ${formatCoord(coordinates.longitude, 'E', 'W')}</span>
         </span>
-        <span class="menu-score" style="--score: ${percent}" aria-label="${percent} % de similitud"><b>${percent}&nbsp;%</b></span>
+        <span class="menu-score" style="--score: ${percent}" aria-label="${percent}% similarity"><b>${percent}%</b></span>
       </button>
     </li>`;
 }
@@ -114,8 +114,8 @@ function pendingCard(index) {
         <span class="menu-icon-box">${EARTH_ICON}</span>
         <span class="menu-divider"></span>
         <span class="menu-label">
-          <span>Pendiente</span>
-          <span class="mission-meta">Sin datos terrestres todavía</span>
+          <span>Pending</span>
+          <span class="mission-meta">No Earth data yet</span>
         </span>
         <span class="menu-score" style="--score: 0"><b>—</b></span>
       </div>
@@ -176,12 +176,12 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
     setVignette(false);
     setComparisonLayout(false);
     render(`
-      <p class="info-section info-lead menu-enter" style="--i: 1">Análogos terrestres más parecidos a</p>
+      <p class="info-section info-lead menu-enter" style="--i: 1">Closest Earth analogs to</p>
       <h2 class="info-name menu-enter" style="--i: 2">${region.name}</h2>
-      <p class="info-coords menu-enter" style="--i: 3">${region.regionId} · ${formatCoord(latitude, 'N', 'S')} · ${formatCoord(longitude, 'E', 'O')}</p>
+      <p class="info-coords menu-enter" style="--i: 3">${region.regionId} · ${formatCoord(latitude, 'N', 'S')} · ${formatCoord(longitude, 'E', 'W')}</p>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
       <section class="cmp-analogs">
-        <ol class="menu-options" aria-label="Análogos terrestres: elige uno para ver la comparación">${cards}</ol>
+        <ol class="menu-options" aria-label="Earth analogs: pick one to see the comparison">${cards}</ol>
       </section>`);
   }
 
@@ -193,12 +193,12 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
     const headerRow = `<tr>
         <th scope="col">Variable</th>
         <th scope="col" class="cmp-col-body">${bodyLabel}<span class="cmp-col-sub">${region.regionId}</span></th>
-        <th scope="col" class="cmp-col-earth">Tierra<span class="cmp-col-sub">${regionId}</span></th>
+        <th scope="col" class="cmp-col-earth">Earth<span class="cmp-col-sub">${regionId}</span></th>
       </tr>`;
     setVignette(true);
     render(`
       <h2 class="info-name menu-enter" style="--i: 2">${name}</h2>
-      <p class="info-coords menu-enter" style="--i: 3">${regionId} · ${formatCoord(coordinates.latitude, 'N', 'S')} · ${formatCoord(coordinates.longitude, 'E', 'O')} · ${percent}&nbsp;% de similitud</p>
+      <p class="info-coords menu-enter" style="--i: 3">${regionId} · ${formatCoord(coordinates.latitude, 'N', 'S')} · ${formatCoord(coordinates.longitude, 'E', 'W')} · ${percent}% similarity</p>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
       <section class="cmp-detail menu-enter" style="--i: 4">
         <table class="cmp-table cmp-head" aria-hidden="true">
@@ -207,11 +207,11 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
         </table>
         <div class="cmp-scroll scroll-fade">
           <table class="cmp-table">
-            <caption class="sr-only">Comparación de variables entre ${region.name} (${bodyLabel}) y ${name} (Tierra)</caption>
+            <caption class="sr-only">Variable comparison between ${region.name} (${bodyLabel}) and ${name} (Earth)</caption>
             ${COLUMNS}
             <thead>${headerRow}</thead>
-            ${comparisonGroup('Variables principales', region.coreVariables ?? {}, CORE_VARIABLES, analog)}
-            ${comparisonGroup('Variables de auditoría', region.auditVariables ?? {}, AUDIT_VARIABLES, analog)}
+            ${comparisonGroup('Core variables', region.coreVariables ?? {}, CORE_VARIABLES, analog)}
+            ${comparisonGroup('Audit variables', region.auditVariables ?? {}, AUDIT_VARIABLES, analog)}
           </table>
         </div>
       </section>`);

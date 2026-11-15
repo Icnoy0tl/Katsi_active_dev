@@ -34,7 +34,7 @@ export function loadPhotoTextures({ anisotropy, earth, moon, mars }) {
         { normalScale: new THREE.Vector2(0.85, -0.85), specular: new THREE.Color(0x4a6a8a), shininess: 22 }
       );
     })
-    .catch((err) => console.warn('Texturas de la Tierra no disponibles, usando procedurales.', err));
+    .catch((err) => console.warn('Earth textures unavailable, using procedural ones.', err));
 
   earthReady.then(() => loadSecondary(loadTexture, loadWithFallback, earth, moon, mars));
 }
@@ -52,18 +52,18 @@ function loadSecondary(loadTexture, loadWithFallback, earth, moon, mars) {
         applyMaps(earth.clouds.material, { map, alphaMap: null }, { opacity: 0.9 });
       })
     )
-    .catch((err) => console.warn('Textura de nubes no disponible.', err));
+    .catch((err) => console.warn('Cloud texture unavailable.', err));
 
   // Luna (mosaico LRO/Clementine) y Marte (mosaico Viking): color + relieve
   const rockyBodies = [
-    { body: moon, color: PHOTO_TEXTURES.moonColor, bump: PHOTO_TEXTURES.moonBump, props: { bumpScale: 1.0, roughness: 0.97, metalness: 0 }, name: 'la Luna' },
-    { body: mars, color: PHOTO_TEXTURES.marsColor, bump: PHOTO_TEXTURES.marsBump, props: { bumpScale: 2.0, roughness: 0.93, metalness: 0 }, name: 'Marte' }
+    { body: moon, color: PHOTO_TEXTURES.moonColor, bump: PHOTO_TEXTURES.moonBump, props: { bumpScale: 1.0, roughness: 0.97, metalness: 0 }, name: 'the Moon' },
+    { body: mars, color: PHOTO_TEXTURES.marsColor, bump: PHOTO_TEXTURES.marsBump, props: { bumpScale: 2.0, roughness: 0.93, metalness: 0 }, name: 'Mars' }
   ];
 
   rockyBodies.forEach(({ body, color, bump, props, name }) => {
     Promise.all([loadWithFallback(color, true), loadWithFallback(bump, false)])
       .then(([colorMap, bumpMap]) => applyMaps(body.mesh.material, { map: colorMap, bumpMap }, props))
-      .catch((err) => console.warn(`Texturas de ${name} no disponibles.`, err));
+      .catch((err) => console.warn(`${name} textures unavailable.`, err));
   });
 }
 

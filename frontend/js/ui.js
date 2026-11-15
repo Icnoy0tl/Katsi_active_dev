@@ -71,7 +71,7 @@ function setupRotationControls() {
     state.isRotating = on;
     pauseIcon.classList.toggle('hidden', !on);
     playIcon.classList.toggle('hidden', on);
-    label.textContent = on ? 'Pausar' : 'Reanudar';
+    label.textContent = on ? 'Pause' : 'Resume';
   };
   $('toggle-rotation-btn').addEventListener('click', () => setRotating(!state.isRotating));
 

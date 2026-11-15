@@ -40,7 +40,7 @@ export function setupMissionsPanel({ onSelect }) {
         <span class="menu-divider"></span>
         <span class="menu-label">
           <span>${region.name}</span>
-          <span class="mission-meta">${region.regionId} · ${formatCoord(latitude, 'N', 'S')}, ${formatCoord(longitude, 'E', 'O')}</span>
+          <span class="mission-meta">${region.regionId} · ${formatCoord(latitude, 'N', 'S')}, ${formatCoord(longitude, 'E', 'W')}</span>
         </span>
         ${ARROW_ICON}`;
       button.addEventListener('click', () => onSelect(region));

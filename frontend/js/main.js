@@ -77,8 +77,8 @@ cameraNavigator.focus('orion', true);
  * `regions` y `markers` se rellenan al cargar los JSON.
  */
 const missionBodies = {
-  moon: { group: moon.group, mesh: moon.mesh, config: MOON, kicker: 'Terreno lunar', regions: null, markers: null },
-  mars: { group: mars.group, mesh: mars.mesh, config: MARS, kicker: 'Terreno marciano', regions: null, markers: null }
+  moon: { group: moon.group, mesh: moon.mesh, config: MOON, kicker: 'Lunar terrain', regions: null, markers: null },
+  mars: { group: mars.group, mesh: mars.mesh, config: MARS, kicker: 'Martian terrain', regions: null, markers: null }
 };
 const regionBody = new Map(); // regionId → nombre del cuerpo ('moon' | 'mars')
 
@@ -110,7 +110,7 @@ const earthHologram = createHologram({ container: hologramsContainer, id: 'holo-
 const missionInfo = setupMissionInfo({
   onAnalogChange: (analog) => {
     showAnalog(analog);
-    setBackLabel(analog ? 'Volver a análogos' : 'Volver a misiones');
+    setBackLabel(analog ? 'Back to analogs' : 'Back to missions');
   }
 });
 
@@ -161,7 +161,7 @@ function closeMission() {
   selectedRegionId = null;
   analogRegionId = null;
   missionInfo.hide();
-  setBackLabel('Volver a misiones');
+  setBackLabel('Back to missions');
   bodyHologram.hide();
   earthHologram.hide();
   earthMini.group.visible = false;
@@ -316,8 +316,8 @@ function showAnalog(analog) {
   setViewShiftTarget(...view.viewShift);
   if (!changed) return;
   earthHologram.show(analog.region, earthMarkers.outline(analogRegionId), EARTH.realRadiusKm, {
-    kicker: `Análogo terrestre · ${analogRegionId}`,
-    tag: `${Math.round(analog.similarity * 100)}\u00a0%` // espacio sin salto: "59 %" no se parte
+    kicker: `Earth analog · ${analogRegionId}`,
+    tag: `${Math.round(analog.similarity * 100)}%`
   }, {
     // La forma del análogo se adapta hacia la del terreno de la misión según la similitud
     target: mission.markers.outline(selectedRegionId),
@@ -368,7 +368,7 @@ function goToMission(region) {
 // Los terrenos de la Tierra son opcionales: sin ellos las misiones se abren igual, sin análogos
 const loadEarthRegions = () =>
   loadRegions('./backend/data/earth.json').catch((err) => {
-    console.warn('Sin terrenos terrestres: las misiones se mostrarán sin análogos.', err);
+    console.warn('No Earth terrains: missions will be shown without analogs.', err);
     return [];
   });
 
@@ -394,7 +394,7 @@ Promise.all([loadRegions('./backend/data/moon.json'), loadRegions('./backend/dat
     updateMissionsPanel(cameraNavigator.currentFocus);
     updateTerrainAreas(cameraNavigator.currentFocus, mainMenu.isOpen);
   })
-  .catch((err) => console.warn('No se pudieron cargar los terrenos de backend/data.', err));
+  .catch((err) => console.warn('Could not load terrains from backend/data.', err));
 
 // --- Bucle principal ---
 const clock = new THREE.Clock();

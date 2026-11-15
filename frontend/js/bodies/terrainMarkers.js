@@ -411,7 +411,7 @@ export function setupMarkerTooltip({ camera, domElement, markerSets, occluders, 
       domElement.style.cursor = region ? 'pointer' : '';
       if (region) {
         const { latitude, longitude } = region.coordinates;
-        tooltip.innerHTML = `<strong>${region.name}</strong><span>${region.regionId} · ${format(latitude, 'N', 'S')}, ${format(longitude, 'E', 'O')}</span>`;
+        tooltip.innerHTML = `<strong>${region.name}</strong><span>${region.regionId} · ${format(latitude, 'N', 'S')}, ${format(longitude, 'E', 'W')}</span>`;
       }
       tooltip.classList.toggle('is-hidden', !region);
     }
