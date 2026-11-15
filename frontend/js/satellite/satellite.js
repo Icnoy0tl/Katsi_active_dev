@@ -8,7 +8,7 @@ const SOLAR_TRACKING_RATE = 3.0; // rapidez con que las alas siguen la luz (1/s)
 const FLASH_DURATION = 0.12; // segundos encendida en cada destello
 
 /**
- * Satélite en un punto fijo de una órbita baja inclinada (51.6°), apuntando al nadir
+ * Satélite en un punto fijo de una órbita baja inclinada (28.5°), apuntando al nadir
  */
 export function createSatellite({ renderer, anisotropy }) {
   const { root, pivot } = createOrbitalAnchor({ inclination: SATELLITE.orbitInclination, angle: SATELLITE.angle });

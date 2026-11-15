@@ -16,6 +16,31 @@ export const EARTH = {
 };
 
 const MOON_RADIUS = EARTH.radius * 0.273;
+const MARS_RADIUS = EARTH.radius * 0.532;
+
+/**
+ * Vista de una misión: cuerpo más pequeño (cámara a `distance` del centro), desplazado a la
+ * izquierda y hacia arriba (`viewShift` [x, y], fracciones del ancho/alto) para dejar sitio
+ * a los hologramas y a la Tierra debajo. `faceCamera` gira el área hacia la cámara
+ * (0 = de perfil en el borde derecho, mayor = más de frente).
+ * `earth`: Tierra en miniatura (no a escala) bajo el cuerpo; `drop` es la separación vertical
+ * entre centros como fracción de `distance` (así se mantiene la composición).
+ * `soloViewShift`: desplazamiento mientras no se ha entrado en un análogo (sin Tierra debajo,
+ * el cuerpo queda centrado en vertical). `soloDistanceScale` < 1 acerca entonces la cámara para
+ * que se vea más grande; al entrar en un análogo vuelve a `distance`.
+ *
+ * Las distancias están pensadas para la Luna; `scale` las ajusta al radio de otro cuerpo para
+ * que ocupe lo mismo en pantalla.
+ */
+const missionView = (scale = 1) => ({
+  distance: 4.6 * scale,
+  viewShift: [0.03, 0.2],
+  soloViewShift: [0.03, 0],
+  soloDistanceScale: 0.75,
+  faceCamera: 0.55,
+  earth: { radius: 0.62 * scale, drop: 0.37 }
+});
+
 export const MOON = {
   radius: MOON_RADIUS,
   realRadiusKm: 1737.4, // para convertir km de superficie a unidades de escena
@@ -24,28 +49,9 @@ export const MOON = {
   orbitInclination: deg(5.14),
   axialTilt: deg(6.68),
   flightSafeRadius: MOON_RADIUS * 1.5,
-  /**
-   * Vista de una misión: Luna más pequeña (cámara a `distance` del centro), desplazada a la
-   * izquierda y hacia arriba (`viewShift` [x, y], fracciones del ancho/alto) para dejar sitio
-   * a los hologramas y a la Tierra debajo. `faceCamera` gira el área hacia la cámara
-   * (0 = de perfil en el borde derecho, mayor = más de frente).
-   * `earth`: Tierra en miniatura (no a escala) bajo la Luna; `drop` es la separación vertical
-   * entre centros como fracción de `distance` (así se mantiene la composición).
-   * `soloViewShift`: desplazamiento mientras no se ha entrado en un análogo (sin Tierra debajo,
-   * la Luna queda centrada en vertical). `soloDistanceScale` < 1 acerca entonces la cámara para
-   * que la Luna se vea más grande; al entrar en un análogo vuelve a `distance`.
-   */
-  missionView: {
-    distance: 4.6,
-    viewShift: [0.03, 0.2],
-    soloViewShift: [0.03, 0],
-    soloDistanceScale: 0.75,
-    faceCamera: 0.55,
-    earth: { radius: 0.62, drop: 0.37 }
-  }
+  missionView: missionView()
 };
 
-const MARS_RADIUS = EARTH.radius * 0.532;
 export const MARS = {
   radius: MARS_RADIUS,
   atmosphereRadius: MARS_RADIUS * 1.055,
@@ -58,18 +64,7 @@ export const MARS = {
   axialTilt: deg(25.19),
   flightSafeRadius: MARS_RADIUS * 1.4,
   realRadiusKm: 3389.5,
-  /**
-   * Misma composición que la vista de misión de la Luna (ver MOON.missionView), con las
-   * distancias escaladas al radio de Marte para que ocupe lo mismo en pantalla
-   */
-  missionView: {
-    distance: 4.6 * (MARS_RADIUS / MOON_RADIUS),
-    viewShift: [0.03, 0.2],
-    soloViewShift: [0.03, 0],
-    soloDistanceScale: 0.75,
-    faceCamera: 0.55,
-    earth: { radius: 0.62 * (MARS_RADIUS / MOON_RADIUS), drop: 0.37 }
-  }
+  missionView: missionView(MARS_RADIUS / MOON_RADIUS)
 };
 
 export const SATELLITE = {
@@ -94,10 +89,6 @@ export const ORION = {
 };
 
 /**
- * Menú principal: la vista se desplaza horizontalmente (fracción del ancho) para dejar
- * Orión a la derecha y el menú a la izquierda. En pantallas estrechas no se desplaza.
- */
-/**
  * Campo de visión vertical (grados). En la vista de misión se estrecha y la cámara se aleja en
  * la misma proporción: los cuerpos ocupan lo mismo en pantalla, pero los que quedan lejos del
  * centro (Tierra en miniatura abajo a la izquierda) ya no se ven ovalados por la perspectiva.
@@ -113,6 +104,10 @@ export const CAMERA = {
 export const distanceForFov = (fov) =>
   Math.tan(deg(CAMERA.fov) / 2) / Math.tan(deg(fov) / 2);
 
+/**
+ * Menú principal: la vista se desplaza horizontalmente (fracción del ancho) para dejar
+ * Orión a la derecha y el menú a la izquierda. En pantallas estrechas no se desplaza.
+ */
 export const MENU = {
   viewShift: 0.22,
   missionsViewShift: 0.08, // lista de misiones (Luna/Marte): separa el cuerpo de las tarjetas

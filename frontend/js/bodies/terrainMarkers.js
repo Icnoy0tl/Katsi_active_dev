@@ -7,7 +7,7 @@ const deg = THREE.MathUtils.degToRad;
  * Convierte latitud/longitud (grados) a un punto sobre una SphereGeometry de Three.js
  * con textura equirectangular (u = 0 en longitud -180°, centro de la textura en 0°).
  */
-export function latLonToVector3(latitude, longitude, radius) {
+function latLonToVector3(latitude, longitude, radius) {
   const phi = deg(longitude + 180); // ángulo azimutal de SphereGeometry
   const theta = deg(90 - latitude); // ángulo polar desde el polo norte
   return new THREE.Vector3(
@@ -139,11 +139,10 @@ function createAreaGeometries(outline, frame, radius, outlineWidth) {
   fill.computeBoundingSphere();
 
   // Borde: cada vértice se desplaza hacia el centro una distancia fija
-  const width = outlineWidth;
   const outlinePositions = [];
   const outlineIndices = [];
   outline.forEach((p) => {
-    const inner = p.clone().multiplyScalar(Math.max(0, 1 - width / p.length()));
+    const inner = p.clone().multiplyScalar(Math.max(0, 1 - outlineWidth / p.length()));
     project(p.x, p.y, v);
     outlinePositions.push(v.x, v.y, v.z);
     project(inner.x, inner.y, v);
@@ -281,8 +280,8 @@ function createBadgeTexture() {
 
 /**
  * Dibuja un área de terreno irregular por cada región sobre la superficie de `body` (se
- * añaden como hijos, así giran con él), cada una con su propio color. El distintivo se
- * comparten; la geometría se genera una vez por región.
+ * añaden como hijos, así giran con él), cada una con su propio color. El material del
+ * distintivo se comparte; la geometría se genera una vez por región.
  */
 export function createTerrainMarkers({ body, radius, regions }) {
   const group = new THREE.Group();
@@ -291,7 +290,7 @@ export function createTerrainMarkers({ body, radius, regions }) {
   const badgeMaterial = new THREE.SpriteMaterial({ map: createBadgeTexture(), depthWrite: false });
 
   const hitTargets = [];
-  const areas = new Map(); // regionId → { normal, outline, anchor, group }
+  const areas = new Map(); // regionId → { normal, outline, anchor, group, badge }
   const normals = regions.map(({ coordinates }) => latLonToVector3(coordinates.latitude, coordinates.longitude, 1));
 
   // Distintivos en el centro visible de cada área (si dos regiones casi coinciden, cada una

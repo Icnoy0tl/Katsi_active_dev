@@ -19,6 +19,20 @@ function sideView(elevation, distance) {
 }
 
 /**
+ * Vista de una nave en órbita baja: desde fuera de la órbita (`outwardDistance` alejándose de la
+ * Tierra, `sideDistance` de costado y `lift` hacia arriba), con la Tierra de fondo
+ */
+function orbitView(outwardDistance, sideDistance, lift) {
+  return (target, out) => {
+    outward.copy(target).normalize();
+    side.set(-outward.z, 0, outward.x).normalize();
+    out.copy(target).addScaledVector(outward, outwardDistance).addScaledVector(side, sideDistance);
+    out.y += lift;
+    return out;
+  };
+}
+
+/**
  * Destinos de cámara. `zoom` limita el acercamiento/alejamiento (nunca lo suficiente para ver
  * todo el sistema) y `near` es el plano cercano de la cámara.
  */
@@ -26,7 +40,7 @@ function createFocusViews(bodies) {
   return {
     earth: {
       object: bodies.earth,
-      cameraPosition: (target, out) => out.set(0, 1.4, 6.2),
+      cameraPosition: (_target, out) => out.set(0, 1.4, 6.2),
       zoom: [2.6, 12.0],
       near: 0.1
     },
@@ -44,27 +58,13 @@ function createFocusViews(bodies) {
     },
     satellite: {
       object: bodies.satellite,
-      // Desde fuera de la órbita, ligeramente por encima, con la Tierra de fondo
-      cameraPosition: (target, out) => {
-        outward.copy(target).normalize();
-        side.set(-outward.z, 0, outward.x).normalize();
-        out.copy(target).addScaledVector(outward, 0.55).addScaledVector(side, 0.45);
-        out.y += 0.22;
-        return out;
-      },
+      cameraPosition: orbitView(0.55, 0.45, 0.22),
       zoom: [0.18, 3.0],
       near: 0.01 // reducido para no recortar el modelo al acercarse
     },
     orion: {
       object: bodies.orion,
-      // Desde fuera de la órbita, con la Tierra de fondo
-      cameraPosition: (target, out) => {
-        outward.copy(target).normalize();
-        side.set(-outward.z, 0, outward.x).normalize();
-        out.copy(target).addScaledVector(outward, 0.6).addScaledVector(side, -0.2);
-        out.y += 0.12;
-        return out;
-      },
+      cameraPosition: orbitView(0.6, -0.2, 0.12),
       zoom: [0.16, 3.0],
       near: 0.01
     }
