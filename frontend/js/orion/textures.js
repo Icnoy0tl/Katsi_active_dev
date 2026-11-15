@@ -1,4 +1,4 @@
-import { createCanvas, createCanvasTexture, createSeededRandom } from '../utils/canvas.js';
+import { createCanvas, createCanvasTexture, createSeededRandom, fillCanvas, strokeLine, withStops } from '../utils/canvas.js';
 
 const FONT = '"Arial Black", "Helvetica Neue", Arial, sans-serif';
 
@@ -28,11 +28,7 @@ function drawCrewModule(rand) {
   const H = 512;
   const { canvas, ctx } = createCanvas(W, H);
 
-  const base = ctx.createLinearGradient(0, 0, 0, H);
-  base.addColorStop(0, '#6f7f94');
-  base.addColorStop(1, '#b7c3d1');
-  ctx.fillStyle = base;
-  ctx.fillRect(0, 0, W, H);
+  fillCanvas(ctx, withStops(ctx.createLinearGradient(0, 0, 0, H), [[0, '#6f7f94'], [1, '#b7c3d1']]));
 
   // Losetas de protección térmica con ligeras variaciones de tono
   const rows = 7;
@@ -50,9 +46,9 @@ function drawCrewModule(rand) {
   ctx.strokeStyle = 'rgba(30, 40, 55, 0.4)';
   ctx.lineWidth = 1.5;
   for (let r = 0; r <= rows; r++) {
-    line(ctx, 0, r * th, W, r * th);
+    strokeLine(ctx, 0, r * th, W, r * th);
     const offset = (r % 2) * tw * 0.5;
-    for (let c = 0; c <= cols; c++) line(ctx, c * tw + offset, r * th, c * tw + offset, (r + 1) * th);
+    for (let c = 0; c <= cols; c++) strokeLine(ctx, c * tw + offset, r * th, c * tw + offset, (r + 1) * th);
   }
 
   // Los detalles frontales se dibujan comprimidos en vertical para compensar el estiramiento del cono
@@ -72,11 +68,11 @@ function drawCrewModule(rand) {
       ctx.fillStyle = '#d7dde5';
       ctx.fill();
       roundedRect(ctx, -27, -21, 54, 42, 9);
-      const glass = ctx.createLinearGradient(-27, -21, 27, 21);
-      glass.addColorStop(0, '#3b4b63');
-      glass.addColorStop(0.45, '#0b1220');
-      glass.addColorStop(1, '#1a2436');
-      ctx.fillStyle = glass;
+      ctx.fillStyle = withStops(ctx.createLinearGradient(-27, -21, 27, 21), [
+        [0, '#3b4b63'],
+        [0.45, '#0b1220'],
+        [1, '#1a2436']
+      ]);
       ctx.fill();
     })
   );
@@ -132,15 +128,11 @@ function drawBand() {
   const H = 256;
   const { canvas, ctx } = createCanvas(W, H);
 
-  const base = ctx.createLinearGradient(0, 0, 0, H);
-  base.addColorStop(0, '#f4f6f8');
-  base.addColorStop(1, '#d9dee4');
-  ctx.fillStyle = base;
-  ctx.fillRect(0, 0, W, H);
+  fillCanvas(ctx, withStops(ctx.createLinearGradient(0, 0, 0, H), [[0, '#f4f6f8'], [1, '#d9dee4']]));
 
   ctx.strokeStyle = 'rgba(60, 70, 85, 0.25)';
   ctx.lineWidth = 2;
-  for (let x = 0; x <= W; x += 256) line(ctx, x, 0, x, H);
+  for (let x = 0; x <= W; x += 256) strokeLine(ctx, x, 0, x, H);
   ctx.fillStyle = 'rgba(40, 48, 60, 0.55)';
   ctx.fillRect(0, 0, W, 6);
   ctx.fillRect(0, H - 6, W, 6);
@@ -161,8 +153,7 @@ function drawServiceModule(rand) {
   const H = 512;
   const { canvas, ctx } = createCanvas(W, H);
 
-  ctx.fillStyle = '#e8ebef';
-  ctx.fillRect(0, 0, W, H);
+  fillCanvas(ctx, '#e8ebef');
 
   const cols = 16;
   const cw = W / cols;
@@ -174,8 +165,8 @@ function drawServiceModule(rand) {
 
   ctx.strokeStyle = 'rgba(70, 80, 95, 0.4)';
   ctx.lineWidth = 2.5;
-  for (let c = 0; c <= cols; c++) line(ctx, c * cw, 0, c * cw, H);
-  [0.34, 0.68].forEach((v) => line(ctx, 0, H * v, W, H * v));
+  for (let c = 0; c <= cols; c++) strokeLine(ctx, c * cw, 0, c * cw, H);
+  [0.34, 0.68].forEach((v) => strokeLine(ctx, 0, H * v, W, H * v));
 
   // Rejillas y escotillas de acceso
   for (let i = 0; i < 40; i++) {
@@ -198,8 +189,7 @@ function drawSolarCells(rand) {
   const W = 1024;
   const H = 884;
   const { canvas, ctx } = createCanvas(W, H);
-  ctx.fillStyle = '#9aa2ad';
-  ctx.fillRect(0, 0, W, H);
+  fillCanvas(ctx, '#9aa2ad');
 
   const cols = 12;
   const rows = 10;
@@ -212,14 +202,14 @@ function drawSolarCells(rand) {
       const x = border + c * (cw + gap);
       const y = border + r * (ch + gap);
       const t = rand() * 0.07;
-      const grad = ctx.createLinearGradient(x, y, x + cw, y + ch);
-      grad.addColorStop(0, `rgb(${(38 + t * 200) | 0}, ${(42 + t * 200) | 0}, ${(52 + t * 220) | 0})`);
-      grad.addColorStop(1, '#12151b');
-      ctx.fillStyle = grad;
+      ctx.fillStyle = withStops(ctx.createLinearGradient(x, y, x + cw, y + ch), [
+        [0, `rgb(${(38 + t * 200) | 0}, ${(42 + t * 200) | 0}, ${(52 + t * 220) | 0})`],
+        [1, '#12151b']
+      ]);
       ctx.fillRect(x, y, cw, ch);
       ctx.strokeStyle = 'rgba(190, 198, 210, 0.3)';
       ctx.lineWidth = 1;
-      line(ctx, x + cw / 2, y + 2, x + cw / 2, y + ch - 2);
+      strokeLine(ctx, x + cw / 2, y + 2, x + cw / 2, y + ch - 2);
     }
   }
   return canvas;
@@ -228,20 +218,12 @@ function drawSolarCells(rand) {
 /** Reverso de las alas solares */
 function drawSolarBack() {
   const { canvas, ctx } = createCanvas(256, 222);
-  ctx.fillStyle = '#c9ced5';
-  ctx.fillRect(0, 0, 256, 222);
+  fillCanvas(ctx, '#c9ced5');
   ctx.strokeStyle = 'rgba(40, 48, 60, 0.2)';
   ctx.lineWidth = 2;
-  for (let x = 0; x <= 256; x += 32) line(ctx, x, 0, x, 222);
-  for (let y = 0; y <= 222; y += 37) line(ctx, 0, y, 256, y);
+  for (let x = 0; x <= 256; x += 32) strokeLine(ctx, x, 0, x, 222);
+  for (let y = 0; y <= 222; y += 37) strokeLine(ctx, 0, y, 256, y);
   return canvas;
-}
-
-function line(ctx, x1, y1, x2, y2) {
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-  ctx.stroke();
 }
 
 function roundedRect(ctx, x, y, w, h, r) {

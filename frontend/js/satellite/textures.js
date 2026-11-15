@@ -1,4 +1,4 @@
-import { createCanvas, createCanvasTexture, createSeededRandom } from '../utils/canvas.js';
+import { createCanvas, createCanvasTexture, createSeededRandom, fillCanvas, strokeLine, withStops } from '../utils/canvas.js';
 
 /**
  * Texturas procedurales del satélite: aislamiento multicapa (MLI) dorado arrugado,
@@ -11,10 +11,8 @@ export function createSatelliteTextures(anisotropy) {
   const S = 1024;
   const { canvas: mliCanvas, ctx: m } = createCanvas(S, S);
   const { canvas: mliBumpCanvas, ctx: mb } = createCanvas(S, S);
-  m.fillStyle = '#c99430';
-  m.fillRect(0, 0, S, S);
-  mb.fillStyle = '#808080';
-  mb.fillRect(0, 0, S, S);
+  fillCanvas(m, '#c99430');
+  fillCanvas(mb, '#808080');
 
   for (let i = 0; i < 900; i++) {
     const cx = rand() * S;
@@ -81,8 +79,7 @@ export function createSatelliteTextures(anisotropy) {
   const PW = 1024;
   const PH = 640;
   const { canvas: solarCanvas, ctx: s } = createCanvas(PW, PH);
-  s.fillStyle = '#aeb6c2';
-  s.fillRect(0, 0, PW, PH);
+  fillCanvas(s, '#aeb6c2');
   const cols = 12;
   const rows = 8;
   const border = 14;
@@ -96,10 +93,10 @@ export function createSatelliteTextures(anisotropy) {
       const x = border + c * (cw + gap);
       const y = border + r * (ch + gap);
       const t = rand() * 0.08;
-      const grad = s.createLinearGradient(x, y, x + cw, y + ch);
-      grad.addColorStop(0, `rgb(${(20 + t * 120) | 0}, ${(40 + t * 140) | 0}, ${(96 + t * 180) | 0})`);
-      grad.addColorStop(1, '#0a1736');
-      s.fillStyle = grad;
+      s.fillStyle = withStops(s.createLinearGradient(x, y, x + cw, y + ch), [
+        [0, `rgb(${(20 + t * 120) | 0}, ${(40 + t * 140) | 0}, ${(96 + t * 180) | 0})`],
+        [1, '#0a1736']
+      ]);
       s.beginPath();
       s.moveTo(x + cut, y);
       s.lineTo(x + cw - cut, y);
@@ -114,48 +111,28 @@ export function createSatelliteTextures(anisotropy) {
 
       s.strokeStyle = 'rgba(150, 172, 215, 0.1)';
       s.lineWidth = 1;
-      for (let fy = y + 5; fy < y + ch - 3; fy += 5) {
-        s.beginPath();
-        s.moveTo(x + 2, fy);
-        s.lineTo(x + cw - 2, fy);
-        s.stroke();
-      }
+      for (let fy = y + 5; fy < y + ch - 3; fy += 5) strokeLine(s, x + 2, fy, x + cw - 2, fy);
       s.strokeStyle = 'rgba(205, 214, 228, 0.45)';
       s.lineWidth = 1.4;
       for (let b = 1; b <= 2; b++) {
         const bx = x + (cw * b) / 3;
-        s.beginPath();
-        s.moveTo(bx, y + 2);
-        s.lineTo(bx, y + ch - 2);
-        s.stroke();
+        strokeLine(s, bx, y + 2, bx, y + ch - 2);
       }
     }
   }
 
   // 3. Reverso de los paneles (sustrato de fibra de carbono con kapton claro)
   const { canvas: backCanvas, ctx: bk } = createCanvas(512, 320);
-  bk.fillStyle = '#d4d8de';
-  bk.fillRect(0, 0, 512, 320);
+  fillCanvas(bk, '#d4d8de');
   bk.strokeStyle = 'rgba(40, 48, 60, 0.18)';
   bk.lineWidth = 2;
-  for (let x = 0; x <= 512; x += 64) {
-    bk.beginPath();
-    bk.moveTo(x, 0);
-    bk.lineTo(x, 320);
-    bk.stroke();
-  }
-  for (let y = 0; y <= 320; y += 64) {
-    bk.beginPath();
-    bk.moveTo(0, y);
-    bk.lineTo(512, y);
-    bk.stroke();
-  }
+  for (let x = 0; x <= 512; x += 64) strokeLine(bk, x, 0, x, 320);
+  for (let y = 0; y <= 320; y += 64) strokeLine(bk, 0, y, 512, y);
 
   // 4. Radiadores OSR: mosaico de pequeñas baldosas de espejo
   const R = 512;
   const { canvas: radCanvas, ctx: rc } = createCanvas(R, R);
-  rc.fillStyle = '#5d6672';
-  rc.fillRect(0, 0, R, R);
+  fillCanvas(rc, '#5d6672');
   const tile = R / 16;
   for (let ty = 0; ty < 16; ty++) {
     for (let tx = 0; tx < 16; tx++) {
@@ -167,12 +144,14 @@ export function createSatelliteTextures(anisotropy) {
 
   // 5. Halo radial para las luces de navegación
   const { canvas: glowCanvas, ctx: gl } = createCanvas(128, 128);
-  const glowGrad = gl.createRadialGradient(64, 64, 0, 64, 64, 64);
-  glowGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-  glowGrad.addColorStop(0.25, 'rgba(255, 255, 255, 0.55)');
-  glowGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-  gl.fillStyle = glowGrad;
-  gl.fillRect(0, 0, 128, 128);
+  fillCanvas(
+    gl,
+    withStops(gl.createRadialGradient(64, 64, 0, 64, 64, 64), [
+      [0, 'rgba(255, 255, 255, 1)'],
+      [0.25, 'rgba(255, 255, 255, 0.55)'],
+      [1, 'rgba(255, 255, 255, 0)']
+    ])
+  );
 
   return {
     mliMap: createCanvasTexture(mliCanvas, anisotropy, true),

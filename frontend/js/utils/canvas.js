@@ -31,3 +31,34 @@ export function createCanvasTexture(canvas, anisotropy, isColor = false) {
   texture.anisotropy = anisotropy;
   return texture;
 }
+
+/** Añade paradas `[[offset, color], …]` a un degradado y lo devuelve */
+export function withStops(gradient, stops) {
+  stops.forEach(([offset, color]) => gradient.addColorStop(offset, color));
+  return gradient;
+}
+
+/** Rellena todo el canvas con un color o degradado */
+export function fillCanvas(ctx, style) {
+  ctx.fillStyle = style;
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
+
+export function fillCircle(ctx, x, y, radius, style) {
+  ctx.fillStyle = style;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+/** Círculo con degradado radial desde `innerRadius` hasta su borde (cráteres, manchas, relieve) */
+export function fillRadialSpot(ctx, x, y, innerRadius, radius, stops) {
+  fillCircle(ctx, x, y, radius, withStops(ctx.createRadialGradient(x, y, innerRadius, x, y, radius), stops));
+}
+
+export function strokeLine(ctx, x1, y1, x2, y2) {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+}
