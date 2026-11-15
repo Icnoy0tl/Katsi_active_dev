@@ -119,6 +119,51 @@ function pendingCard(index) {
     </li>`;
 }
 
+/** Tarjeta esqueleto mientras llegan los análogos: misma forma que la tarjeta, con barras en vez de texto */
+function skeletonCard(index) {
+  return `<li class="menu-enter" style="--i: ${index + 5}">
+      <div class="menu-tag menu-tag--mission is-pending is-skeleton" aria-hidden="true">${missionCardContent({
+        icon: EARTH_ICON,
+        title: '<span class="skeleton-bar"></span>',
+        meta: '<span class="skeleton-bar skeleton-bar--short"></span>',
+        trailing: '<span class="menu-score" style="--score: 0"></span>'
+      })}
+      </div>
+    </li>`;
+}
+
+const RETRY_ICON =
+  '<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4.5v4.2h-4.2"/></svg>';
+
+/** Tarjeta única cuando el backend no respondió: pulsarla repite la petición */
+function errorCard() {
+  return `<li class="menu-enter" style="--i: 5">
+      <button type="button" class="menu-tag menu-tag--mission" data-retry>${missionCardContent({
+        icon: RETRY_ICON,
+        title: 'Earth analogs unavailable',
+        meta: 'The analogs service did not respond · Retry',
+        trailing: ''
+      })}
+      </button>
+    </li>`;
+}
+
+/**
+ * Tarjetas de la lista según el estado de la petición: esqueletos mientras carga (`analogs` null),
+ * una tarjeta para reintentar si falló, y si llegaron, huecos «Pending» para los que falten.
+ */
+function analogCards(analogs, failed) {
+  if (failed) return errorCard();
+  return Array.from({ length: ANALOG_SLOTS }, (_, i) => {
+    if (!analogs) return skeletonCard(i);
+    return analogs[i] ? analogCard(analogs[i], i) : pendingCard(i);
+  }).join('');
+}
+
+/** Texto para lectores de pantalla del estado de la lista */
+const listStatus = (analogs, failed) =>
+  failed ? 'Earth analogs unavailable.' : analogs ? '' : 'Loading Earth analogs…';
+
 /**
  * Panel izquierdo de la misión con dos apartados:
  *  - Lista: el terreno seleccionado y sus análogos terrestres más parecidos (hasta 3 tarjetas).
@@ -127,9 +172,12 @@ function pendingCard(index) {
  *
  * @param onAnalogChange(analog | null) se llama al entrar en un análogo (con él) y al volver a la
  *        lista (con null): la Tierra solo se muestra mientras se está dentro de un análogo
- * @returns { show(region, analogs, bodyName), hide(), backToList(), inAnalog }
+ * @param onRetry() se llama al pulsar «reintentar» tras un fallo del backend de análogos
+ * @returns { show(region, analogs, bodyName), setAnalogs(analogs), setAnalogsError(), hide(), backToList(), inAnalog }
+ *          `analogs` null en `show` = aún cargando (tarjetas esqueleto hasta `setAnalogs` o
+ *          `setAnalogsError`)
  */
-export function setupMissionInfo({ onAnalogChange } = {}) {
+export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
   const panel = $('mission-info');
   const body = $('mission-info-body');
   const vignette = $('cmp-vignette');
@@ -154,7 +202,8 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
 
   let region = null;
   let bodyLabel = '';
-  let analogs = [];
+  let analogs = null;
+  let analogsFailed = false; // la última petición de análogos falló
   let shown = -1; // análogo en el que se ha entrado (-1 = lista)
 
   function render(html) {
@@ -164,9 +213,6 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
   }
 
   function renderList() {
-    const cards = Array.from({ length: ANALOG_SLOTS }, (_, i) =>
-      analogs[i] ? analogCard(analogs[i], i) : pendingCard(i)
-    ).join('');
     setVignette(false);
     setComparisonLayout(false);
     render(`
@@ -175,7 +221,8 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
       <p class="info-coords menu-enter" style="--i: 3">${region.regionId} · ${formatLatLon(region.coordinates, ' · ')}</p>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
       <section class="cmp-analogs">
-        <ol class="menu-options" aria-label="Earth analogs: pick one to see the comparison">${cards}</ol>
+        <ol class="menu-options" aria-label="Earth analogs: pick one to see the comparison" aria-busy="${!analogs && !analogsFailed}">${analogCards(analogs, analogsFailed)}</ol>
+        <p class="sr-only" role="status">${listStatus(analogs, analogsFailed)}</p>
       </section>`);
   }
 
@@ -212,7 +259,24 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
     setComparisonLayout(true);
   }
 
+  /** Vuelve a pintar solo las tarjetas (sin animar el resto de la lista); en una comparación, al volver */
+  function updateCards() {
+    const list = body.querySelector('.cmp-analogs ol');
+    if (shown !== -1 || !list) return;
+    list.innerHTML = analogCards(analogs, analogsFailed);
+    list.setAttribute('aria-busy', String(!analogs && !analogsFailed));
+    body.querySelector('.cmp-analogs [role="status"]').textContent = listStatus(analogs, analogsFailed);
+    updateScrollEnd();
+  }
+
   body.addEventListener('click', (event) => {
+    if (event.target.closest('button[data-retry]')) {
+      analogs = null;
+      analogsFailed = false;
+      updateCards();
+      onRetry?.();
+      return;
+    }
     const card = event.target.closest('button[data-index]');
     if (!card) return;
     const index = Number(card.dataset.index);
@@ -238,15 +302,31 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
     show(selectedRegion, foundAnalogs, bodyName) {
       region = selectedRegion;
       bodyLabel = BODY_LABELS[bodyName] ?? bodyName;
-      analogs = foundAnalogs.slice(0, ANALOG_SLOTS);
+      analogs = foundAnalogs?.slice(0, ANALOG_SLOTS) ?? null;
+      analogsFailed = false;
       shown = -1;
       renderList();
       panel.classList.remove('is-hidden');
       panel.setAttribute('aria-hidden', 'false');
     },
+    /** Cambia los esqueletos por los análogos que devolvió el backend */
+    setAnalogs(foundAnalogs) {
+      if (!region) return;
+      analogs = foundAnalogs.slice(0, ANALOG_SLOTS);
+      analogsFailed = false;
+      updateCards();
+    },
+    /** Cambia los esqueletos por la tarjeta para reintentar */
+    setAnalogsError() {
+      if (!region) return;
+      analogs = null;
+      analogsFailed = true;
+      updateCards();
+    },
     hide() {
       region = null;
-      analogs = [];
+      analogs = null;
+      analogsFailed = false;
       shown = -1;
       setVignette(false);
       setComparisonLayout(false);

@@ -10,19 +10,6 @@
 - [x] **Favicon**: `frontend/icons/favicon.svg` + `apple-touch-icon.png` de 180×180.
 - [x] `<title>` descriptivo: "HailMary · Earth analogs for Moon and Mars base sites".
 
-## Qué se publica
-- [ ] Publicar solo lo necesario: `index.html`, `frontend/` y `backend/data/*.json` (`main.js` los carga). No publicar `backend/API`, `backend/knn` ni `backend/jsonParser`. robots.txt **no** los protege.
-- [ ] Página 404 sencilla (o redirección a `/`).
-
-## Rendimiento (con métricas)
-Medir antes y después con Lighthouse (móvil) y la pestaña Network con "Fast 4G".
-
-| Métrica | Objetivo |
-|---|---|
-| Peso total de la primera carga | < 5 MB (texturas: 8.6 MB en JPG → 5.7 MB en WebP) |
-| LCP | < 2.5 s |
-| TBT | < 200 ms |
-| FPS en la escena (laptop media) | ≥ 50 |
 
 - [ ] **Quitar `cdn.tailwindcss.com`**: es el Play CDN, que compila en el navegador y no está pensado para producción (bloquea el render y pesa ~300 KB de JS). Generar un CSS estático con el CLI de Tailwind.
 - [x] **Comprimir texturas** a WebP (−34 %: 8.6 → 5.7 MB). Calidad 82 general, 92 en el normal map, 75 en Luna y nubes (error medio < 4/255).

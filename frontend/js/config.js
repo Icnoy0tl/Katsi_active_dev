@@ -174,3 +174,15 @@ export const PHOTO_TEXTURES = {
   marsColor: { local: LOCAL + 'mars_4k.webp', fallback: PLANETS_CDN + 'marsmap1k.jpg' },
   marsBump: { local: LOCAL + 'mars_bump_1k.webp', fallback: PLANETS_CDN + 'marsbump1k.jpg' }
 };
+
+/**
+ * Backend de análogos (`GET /api/analog`, en backend/main.go): es la única fuente de los análogos,
+ * el front no los calcula. En local apunta al servidor de Go en el puerto 8080; en producción, a
+ * `/api/analog` del mismo dominio (cambiar `url` si el backend se publica en otro).
+ * Si la petición falla o tarda más de `timeoutMs`, el panel ofrece reintentar.
+ */
+const IS_LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
+export const ANALOGS_API = {
+  url: IS_LOCAL ? 'http://localhost:8080/api/analog' : '/api/analog',
+  timeoutMs: 8000
+};

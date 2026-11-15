@@ -15,7 +15,7 @@ import { createMenuTour } from './menuTour.js';
 import { setupMissionsPanel } from './missions.js';
 import { setupMissionInfo } from './missionInfo.js';
 import { createHologram } from './hologram.js';
-import { findClosestAnalogs } from './analogs.js';
+import { fetchClosestAnalogs } from './analogs.js';
 import { createEarthMiniature } from './bodies/earthMiniature.js';
 import { createTerrainMarkers, loadRegions, setupMarkerTooltip } from './bodies/terrainMarkers.js';
 import { createViewShift, shiftIfWide } from './viewShift.js';
@@ -108,7 +108,8 @@ const missionInfo = setupMissionInfo({
   onAnalogChange: (analog) => {
     showAnalog(analog);
     setBackLabel(analog ? 'Back to analogs' : 'Back to missions');
-  }
+  },
+  onRetry: () => requestAnalogs()
 });
 
 // En la vista de misión, "Volver al menú" se sustituye por "Volver a misiones"; dentro de un
@@ -131,6 +132,7 @@ function setMissionButtons(inMission) {
 let missionBodyName = null; // cuerpo de la misión abierta ('moon' | 'mars')
 let selectedRegionId = null; // misión mostrada en el holograma
 let analogRegionId = null; // análogo terrestre elegido entre los más parecidos
+let analogsRequest = 0; // petición de análogos más reciente (las anteriores se descartan)
 let isRotating = true; // los cuerpos giran salvo con una misión abierta
 
 // Tierra en miniatura bajo el cuerpo durante la vista de misión (su tamaño depende del cuerpo)
@@ -292,6 +294,23 @@ function showAnalog(analog) {
 }
 
 /**
+ * Pide al backend los análogos de la misión abierta y los pasa al panel (o el error, para que
+ * ofrezca reintentar). Se descarta la respuesta si mientras tanto cambió la misión.
+ */
+function requestAnalogs() {
+  const request = ++analogsRequest;
+  const regionId = selectedRegionId;
+  const isCurrent = () => request === analogsRequest && selectedRegionId === regionId;
+  fetchClosestAnalogs(regionId, missionBodyName, earthRegions)
+    .then((analogs) => isCurrent() && missionInfo.setAnalogs(analogs))
+    .catch((err) => {
+      if (!isCurrent()) return;
+      console.error('Analogs API unavailable.', err);
+      missionInfo.setAnalogsError();
+    });
+}
+
+/**
  * Misma acción desde una tarjeta del panel o al hacer clic en un área del cuerpo:
  * información a la izquierda, cuerpo más pequeño y holograma del terreno a su derecha,
  * con la Tierra en miniatura y su análogo debajo
@@ -314,8 +333,10 @@ function goToMission(region) {
     kicker: mission.kicker,
     tag: region.regionId
   });
-  // Los 3 análogos más parecidos; la Tierra no aparece hasta entrar en uno de ellos
-  missionInfo.show(region, findClosestAnalogs(region, earthRegions), name);
+  // Los 3 análogos más parecidos, del backend, con tarjetas esqueleto mientras llegan; la Tierra
+  // no aparece hasta entrar en uno de ellos
+  missionInfo.show(region, null, name);
+  requestAnalogs();
   analogRegionId = null;
 
   missionVignette.classList.add('is-visible');

@@ -1,36 +1,25 @@
+import { ANALOGS_API } from './config.js';
+
 /**
- * Busca los `count` terrenos análogos más parecidos a `target` entre `candidates`, comparando sus
- * `coreVariables`. Cada variable se normaliza por su rango (mín–máx entre todos los terrenos
- * comparados) para que todas pesen igual; se ignoran las que falten o sean null.
+ * Los `count` análogos terrestres de la región `regionId` de `planet` según el backend
+ * (`GET /api/analog`): el cálculo vive solo allí. Lanza un error si la petición falla, responde
+ * con error o tarda más de `ANALOGS_API.timeoutMs`; quien llama decide cómo mostrarlo.
  *
- * similitud = 1 − distancia cuadrática media normalizada (1 = idénticos, 0 = opuestos en todo)
+ * Si la región terrestre ya está cargada en el front (`earthRegions`, mismo regionId) se usa esa
+ * para mostrarla: conserva los null de las variables, que el backend en Go convierte en 0.
  *
- * @returns [{ region, similarity }] ordenados de mayor a menor similitud (vacío si no hay candidatos)
+ * @returns [{ region, similarity }] en el orden del backend (de mayor a menor similitud)
  */
-export function findClosestAnalogs(target, candidates, count = 3) {
-  if (!candidates?.length) return [];
-  const pool = [target, ...candidates];
-  const keys = Object.keys(target.coreVariables ?? {});
-
-  const ranges = {};
-  keys.forEach((key) => {
-    const values = pool.map((r) => r.coreVariables?.[key]).filter((v) => typeof v === 'number');
-    ranges[key] = Math.max(...values) - Math.min(...values) || 1;
+export async function fetchClosestAnalogs(regionId, planet, earthRegions, count = 3) {
+  const params = new URLSearchParams({ planet, regionId });
+  const response = await fetch(`${ANALOGS_API.url}?${params}`, {
+    signal: AbortSignal.timeout(ANALOGS_API.timeoutMs)
   });
-
-  const scored = [];
-  candidates.forEach((candidate) => {
-    let sum = 0;
-    let used = 0;
-    keys.forEach((key) => {
-      const a = target.coreVariables[key];
-      const b = candidate.coreVariables?.[key];
-      if (typeof a !== 'number' || typeof b !== 'number') return;
-      sum += ((a - b) / ranges[key]) ** 2;
-      used++;
-    });
-    if (!used) return;
-    scored.push({ region: candidate, similarity: 1 - Math.sqrt(sum / used) });
-  });
-  return scored.sort((a, b) => b.similarity - a.similarity).slice(0, count);
+  if (!response.ok) throw new Error(`Analogs API: HTTP ${response.status}`);
+  const { matches = [] } = await response.json();
+  const byId = new Map(earthRegions?.map((region) => [region.regionId, region]));
+  return matches.slice(0, count).map(({ regionId, region, similarity }) => ({
+    region: byId.get(regionId) ?? region,
+    similarity
+  }));
 }
