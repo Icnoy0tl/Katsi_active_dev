@@ -1,0 +1,118 @@
+{
+  "regions": [
+    {
+      "regionId": "MOON-001",
+      "name": "Shackleton Crater rim",
+      "coordinates": {
+        "latitude": -89.9,
+        "longitude": 129.78
+      },
+      "coreVariables": {
+        "slope": 14.0,
+        "radar_roughness": 0.55,
+        "apparent_thermal_inertia": 60,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 55,
+        "line_of_sight": 30,
+        "diurnal_thermal_range": 130,
+        "dust_aerosols": 0.0,
+        "insolation": 28
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 1.5,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 5,
+        "depth_to_bedrock_max_m": 15,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 2.7,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.15,
+        "albedo": 0.15,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 6.0,
+        "ground_ice_index": 0.25
+      }
+    },
+    {
+      "regionId": "MOON-002",
+      "name": "Mare Tranquillitatis",
+      "coordinates": {
+        "latitude": 8.5,
+        "longitude": 31.4
+      },
+      "coreVariables": {
+        "slope": 2.5,
+        "radar_roughness": 0.3,
+        "apparent_thermal_inertia": 55,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.2,
+        "low_sun_shadows": 10,
+        "line_of_sight": 80,
+        "diurnal_thermal_range": 290,
+        "dust_aerosols": 0.0,
+        "insolation": 425
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 0.7,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 3,
+        "depth_to_bedrock_max_m": 6,
+        "vrm_microrelief": 0.005,
+        "dielectric_constant": 3.0,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.08,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 5.5,
+        "ground_ice_index": 0
+      }
+    },
+    {
+      "regionId": "MOON-003",
+      "name": "Aristarchus Plateau",
+      "coordinates": {
+        "latitude": 24.5,
+        "longitude": -49.0
+      },
+      "coreVariables": {
+        "slope": 7.0,
+        "radar_roughness": 0.75,
+        "apparent_thermal_inertia": 90,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.7,
+        "low_sun_shadows": 35,
+        "line_of_sight": 50,
+        "diurnal_thermal_range": 270,
+        "dust_aerosols": 0.0,
+        "insolation": 395
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 4.0,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 2,
+        "depth_to_bedrock_max_m": 8,
+        "vrm_microrelief": 0.04,
+        "dielectric_constant": 2.8,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.18,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 6.0,
+        "ground_ice_index": 0
+      }
+    }
+  ]
+}
