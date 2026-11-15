@@ -6,163 +6,165 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 )
-
-type Coordinates struct{
-	Latitude	float64	`json:"latitude"`
-	Longiude 	float64 `json:"longitude"`
-}
-
-type CoreVariables struct {
-	Slope					float64	`json:"slope"`
-	RadarRoughness			float64	`json:"radar_roughness"`
-	ApparentThermalInertia	int64	`json:"apparent_thermal_inertia"`
-	SoilMoisture			float64	`json:"soil_moisture"`
-	VisualTexture			float64	`json:"visual/_texture"`
-	LowSunShadows			int64	`json:"low_sun_shadows"`
-	LineOfSight				int64	`json:"line_of_sight"`
-	DiurnalThermalRange		int64	`json:"diurnal_thermal_range"`
-	DustAerosols			float64	`json:"dust_aerosols"`
-	Insolation				int64	`json:"insolation"`
-
-}
-
-type AuditVariables struct {
-	RockAbundancePct	int64
-	GrainSizeUm			int64
-	AngleOfReposeDeg	int64
-	DepthToBedrockMinM	int64
-	DepthToBedrockMaxM	int64
-	VrmMicrorelief		float64
-	DielectrictConstant	float64
-	SalinityWtPct		float64
-	DiffuseRatio		float64
-	Elbedo				float64
-	VegetationNvdi		float64
-	SurfacePressureKpa	float64
-	WindTypicalMs		int64
-	WindGustMs			int64
-	AbrasiveMohs		float64
-}
-
-type Region struct {
-	
-	RegionId		string				`json:"regionId"`
-	Name			string 				`json:"name"`	
-	Coords			Coordinates 		`json:"coordinates"`
-	CoreVariables 	CoreVariables		`json:"coreVariables"`
-	AuditVariables 	AuditVariables		`json:"auditVariables"`
-
-}
-
-type PlanetInformation struct { //Only parses the database of the selected planet
-	Regions []Region `json:"regions"`
-}
-
-
-
-func parseJson(filename string) (PlanetInformation, error){
-
-	baseDir := "backend/data/" // TODO dont think this is the right file path
-	path := filepath.Join(baseDir, filename)
-	
-	file , err := os.ReadFile(path)
-
-	if err != nil {
-		fmt.Println("Error while opening the file", err)
-		return PlanetInformation{}, errors.New("Error opening the file")
-	}	
-		
-	var data PlanetInformation
-
-	err = json.Unmarshal(file, &data)
-
-		if err != nil {
-		fmt.Println("Error while reading the file", err)
-		return PlanetInformation{}, errors.New("Error reading from file")
-	}	
-	
-	return data, nil
-
-	var Value float64
-	if err := json.Unmarshal(Data, &Value); err != nil {
-		return err
-	}
-	*F = FallbackFloat(Value)
-	return nil
-}
-
-type PlanetDataset struct {
-	Regions []Region `json:"regions"`
-}
-
-type Region struct {
-	RegionID       string         `json:"regionId"`
-	Name           string         `json:"name"`
-	Coordinates    Coordinates    `json:"coordinates"`
-	CoreVariables  CoreVariables  `json:"coreVariables"`
-	AuditVariables AuditVariables `json:"auditVariables"`
-}
 
 type Coordinates struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 }
 
+//TODO every field passed to be float64: for convenience. All use cases so far didnt used the full capacity of an int and floats made overall calculations easier. Further testing is needed
 type CoreVariables struct {
-	Slope                  FallbackFloat `json:"slope"`
-	RadarRoughness         FallbackFloat `json:"radar_roughness"`
-	ApparentThermalInertia FallbackFloat `json:"apparent_thermal_inertia"`
-	SoilMoisture           FallbackFloat `json:"soil_moisture"`
-	VisualTexture          FallbackFloat `json:"visual_texture"`
-	LowSunShadows          FallbackFloat `json:"low_sun_shadows"`
-	LineOfSight            FallbackFloat `json:"line_of_sight"`
-	DiurnalThermalRange    FallbackFloat `json:"diurnal_thermal_range"`
-	DustAerosols           FallbackFloat `json:"dust_aerosols"`
-	Insolation             FallbackFloat `json:"insolation"`
+	Slope                  float64 `json:"slope"`
+	RadarRoughness         float64 `json:"radar_roughness"`
+	ApparentThermalInertia float64 `json:"apparent_thermal_inertia"`
+	SoilMoisture           float64 `json:"soil_moisture"`
+	VisualTexture          float64 `json:"visual_texture"`
+	LowSunShadows          float64 `json:"low_sun_shadows"`
+	LineOfSight            float64 `json:"line_of_sight"`
+	DiurnalThermalRange    float64 `json:"diurnal_thermal_range"`
+	DustAerosols           float64 `json:"dust_aerosols"`
+	Insolation             float64 `json:"insolation"`
 }
 
 type AuditVariables struct {
-	RockAbundancePct   FallbackFloat `json:"rock_abundance_pct"`
-	GrainSizeUm        FallbackFloat `json:"grain_size_um"`
-	AngleOfReposeDeg   FallbackFloat `json:"angle_of_repose_deg"`
-	DepthToBedrockMinM FallbackFloat `json:"depth_to_bedrock_min_m"`
-	DepthToBedrockMaxM FallbackFloat `json:"depth_to_bedrock_max_m"`
-	VrmMicrorelief     FallbackFloat `json:"vrm_microrelief"`
-	DielectricConstant FallbackFloat `json:"dielectric_constant"`
-	SalinityWtPct      FallbackFloat `json:"salinity_wt_pct"`
-	DiffuseRatio       FallbackFloat `json:"diffuse_ratio"`
-	Albedo             FallbackFloat `json:"albedo"`
-	VegetationNdvi     FallbackFloat `json:"vegetation_ndvi"`
-	SurfacePressureKpa FallbackFloat `json:"surface_pressure_kpa"`
-	WindTypicalMs      FallbackFloat `json:"wind_typical_ms"`
-	WindGustMs         FallbackFloat `json:"wind_gust_ms"`
-	AbrasiveMohs       FallbackFloat `json:"abrasive_mohs"`
+	RockAbundancePct   float64 `json:"rock_abundance_pct"`
+	GrainSizeUm        float64 `json:"grain_size_um"`
+	AngleOfReposeDeg   float64 `json:"angle_of_repose_deg"`
+	DepthToBedrockMinM float64 `json:"depth_to_bedrock_min_m"`
+	DepthToBedrockMaxM float64 `json:"depth_to_bedrock_max_m"`
+	VrmMicrorelief     float64 `json:"vrm_microrelief"`
+	DielectricConstant float64 `json:"dielectric_constant"`
+	SalinityWtPct      float64 `json:"salinity_wt_pct"`
+	DiffuseRatio       float64 `json:"diffuse_ratio"`
+	Albedo             float64 `json:"albedo"`
+	VegetationNdvi     float64 `json:"vegetation_ndvi"`
+	SurfacePressureKpa float64 `json:"surface_pressure_kpa"`
+	WindTypicalMs      float64 `json:"wind_typical_ms"`
+	WindGustMs         float64 `json:"wind_gust_ms"`
+	AbrasiveMohs       float64 `json:"abrasive_mohs"`
 }
 
-func Parser(RawData []byte) ([]Region, error) {
-	var Dataset PlanetDataset
+type Region struct {
+	RegionId       string         `json:"regionId"`
+	Name           string         `json:"name"`
+	Coords         Coordinates    `json:"coordinates"`
+	CoreVariables  CoreVariables  `json:"coreVariables"`
+	AuditVariables AuditVariables `json:"auditVariables"`
+}
 
-	err := json.Unmarshal(RawData, &Dataset)
+type PlanetInformation struct { 
+	Planet  string   `json:"planet"`
+	Regions []Region `json:"regions"`
+}
+
+var (
+	ErrInvalidPlanet   = errors.New("Planet Not valid")
+	ErrInvalidRegionID = errors.New("RegionId not valid")
+	ErrRegionNotFound  = errors.New("Region not found")
+)
+
+// Allowed/available planets from the frontend
+var planetFiles = map[string]string{
+	"moon": "moon.json",
+	"mars": "mars.json",
+}
+
+const earthFile = "earth.json"
+
+var (
+	planetNameRe = regexp.MustCompile(`^[a-z]{1,16}$`)
+	regionIDRe   = regexp.MustCompile(`^[A-Za-z0-9_-]{1,64}$`)
+)
+
+// SanitizePlanet normalize and validates planet name
+func SanitizePlanet(raw string) (string, error) {
+	p := strings.ToLower(strings.TrimSpace(raw))
+	if !planetNameRe.MatchString(p) {
+		return "", ErrInvalidPlanet
+	}
+	if _, ok := planetFiles[p]; !ok {
+		return "", ErrInvalidPlanet
+	}
+	return p, nil
+}
+
+func SanitizeRegionID(raw string) (string, error) {
+	id := strings.TrimSpace(raw)
+	if !regionIDRe.MatchString(id) {
+		return "", ErrInvalidRegionID
+	}
+	return id, nil
+}
+
+type Parser struct {
+	dataDir string
+}
+
+//constructor of the parser, checks for the data directory
+func New(dataDir string) (*Parser, error) {
+	abs, err := filepath.Abs(dataDir)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing regions JSON: %w", err)
+		return nil, fmt.Errorf("Error looking for datadir: %w", err)
 	}
-
-	return Dataset.Regions, nil
+	info, err := os.Stat(abs)
+	if err != nil || !info.IsDir() {
+		return nil, fmt.Errorf("dataDir %q does NOT exist", abs)
+	}
+	return &Parser{dataDir: abs}, nil
 }
 
-func (R Region) GetKNNVector() []float64 {
-	C := R.CoreVariables
-	return []float64{
-		float64(C.Slope),
-		float64(C.RadarRoughness),
-		float64(C.ApparentThermalInertia),
-		float64(C.SoilMoisture),
-		float64(C.VisualTexture),
-		float64(C.LowSunShadows),
-		float64(C.LineOfSight),
-		float64(C.DiurnalThermalRange),
-		float64(C.DustAerosols),
-		float64(C.Insolation),
+// Sanitization function, filename can only come from constants in here, never accept arbitrary filenames from userr 
+func (p *Parser) readFile(filename string) ([]Region, error) {
+	path := filepath.Join(p.dataDir, filename)
+
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("abriendo %s: %w", filename, err)
 	}
+
+	var data PlanetInformation
+	if err := json.Unmarshal(raw, &data); err != nil {
+		return nil, fmt.Errorf("parseando %s: %w", filename, err)
+	}
+	return data.Regions, nil
+}
+
+// GetRegion returns PlanetInformation with justONE specific region consulted.
+func (p *Parser) GetRegion(planet, regionID string) (PlanetInformation, error) {
+	planet, err := SanitizePlanet(planet)
+	if err != nil {
+		return PlanetInformation{}, err
+	}
+	regionID, err = SanitizeRegionID(regionID)
+	if err != nil {
+		return PlanetInformation{}, err
+	}
+
+	regions, err := p.readFile(planetFiles[planet])
+	if err != nil {
+		return PlanetInformation{}, err
+	}
+
+	for _, r := range regions {
+		if r.RegionId == regionID {
+			return PlanetInformation{Planet: planet, Regions: []Region{r}}, nil
+		}
+	}
+	return PlanetInformation{}, ErrRegionNotFound
+}
+
+// GetEarthRegions returns the whole planet region pool to procces using knn
+//TODO maybe if needed we can just make this one a generic function to get the information of a whole planet 
+func (p *Parser) GetEarthRegions() ([]Region, error) {
+	regions, err := p.readFile(earthFile)
+	if err != nil {
+		return nil, err
+	}
+	if len(regions) == 0 {
+		return nil, errors.New("earth.json no tiene regiones")
+	}
+	return regions, nil
 }

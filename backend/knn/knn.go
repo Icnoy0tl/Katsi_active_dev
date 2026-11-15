@@ -3,117 +3,108 @@ package knn
 import (
 	"errors"
 	"math"
+	"sort"
 )
 
-type RecentStack[T any] struct {
-	
-	items []T
-	limit int
+type Vector []float64
 
+type Candidate struct {
+	ID     string
+	Name   string
+	Vector Vector
 }
 
-func NewRecentStack[T any](limit int) *RecentStack[T]{
-	return &RecentStack[T]{
-		items: make([]T, 0, limit),
-		limit: limit,
-	}
+type Match struct {
+	RegionID   string  `json:"regionId"`
+	Name       string  `json:"name"`
+	Distance   float64 `json:"distance"`
+	Similarity float64 `json:"similarity"` 
 }
 
-func (stack *RecentStack[T]) Push (item T){
-	if len(stack.items) == stack.limit {
-		copy(stack.items, stack.items[1:])
-		stack.items[stack.limit-1] = item
-		return 
-	}
-
-	stack.items = append(stack.items, item)
-
+// Weight based in mision filter, name indexed so weights cant multiply wrong variables
+//TODO Weights are hardcoded, full mathematical fundamentation is due 
+var filterWeights = map[string]map[string]float64{
+	"rover": {
+		"slope": 1.0, "radar_roughness": 0.9, "visual_texture": 0.7,
+		"low_sun_shadows": 0.6, "dust_aerosols": 0.6, "line_of_sight": 0.5,
+		"insolation": 0.4, "apparent_thermal_inertia": 0.3,
+		"soil_moisture": 0.2, "diurnal_thermal_range": 0.2,
+	},
+	"ice_and_volatiles": {
+		"soil_moisture": 1.0, "apparent_thermal_inertia": 0.8, "insolation": 0.8,
+		"low_sun_shadows": 0.7, "diurnal_thermal_range": 0.5, "radar_roughness": 0.3,
+		"dust_aerosols": 0.3, "slope": 0.2, "visual_texture": 0.2, "line_of_sight": 0.1,
+	},
+	"thermal_cycles": {
+		"diurnal_thermal_range": 1.0, "apparent_thermal_inertia": 0.9, "insolation": 0.7,
+		"dust_aerosols": 0.5, "soil_moisture": 0.4, "slope": 0.1, "radar_roughness": 0.1,
+		"visual_texture": 0.1, "low_sun_shadows": 0.2, "line_of_sight": 0.1,
+	},
 }
 
-func (stack *RecentStack[T]) Pop() (T,error){
-	var zero T
-	if len(stack.items) == 0 {
-		return zero, errors.New("buffer's empty")
-	}
+var ErrUnknownFilter = errors.New("filtro desconocido")
 
-	lastIdx := len(stack.items) - 1
-	item := stack.items[lastIdx]
-	stack.items[lastIdx] = zero // Clear reference for garbage collector
-	stack.items = stack.items[:lastIdx]
-	return item, nil
-}
+// Coonstructs the vectore of weights to be evaluated 
 
-//shows the latest value without deleting it
-func (stack *RecentStack[T]) peek() (T, error){
-	var zero T
-	if len(stack.items) == 0 {
-		return zero, errors.New("Buffers empty")
-	}
-
-	return stack.items[len(stack.items) - 1], nil
-
-}
-
-
-type Features struct {
-
-	Foo	float64
-	Faa float64
-	Fii float64
-	// fill with whatever pookie(jorge) say 
-
-} // physical and ambiental characteristics 
-
-type Region struct {
-	ID		string `json:"id"`
-	Name	string `json:"name"`
-	Features Features `json:"features"`
-}
-
-type FilterWeights struct { // it adds a weight to the characteristics based in the filter
-	Foo	float64
-	Faa float64
-	Fii float64
-}
-
-func GetWeights(filter string) FilterWeights {
-	switch filter{
-		case "rover":
-			return FilterWeights{Foo:0.8,Faa:0.2,Fii: 0.25} //Filter weigths shall be dynamically obtained (with mathematical fundament rather than hardcoded like rn)
-															// Weights goes from 0 to 1, default case is .25 to keep it equilibrated (default)
-		case "ice_and_volatiles":
-			return FilterWeights{Foo: 0.3, Faa: 0.1 , Fii: 0.4}
-
-		case "thermal_cycles":
-			return FilterWeights{Foo: 0.1 , Faa: 0.3 , Fii: 0.6 }
-
-		default: 
-			return FilterWeights{Foo: 0.3, Faa: 0.1, Fii: 0.4}
+func WeightsFor(filter string, names []string) (Vector, error) {
+	w := make(Vector, len(names))
+	if filter == "" {
+		for i := range w {
+			w[i] = 1.0
 		}
-}
-
-func WeightedEuclideanDistance(f1, f2 Features, w FilterWeights) float64 {
-	//calculates euclidean distance
-	sum := w.Fii * math.Pow(f1.Foo - f2.Foo, 2 ) + w.Faa * math.Pow(f1.Fii - f2.Fii, 2) + w.Foo * math.Pow(f1.Faa - f2.Faa,2 ) // Mock values, to be changed when final characteristic decided
-	
-	return math.Sqrt(sum) 
-}
-
-func FindMostSimilar(targetFeatures Features, earthRegions []Region, filter string)(RecentStack[Region], float64){
-
-	weights := GetWeights(filter)
-	
-	bestMatches := NewRecentStack[Region](3)  //TODO caping bestMatches to 1 rn, change for a queue to have 3 options of matches 
-	minDistance := math.MaxFloat64 
-
-	for _, region := range earthRegions{
-		dist := WeightedEuclideanDistance(targetFeatures, region.Features, weights)
-		if dist < minDistance {
-			minDistance = dist 
-			bestMatches.Push(region)
-		}
+		return w, nil // if not active filter by default every value weights the same
 	}
-	
-	return *bestMatches, minDistance
+	table, ok := filterWeights[filter]
+	if !ok {
+		return nil, ErrUnknownFilter
+	}
+	for i, n := range names {
+		w[i] = table[n] 
+	}
+	return w, nil
+}
 
+func WeightedEuclideanDistance(a, b, w Vector) (float64, error) {
+	if len(a) != len(b) || len(a) != len(w) {
+		return 0, errors.New("vectores de distinta longitud")
+	}
+	sum := 0.0
+	for i := range a {
+		d := a[i] - b[i]
+		sum += w[i] * d * d
+	}
+	return math.Sqrt(sum), nil
+}
+
+// FindMostSimilar returns k regions closer
+func FindMostSimilar(target Candidate, pool []Candidate, w Vector, k int) ([]Match, error) {
+	if k <= 0 {
+		return nil, errors.New("k debe ser > 0")
+	}
+
+	maxDist := 0.0
+	for _, wi := range w {
+		maxDist += wi
+	}
+	maxDist = math.Sqrt(maxDist)
+
+	matches := make([]Match, 0, len(pool))
+	for _, c := range pool {
+		d, err := WeightedEuclideanDistance(target.Vector, c.Vector, w)
+		if err != nil {
+			return nil, err
+		}
+		sim := 0.0
+		if maxDist > 0 {
+			sim = 1 - d/maxDist
+		}
+		matches = append(matches, Match{RegionID: c.ID, Name: c.Name, Distance: d, Similarity: sim})
+	}
+
+	sort.SliceStable(matches, func(i, j int) bool { return matches[i].Distance < matches[j].Distance })
+
+	if len(matches) > k {
+		matches = matches[:k]
+	}
+	return matches, nil
 }

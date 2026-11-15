@@ -1,3 +1,4 @@
-module backend
-
-go 1.27.4
+module spaceapps
+ 
+go 1.22
+ 
