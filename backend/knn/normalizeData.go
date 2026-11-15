@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"spaceapps/jsonParser"
-	"spaceapps/knn"
 )
 
 type feature struct {
@@ -38,8 +37,8 @@ func FeatureNames() []string {
 	return names
 }
 
-func ToVector(cv jsonParser.CoreVariables) (knn.Vector, error){
-	v := make(knn.Vector, len(features))
+func ToVector(cv jsonParser.CoreVariables) (Vector, error){
+	v := make(Vector, len(features))
 	for i, f := range features {
 		val := f.Get(&cv)
 		if math.IsNaN(val) || math.IsInf(val, 0) {
@@ -57,7 +56,7 @@ type Stats struct {
 
 }
 
-func ComputeStats(vectors []knn.Vector) Stats {
+func ComputeStats(vectors []Vector) Stats {
 	n := len (features)
 	stat := Stats{Min: make([]float64, n), Max: make([]float64, n)}
 
@@ -76,8 +75,8 @@ func ComputeStats(vectors []knn.Vector) Stats {
 	return stat
 }
 
-func (stat Stats) Apply (v knn.Vector) knn.Vector {
-	out := make(knn.Vector, len(v))
+func (stat Stats) Apply (v Vector) Vector {
+	out := make(Vector, len(v))
 	for i, val := range v {
 		rng := stat.Max[i] - stat.Min[i]
 		if rng == 0{
@@ -91,20 +90,20 @@ func (stat Stats) Apply (v knn.Vector) knn.Vector {
 
 }
 
-func Prepare(target jsonParser.Region, earth []jsonParser.Region) (knn.Candidate, []knn.Candidate, error) {
+func Prepare(target jsonParser.Region, earth []jsonParser.Region) (Candidate, []Candidate, error) {
 	targetVec, err := ToVector(target.CoreVariables)
 	if err != nil {
-		return knn.Candidate{}, nil, fmt.Errorf("región %s: %w", target.RegionId, err)
+		return Candidate{}, nil, fmt.Errorf("región %s: %w", target.RegionId, err)
 	}
  
-	all := make([]knn.Vector, 0, len(earth)+1)
+	all := make([]Vector, 0, len(earth)+1)
 	all = append(all, targetVec)
  
-	earthVecs := make([]knn.Vector, len(earth))
+	earthVecs := make([]Vector, len(earth))
 	for i, r := range earth {
 		v, err := ToVector(r.CoreVariables)
 		if err != nil {
-			return knn.Candidate{}, nil, fmt.Errorf("región tierra %s: %w", r.RegionId, err)
+			return Candidate{}, nil, fmt.Errorf("región tierra %s: %w", r.RegionId, err)
 		}
 		earthVecs[i] = v
 		all = append(all, v)
@@ -112,10 +111,10 @@ func Prepare(target jsonParser.Region, earth []jsonParser.Region) (knn.Candidate
  
 	stats := ComputeStats(all)
  
-	normTarget := knn.Candidate{ID: target.RegionId, Name: target.Name, Vector: stats.Apply(targetVec)}
-	pool := make([]knn.Candidate, len(earth))
+	normTarget := Candidate{ID: target.RegionId, Name: target.Name, Vector: stats.Apply(targetVec)}
+	pool := make([]Candidate, len(earth))
 	for i, r := range earth {
-		pool[i] = knn.Candidate{ID: r.RegionId, Name: r.Name, Vector: stats.Apply(earthVecs[i])}
+		pool[i] = Candidate{ID: r.RegionId, Name: r.Name, Vector: stats.Apply(earthVecs[i])}
 	}
 	return normTarget, pool, nil
 }
