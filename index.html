@@ -882,8 +882,79 @@
       }
     }
 
+    /* ---------- Panel de controles del modo Prueba (izquierda, tarjetas como las misiones) ---------- */
     #control-panel {
-      transition-property: opacity, transform;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #control-panel.translate-y-4 {
+      transform: translateX(-12px);
+    }
+    #control-panel.is-test-mode:not(.is-hidden) .menu-enter {
+      animation: menu-enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(0.05s + var(--i, 0) * 0.08s);
+    }
+    #control-panel.is-test-mode:not(.is-hidden) .missions-accent {
+      transform-origin: left center;
+      animation: menu-accent-grow 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #control-panel .menu-enter,
+      #control-panel .missions-accent {
+        animation: none !important;
+      }
+    }
+    .ctrl-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    /* Tarjeta con esquinas biseladas: marco tenue en reposo y borde azul al resaltar */
+    .ctrl-card {
+      --chamfer: 14px;
+      --frame: polygon(var(--chamfer) 0, calc(100% - var(--chamfer)) 0, 100% var(--chamfer), 100% calc(100% - var(--chamfer)), calc(100% - var(--chamfer)) 100%, var(--chamfer) 100%, 0 calc(100% - var(--chamfer)), 0 var(--chamfer));
+      position: relative;
+      isolation: isolate;
+      padding: 0.95rem 1.2rem 1.05rem;
+      transition: filter 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .ctrl-card::before,
+    .ctrl-card::after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      clip-path: var(--frame);
+      transition: opacity 0.3s ease, background 0.3s ease;
+    }
+    .ctrl-card::before {
+      inset: 0;
+      background: rgba(148, 163, 184, 0.28);
+    }
+    .ctrl-card::after {
+      inset: 1.5px;
+      background:
+        radial-gradient(120% 140% at 100% 100%, rgba(59, 130, 246, 0.16) 0%, transparent 45%),
+        linear-gradient(180deg, rgba(14, 24, 48, 0.9) 0%, rgba(6, 11, 26, 0.9) 100%);
+    }
+    .ctrl-card:hover,
+    .ctrl-card:focus-within {
+      filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.45));
+      transform: translateX(6px);
+    }
+    .ctrl-card:hover::before,
+    .ctrl-card:focus-within::before {
+      background: linear-gradient(90deg, #3b82f6 0%, #93c5fd 45%, #60a5fa 75%, #2563eb 100%);
+    }
+    .ctrl-card .info-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.7rem;
+    }
+    .ctrl-value {
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.04em;
+      color: #7dd3fc;
+      font-variant-numeric: tabular-nums;
     }
 
     /* ---------- Botones de la escena (mismo lenguaje visual que .menu-tag) ---------- */
@@ -1181,57 +1252,54 @@
     <div id="holograms"></div>
   </div>
 
-  <!-- Panel lateral flotante de controles -->
+  <!-- Panel de controles del modo Prueba (izquierda, tarjetas como las misiones) -->
   <aside
     id="control-panel"
     data-scene-ui
-    class="is-test-only fixed top-16 right-4 sm:top-20 sm:right-6 z-20 glass-panel rounded-2xl p-4 sm:p-5 w-[calc(100vw-2rem)] max-w-xs sm:w-80 max-h-[calc(100vh-11rem)] overflow-y-auto custom-scroll transition-all duration-300"
+    aria-label="Controles"
+    class="is-test-only fixed top-20 left-4 sm:top-24 sm:left-6 z-20 w-[min(24rem,calc(100vw-2rem))] max-h-[calc(100vh-8rem)] overflow-y-auto overflow-x-hidden scroll-fade pl-1 pr-3 py-1"
   >
-    <div class="flex items-center justify-between pb-3 mb-3.5 border-b border-white/10">
-      <span class="text-xs font-semibold uppercase tracking-wider text-slate-200">
-        Panel de Control
-      </span>
-      <button id="reset-camera-btn" class="hud-btn hud-btn--ghost hud-btn--sm !px-3">
-        <span class="hud-frame" aria-hidden="true"></span>
-        Centrar vista
-      </button>
-    </div>
+    <h2 class="missions-title menu-enter" style="--i: 0">Controles · <b>Prueba</b></h2>
+    <div class="menu-accent missions-accent" aria-hidden="true"></div>
 
-    <div class="space-y-4">
-      <!-- 1. Selector de Enfoque de Cámara -->
-      <div class="space-y-1.5">
-        <span class="text-xs text-slate-300 block">Ir a</span>
-        <div class="grid grid-cols-5 gap-1 bg-black/50 p-1 rounded-xl border border-white/10">
+    <div class="ctrl-cards">
+      <!-- 1. Selector de enfoque de cámara -->
+      <section class="ctrl-card menu-enter" style="--i: 2">
+        <h3 class="info-section">
+          Ir a
+          <button id="reset-camera-btn" class="hud-btn hud-btn--ghost hud-btn--sm !px-2.5">
+            <span class="hud-frame" aria-hidden="true"></span>
+            Centrar vista
+          </button>
+        </h3>
+        <div class="grid grid-cols-5 gap-1">
           <button id="focus-earth-btn" class="hud-btn hud-btn--ghost hud-btn--sm"><span class="hud-frame" aria-hidden="true"></span>Tierra</button>
           <button id="focus-moon-btn" class="hud-btn hud-btn--ghost hud-btn--sm"><span class="hud-frame" aria-hidden="true"></span>Luna</button>
           <button id="focus-mars-btn" class="hud-btn hud-btn--ghost hud-btn--sm hud-btn--mars"><span class="hud-frame" aria-hidden="true"></span>Marte</button>
           <button id="focus-satellite-btn" class="hud-btn hud-btn--ghost hud-btn--sm"><span class="hud-frame" aria-hidden="true"></span>Satélite</button>
           <button id="focus-orion-btn" class="hud-btn hud-btn--ghost hud-btn--sm is-active"><span class="hud-frame" aria-hidden="true"></span>Orión</button>
         </div>
-      </div>
+      </section>
 
-      <!-- 2. Botón Pausar / Reanudar -->
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-slate-300">Rotación de los planetas</span>
-        <button id="toggle-rotation-btn" class="hud-btn">
-          <span class="hud-frame" aria-hidden="true"></span>
-          <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" class="hud-icon !w-3.5 !h-3.5" viewBox="0 0 24 24" fill="currentColor">
-            <rect x="6" y="4" width="4" height="16" rx="1"></rect>
-            <rect x="14" y="4" width="4" height="16" rx="1"></rect>
-          </svg>
-          <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="hud-icon !w-3.5 !h-3.5 hidden" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
-          <span class="hud-divider"></span>
-          <span id="rotation-btn-label">Pausar</span>
-        </button>
-      </div>
-
-      <!-- 3. Control deslizante: Velocidad de rotación -->
-      <div class="space-y-1.5">
-        <div class="flex justify-between text-xs">
-          <label for="speed-slider" class="text-slate-300">Velocidad de rotación</label>
-          <span id="speed-value" class="text-sky-300 font-mono font-medium">0.5x</span>
+      <!-- 2. Rotación: pausar / reanudar y velocidad -->
+      <section class="ctrl-card menu-enter" style="--i: 3">
+        <h3 class="info-section">
+          Rotación de los planetas
+          <button id="toggle-rotation-btn" class="hud-btn hud-btn--sm !px-3 !gap-2">
+            <span class="hud-frame" aria-hidden="true"></span>
+            <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" class="hud-icon !w-3 !h-3" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+              <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+            </svg>
+            <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="hud-icon !w-3 !h-3 hidden" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span id="rotation-btn-label">Pausar</span>
+          </button>
+        </h3>
+        <div class="flex justify-between text-xs mb-2">
+          <label for="speed-slider" class="text-slate-300">Velocidad</label>
+          <span id="speed-value" class="ctrl-value font-medium">0.5x</span>
         </div>
         <input
           id="speed-slider"
@@ -1241,38 +1309,38 @@
           step="0.1"
           value="0.5"
         />
-      </div>
+      </section>
 
-      <!-- 4. Interruptores (Nubes y Atmósfera) -->
-      <div class="pt-2.5 border-t border-white/10 grid grid-cols-2 gap-2">
-        <!-- Nubes -->
-        <button id="toggle-clouds-btn" class="hud-btn is-active !justify-between !px-3.5" aria-pressed="true">
-          <span class="hud-frame" aria-hidden="true"></span>
-          <span class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="hud-icon !w-3.5 !h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
-            </svg>
-            Nubes
-          </span>
-          <span class="hud-dot"></span>
-        </button>
-
-        <!-- Atmósfera -->
-        <button id="toggle-atmosphere-btn" class="hud-btn is-active !justify-between !px-3.5" aria-pressed="true">
-          <span class="hud-frame" aria-hidden="true"></span>
-          <span class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="hud-icon !w-3.5 !h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="4"></circle>
-              <path d="M12 2v2"></path>
-              <path d="M12 20v2"></path>
-              <path d="M2 12h2"></path>
-              <path d="M20 12h2"></path>
-            </svg>
-            Atmósfera
-          </span>
-          <span class="hud-dot"></span>
-        </button>
-      </div>
+      <!-- 3. Interruptores (Nubes y Atmósfera) -->
+      <section class="ctrl-card menu-enter" style="--i: 4">
+        <h3 class="info-section">Capas</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="toggle-clouds-btn" class="hud-btn is-active !justify-between !px-3.5" aria-pressed="true">
+            <span class="hud-frame" aria-hidden="true"></span>
+            <span class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="hud-icon !w-3.5 !h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+              </svg>
+              Nubes
+            </span>
+            <span class="hud-dot"></span>
+          </button>
+          <button id="toggle-atmosphere-btn" class="hud-btn is-active !justify-between !px-3.5" aria-pressed="true">
+            <span class="hud-frame" aria-hidden="true"></span>
+            <span class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="hud-icon !w-3.5 !h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2"></path>
+                <path d="M12 20v2"></path>
+                <path d="M2 12h2"></path>
+                <path d="M20 12h2"></path>
+              </svg>
+              Atmósfera
+            </span>
+            <span class="hud-dot"></span>
+          </button>
+        </div>
+      </section>
     </div>
   </aside>
 

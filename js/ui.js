@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { setupScrollFade } from './utils/scrollFade.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -27,6 +28,7 @@ export function setupControlPanel({ cameraNavigator, onToggleClouds, onToggleAtm
 /** Mostrar / ocultar el panel */
 function setupPanelVisibility() {
   const panel = $('control-panel');
+  setupScrollFade(panel)();
   let isOpen = true;
   $('toggle-panel-btn').addEventListener('click', () => {
     isOpen = !isOpen;

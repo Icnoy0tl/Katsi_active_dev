@@ -161,7 +161,8 @@ export function createCameraNavigator({ camera, controls, bodies, obstacles }) {
 
   /**
    * Vuela hasta ver un cuerpo desde `direction` (unitaria, en coordenadas de mundo) a
-   * `distance` de su centro; la cámara sigue orbitando alrededor del cuerpo.
+   * `distance` de su centro; la cámara sigue orbitando alrededor del cuerpo. El límite de
+   * zoom se amplía si hace falta para que OrbitControls no la acerque al terminar el vuelo.
    */
   function focusFrom(name, direction, distance) {
     const view = views[name];
@@ -176,6 +177,7 @@ export function createCameraNavigator({ camera, controls, bodies, obstacles }) {
     }
     view.object.getWorldPosition(flight.toTarget);
     flight.toCamera.copy(flight.toTarget).addScaledVector(surfaceDirection.normalize(), distance);
+    flight.zoom = [view.zoom[0], Math.max(view.zoom[1], distance)];
   }
 
   /** Avanza el vuelo (smootherstep) evitando atravesar obstáculos */

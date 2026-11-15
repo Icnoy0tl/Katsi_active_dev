@@ -90,6 +90,21 @@ export const ORION = {
  * Menú principal: la vista se desplaza horizontalmente (fracción del ancho) para dejar
  * Orión a la derecha y el menú a la izquierda. En pantallas estrechas no se desplaza.
  */
+/**
+ * Campo de visión vertical (grados). En la vista de misión se estrecha y la cámara se aleja en
+ * la misma proporción: los cuerpos ocupan lo mismo en pantalla, pero los que quedan lejos del
+ * centro (Tierra en miniatura abajo a la izquierda) ya no se ven ovalados por la perspectiva.
+ */
+export const CAMERA = {
+  fov: 45,
+  missionFov: 22,
+  fovSpeed: 3.5 // rapidez de la transición entre ambos
+};
+
+/** Factor de distancia que mantiene el tamaño en pantalla al pasar de `CAMERA.fov` a `fov` */
+export const distanceForFov = (fov) =>
+  Math.tan(deg(CAMERA.fov) / 2) / Math.tan(deg(fov) / 2);
+
 export const MENU = {
   viewShift: 0.22,
   missionsViewShift: 0.08, // lista de misiones (Luna/Marte): separa el cuerpo de las tarjetas

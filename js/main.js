@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { EARTH, MARS, MENU, MOON, ORION, ROTATION, SATELLITE } from './config.js';
+import { CAMERA, EARTH, MARS, MENU, MOON, ORION, ROTATION, SATELLITE, distanceForFov } from './config.js';
 import { state } from './state.js';
 import { createLighting } from './lighting.js';
 import { createStarfield } from './bodies/starfield.js';
@@ -33,7 +33,8 @@ const anisotropy = renderer.capabilities.getMaxAnisotropy();
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x05070c);
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(CAMERA.fov, window.innerWidth / window.innerHeight, 0.1, 1000);
+let targetFov = CAMERA.fov; // se estrecha en la vista de misión (ver CAMERA.missionFov)
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -83,8 +84,11 @@ const regionBody = new Map(); // regionId → nombre del cuerpo ('moon' | 'mars'
 
 // Panel de misiones: visible solo mientras se enfoca un cuerpo con misiones ya cargadas
 const missionsPanel = setupMissionsPanel({ onSelect: (region) => goToMission(region) });
+// Modo Prueba: el panel de controles ocupa la izquierda, así que no hay lista de misiones ni áreas
+let isTestMode = false;
+
 function updateMissionsPanel(name) {
-  const regions = missionBodies[name]?.regions;
+  const regions = isTestMode ? null : missionBodies[name]?.regions;
   if (regions) missionsPanel.show(regions);
   else missionsPanel.hide();
   // Con la lista de misiones visible, el cuerpo se desplaza a la derecha para no pegarse a ella
@@ -95,7 +99,7 @@ const missionsShift = () => (window.innerWidth >= MENU.minWidthForShift ? MENU.m
 /** Áreas de terreno: solo en las misiones del cuerpo enfocado, nunca durante el menú */
 function updateTerrainAreas(focus, menuOpen) {
   Object.entries(missionBodies).forEach(([name, mission]) => {
-    if (mission.markers) mission.markers.group.visible = !menuOpen && focus === name;
+    if (mission.markers) mission.markers.group.visible = !menuOpen && !isTestMode && focus === name;
   });
 }
 
@@ -147,6 +151,7 @@ function closeMission() {
   earthHologram.hide();
   earthMini.group.visible = false;
   missionVignette.classList.remove('is-visible');
+  targetFov = CAMERA.fov;
   if (!mainMenu.isOpen) setViewShiftTarget(0, 0);
 }
 
@@ -189,7 +194,10 @@ const menuTarget = () => (window.innerWidth >= MENU.minWidthForShift ? MENU.view
 
 // Botón y panel de controles: solo en el modo Prueba
 const testOnlyUi = document.querySelectorAll('.is-test-only');
-const setTestMode = (active) => testOnlyUi.forEach((el) => el.classList.toggle('is-test-mode', active));
+const setTestMode = (active) => {
+  isTestMode = active;
+  testOnlyUi.forEach((el) => el.classList.toggle('is-test-mode', active));
+};
 
 const leaveMenuTo = (name, testMode = false) => () => {
   setTestMode(testMode);
@@ -222,7 +230,7 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   if (mainMenu.isOpen) viewShift.targetX = menuTarget();
-  else if (!selectedRegionId && missionBodies[cameraNavigator.currentFocus]?.regions) viewShift.targetX = missionsShift();
+  else if (!selectedRegionId && !isTestMode && missionBodies[cameraNavigator.currentFocus]?.regions) viewShift.targetX = missionsShift();
   applyViewShift(); // también actualiza la proyección
   camera.updateProjectionMatrix();
 });
@@ -304,7 +312,9 @@ function goToMission(region) {
   setAnalysisMode(true, mission.group);
 
   mission.markers.worldPosition(region.regionId, missionArea);
-  cameraNavigator.focusFrom(name, missionViewDirection(mission, missionArea), view.distance);
+  // Campo de visión estrecho y cámara más lejos: mismo encuadre, sin deformar los bordes
+  targetFov = CAMERA.missionFov;
+  cameraNavigator.focusFrom(name, missionViewDirection(mission, missionArea), view.distance * distanceForFov(CAMERA.missionFov));
 }
 
 Promise.all(['moon', 'mars', 'earth'].map((name) => loadRegions(`./backend/data/${name}.json`)))
@@ -355,6 +365,13 @@ renderer.setAnimationLoop(() => {
     viewShift.x = Math.abs(stepX) < 1e-4 ? viewShift.targetX : viewShift.x + stepX * ease;
     viewShift.y = Math.abs(stepY) < 1e-4 ? viewShift.targetY : viewShift.y + stepY * ease;
     applyViewShift();
+  }
+
+  // Transición suave del campo de visión (entrar y salir de la vista de misión)
+  if (camera.fov !== targetFov) {
+    const step = targetFov - camera.fov;
+    camera.fov = Math.abs(step) < 0.01 ? targetFov : camera.fov + step * Math.min(1, CAMERA.fovSpeed * delta);
+    camera.updateProjectionMatrix();
   }
 
   cameraNavigator.update(delta);
