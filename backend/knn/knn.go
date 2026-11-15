@@ -1,8 +1,59 @@
-package main
+package knn
 
 import (
+	"errors"
 	"math"
 )
+
+type RecentStack[T any] struct {
+	
+	items []T
+	limit int
+
+}
+
+func NewRecentStack[T any](limit int) *RecentStack[T]{
+	return &RecentStack[T]{
+		items: make([]T, 0, limit),
+		limit: limit,
+	}
+}
+
+func (stack *RecentStack[T]) Push (item T){
+	if len(stack.items) == stack.limit {
+		copy(stack.items, stack.items[1:])
+		stack.items[stack.limit-1] = item
+		return 
+	}
+
+	stack.items = append(stack.items, item)
+
+}
+
+func (stack *RecentStack[T]) Pop() (T,error){
+	var zero T
+	if len(stack.items) == 0 {
+		return zero, errors.New("buffer's empty")
+	}
+
+	lastIdx := len(stack.items) - 1
+	item := stack.items[lastIdx]
+	stack.items[lastIdx] = zero // Clear reference for garbage collector
+	stack.items = stack.items[:lastIdx]
+	return item, nil
+}
+
+//shows the latest value without deleting it
+func (stack *RecentStack[T]) peek() (T, error){
+	var zero T
+	if len(stack.items) == 0 {
+		return zero, errors.New("Buffers empty")
+	}
+
+	return stack.items[len(stack.items) - 1], nil
+
+}
+
 
 type Features struct {
 
@@ -48,23 +99,21 @@ func WeightedEuclideanDistance(f1, f2 Features, w FilterWeights) float64 {
 	return math.Sqrt(sum) 
 }
 
-func FindMostSimilar(targetFeatures Features, earthRegions []Region, filter string)(Region, float64){
-
-	
+func FindMostSimilar(targetFeatures Features, earthRegions []Region, filter string)(RecentStack[Region], float64){
 
 	weights := GetWeights(filter)
 	
-	var bestMatches Region //TODO caping bestMatches to 1 rn, change for a queue to have 3 options of matches 
+	bestMatches := NewRecentStack[Region](3)  //TODO caping bestMatches to 1 rn, change for a queue to have 3 options of matches 
 	minDistance := math.MaxFloat64 
 
 	for _, region := range earthRegions{
 		dist := WeightedEuclideanDistance(targetFeatures, region.Features, weights)
 		if dist < minDistance {
 			minDistance = dist 
-			bestMatches = region
+			bestMatches.Push(region)
 		}
 	}
 	
-	return bestMatches, minDistance
+	return *bestMatches, minDistance
 
 }
