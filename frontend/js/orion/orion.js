@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { ORION } from '../config.js';
 import { createOrbitalAnchor } from '../bodies/placement.js';
 import { buildOrionModel } from './model.js';
+import { turnTowardsLight } from '../utils/spacecraft.js';
 
 const SOLAR_TRACKING_RATE = 2.0; // rapidez con que las alas siguen la luz (1/s)
 
@@ -34,9 +35,7 @@ export function createOrion({ renderer, anisotropy }) {
     wings.forEach(({ wing, array }) => {
       wing.getWorldQuaternion(wingQuaternionInverse).invert();
       localLight.copy(lightDirection).applyQuaternion(wingQuaternionInverse);
-      const targetAngle = Math.atan2(-localLight.y, localLight.z);
-      const diff = targetAngle - array.rotation.x;
-      array.rotation.x += Math.atan2(Math.sin(diff), Math.cos(diff)) * follow;
+      turnTowardsLight(array, localLight, follow);
     });
   }
 

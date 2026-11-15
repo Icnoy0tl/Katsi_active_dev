@@ -1,10 +1,6 @@
 import * as THREE from 'three';
-import { getEnvironmentMap } from '../utils/environment.js';
-import { createBellGeometry } from '../satellite/model.js';
+import { createBellGeometry, createEnvMaterialFactory, createPartBuilder, V } from '../utils/spacecraft.js';
 import { createOrionTextures } from './textures.js';
-
-const UP = new THREE.Vector3(0, 1, 0);
-const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
 // Las geometrías de revolución empiezan en π para que el centro de cada textura (u = 0.5)
 // quede en +Z local: la cara frontal con las letras, el emblema y las ventanas
@@ -26,21 +22,7 @@ export function buildOrionModel({ renderer, anisotropy }) {
   hull.position.y = 1.2;
   root.add(hull);
 
-  const add = (geometry, material, x = 0, y = 0, z = 0, parent = hull) => {
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
-    parent.add(mesh);
-    return mesh;
-  };
-
-  const strut = (a, b, radius, material, parent = hull) => {
-    const dir = new THREE.Vector3().subVectors(b, a);
-    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, dir.length(), 10), material);
-    mesh.position.copy(a).addScaledVector(dir, 0.5);
-    mesh.quaternion.setFromUnitVectors(UP, dir.normalize());
-    parent.add(mesh);
-    return mesh;
-  };
+  const { add, strut } = createPartBuilder(hull);
 
   // --- Módulo de tripulación: cono truncado con flancos ligeramente abombados (y: 0 → 3) ---
   const crewHeight = 3.0;
@@ -155,8 +137,7 @@ export function buildOrionModel({ renderer, anisotropy }) {
 
 /** Materiales de la cápsula; comparten el mapa de entorno con el satélite */
 function createMaterials(renderer, textures) {
-  const envMap = getEnvironmentMap(renderer);
-  const standard = (params) => new THREE.MeshStandardMaterial({ envMap, ...params });
+  const standard = createEnvMaterialFactory(renderer);
 
   return {
     crew: standard({ map: textures.crewMap, metalness: 0.7, roughness: 0.34, envMapIntensity: 0.9 }),

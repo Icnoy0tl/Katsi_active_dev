@@ -1,9 +1,8 @@
 import * as THREE from 'three';
-import { getEnvironmentMap } from '../utils/environment.js';
+import { createBellGeometry, createEnvMaterialFactory, createPartBuilder, V } from '../utils/spacecraft.js';
 import { createSatelliteTextures } from './textures.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
-const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
 /**
  * Construye el modelo detallado del satélite (unidades locales; -Y apunta a la Tierra).
@@ -14,22 +13,7 @@ export function buildSatelliteModel({ renderer, anisotropy }) {
   const materials = createMaterials(renderer, textures);
   const root = new THREE.Group();
 
-  const add = (geometry, material, x = 0, y = 0, z = 0, parent = root) => {
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
-    parent.add(mesh);
-    return mesh;
-  };
-
-  // Barra cilíndrica entre dos puntos
-  const strut = (a, b, radius, material, parent = root) => {
-    const dir = new THREE.Vector3().subVectors(b, a);
-    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, dir.length(), 10), material);
-    mesh.position.copy(a).addScaledVector(dir, 0.5);
-    mesh.quaternion.setFromUnitVectors(UP, dir.normalize());
-    parent.add(mesh);
-    return mesh;
-  };
+  const { add, strut } = createPartBuilder(root);
 
   // --- Cuerpo principal (bus) ---
   const W = 1.2;
@@ -187,9 +171,7 @@ export function buildSatelliteModel({ renderer, anisotropy }) {
  * (solo afecta al satélite).
  */
 function createMaterials(renderer, textures) {
-  const envMap = getEnvironmentMap(renderer);
-
-  const standard = (params) => new THREE.MeshStandardMaterial({ envMap, ...params });
+  const standard = createEnvMaterialFactory(renderer);
 
   return {
     mli: standard({ map: textures.mliMap, bumpMap: textures.mliBump, bumpScale: 1.5, metalness: 1, roughness: 0.32, envMapIntensity: 0.9 }),
@@ -202,12 +184,4 @@ function createMaterials(renderer, textures) {
     lens: standard({ color: 0x05070c, metalness: 0.3, roughness: 0.05, envMapIntensity: 1.4 }),
     engine: standard({ color: 0x4a4038, metalness: 0.9, roughness: 0.3, envMapIntensity: 0.8, side: THREE.DoubleSide })
   };
-}
-
-/**
- * Tobera tipo campana (abre hacia +Y local)
- */
-export function createBellGeometry(scale) {
-  const profile = [[0.06, 0], [0.075, 0.04], [0.1, 0.1], [0.15, 0.2], [0.21, 0.32]];
-  return new THREE.LatheGeometry(profile.map(([r, y]) => new THREE.Vector2(r * scale, y * scale)), 32);
 }
