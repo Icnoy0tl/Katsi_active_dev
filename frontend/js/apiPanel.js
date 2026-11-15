@@ -1,4 +1,7 @@
-import { missionCardContent } from './missionCard.js';
+import { EARTH_ICON, RETRY_ICON, missionCardContent } from './missionCard.js';
+import { fetchCustomAnalogs } from './analogs.js';
+import { formatLatLon } from './utils/format.js';
+import { setupScrollFade } from './utils/scrollFade.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -17,26 +20,82 @@ const SLOTS = [
   { id: 'characteristics', title: 'Region characteristics' },
   { id: 'mission', title: 'Mission' }
 ];
+const ANALOGS_PER_REGION = 3; // los que devuelve el backend (topK)
 
 const formatSize = (bytes) => (bytes < 1024 ? `${bytes} B` : `${(bytes / 1024).toFixed(1)} KB`);
-const escapeHtml = (text) => text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const escapeHtml = (text) => String(text).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const percent = (x) => Math.round(x * 100);
+
+/** Tarjeta de análogo terrestre (mismo diseño que en la comparativa, sin acción) */
+function analogCard({ region, similarity }, i) {
+  const score = percent(similarity);
+  return `<li class="menu-enter" style="--i: ${i}">
+      <div class="menu-tag menu-tag--mission api-result">${missionCardContent({
+        icon: EARTH_ICON,
+        title: escapeHtml(region.name),
+        meta: `${escapeHtml(region.regionId)} · ${formatLatLon(region.coordinates)}`,
+        trailing: `<span class="menu-score" style="--score: ${score}" aria-label="${score}% similarity"><b>${score}%</b></span>`
+      })}</div>
+    </li>`;
+}
+
+function skeletonCard(i) {
+  return `<li class="menu-enter" style="--i: ${i}">
+      <div class="menu-tag menu-tag--mission is-pending is-skeleton" aria-hidden="true">${missionCardContent({
+        icon: EARTH_ICON,
+        title: '<span class="skeleton-bar"></span>',
+        meta: '<span class="skeleton-bar skeleton-bar--short"></span>',
+        trailing: '<span class="menu-score" style="--score: 0"></span>'
+      })}</div>
+    </li>`;
+}
+
+/** Fallo: el mensaje del backend (datos rechazados) o reintentar si no respondió */
+function errorCard(error) {
+  const canRetry = !error.fromBackend;
+  const tag = canRetry ? 'button type="button" data-retry' : 'div';
+  return `<li class="menu-enter" style="--i: 0">
+      <${tag} class="menu-tag menu-tag--mission api-result${canRetry ? '' : ' is-error'}">${missionCardContent({
+        icon: canRetry ? RETRY_ICON : FILE_ICON,
+        title: canRetry ? 'Earth analogs unavailable' : 'Data rejected',
+        meta: canRetry ? 'The analogs service did not respond · Retry' : escapeHtml(error.message),
+        trailing: ''
+      })}</${tag.split(' ')[0]}>
+    </li>`;
+}
+
+/** Bloque de una región del usuario: nombre, cobertura de sus datos y sus análogos */
+function regionResult(result, multiple) {
+  const { selectedRegion, matches = [], dataCoverage, extrapolation } = result;
+  const notes = [`Data covers ${percent(dataCoverage)}% of the mission weight`];
+  if (extrapolation?.dominant) notes.push('mostly outside the range of any Earth site');
+  const heading = multiple
+    ? `<h3 class="api-region menu-enter" style="--i: 0">${escapeHtml(selectedRegion.name)}</h3>`
+    : '';
+  return `${heading}
+    <p class="api-note menu-enter${dataCoverage < 0.5 || extrapolation?.dominant ? ' is-warning' : ''}" style="--i: 0">${notes.join(' · ')}</p>
+    <ul class="menu-options">${matches.map(analogCard).join('')}</ul>`;
+}
 
 /**
- * Panel derecho de la vista API (satélite): arrastrar y soltar los dos JSON.
- * Se pueden soltar ambos de golpe sobre el panel (rellenan las ranuras libres en orden)
- * o uno sobre una ranura concreta; también se pueden elegir con el explorador al pulsarla.
+ * Panel derecho de la vista API (satélite): arrastrar y soltar los dos JSON y ver los análogos
+ * terrestres que calcula el backend. Se pueden soltar ambos de golpe sobre el panel (rellenan
+ * las ranuras libres en orden) o uno sobre una ranura concreta; también se pueden elegir con el
+ * explorador al pulsarla. Con los dos cargados se envían solos; cambiar uno repite el cálculo.
  *
- * @param onChange(files) se llama al cargar o quitar un JSON — `files`: { [slotId]: { name, data } | null }
- * @returns { show(), hide(), files }
+ * @returns { show(), hide() }
  */
-export function setupApiPanel({ onChange = () => {} } = {}) {
+export function setupApiPanel() {
   const panel = $('api-panel');
   const list = $('api-slots');
   const status = $('api-status');
   const input = $('api-file-input');
+  const results = $('api-results');
   const files = Object.fromEntries(SLOTS.map((slot) => [slot.id, null]));
   const buttons = {};
   let pickTarget = null; // ranura que abrió el explorador de archivos
+  let request = 0; // petición más reciente (las anteriores se descartan)
+  const updateScrollEnd = setupScrollFade(panel);
 
   function renderSlot(slot) {
     const file = files[slot.id];
@@ -56,6 +115,47 @@ export function setupApiPanel({ onChange = () => {} } = {}) {
     status.textContent = message;
     status.classList.toggle('is-error', isError);
   }
+
+  const loadedCount = () => SLOTS.filter((slot) => files[slot.id]).length;
+  const readyStatus = () => `${loadedCount()} / ${SLOTS.length} files ready`;
+
+  function showResults(html, title = 'Earth analogs') {
+    results.hidden = !html;
+    results.innerHTML = html
+      ? `<h2 class="missions-title menu-enter" style="--i: 0">${title}</h2>
+         <div class="menu-accent missions-accent" aria-hidden="true"></div>${html}`
+      : '';
+    updateScrollEnd();
+  }
+
+  /** Envía los dos JSON al backend y pinta los análogos de cada región */
+  async function analyze() {
+    const id = ++request;
+    if (loadedCount() < SLOTS.length) {
+      showResults('');
+      return;
+    }
+    results.setAttribute('aria-busy', 'true');
+    showResults(`<ul class="menu-options">${Array.from({ length: ANALOGS_PER_REGION }, (_, i) => skeletonCard(i)).join('')}</ul>`);
+    try {
+      const { mission, results: regions = [] } = await fetchCustomAnalogs(files.characteristics.data, files.mission.data);
+      if (id !== request) return;
+      const multiple = regions.length > 1;
+      showResults(
+        regions.map((result) => regionResult(result, multiple)).join(''),
+        `Earth analogs · <b>${escapeHtml(mission?.mission ?? 'custom')}</b>`
+      );
+    } catch (error) {
+      if (id !== request) return;
+      showResults(`<ul class="menu-options">${errorCard(error)}</ul>`);
+    } finally {
+      if (id === request) results.removeAttribute('aria-busy');
+    }
+  }
+
+  results.addEventListener('click', (event) => {
+    if (event.target.closest('[data-retry]')) analyze();
+  });
 
   async function load(file, slotId) {
     if (!/\.json$/i.test(file.name) && file.type !== 'application/json') {
@@ -79,17 +179,18 @@ export function setupApiPanel({ onChange = () => {} } = {}) {
       ? [slotId]
       : SLOTS.map((slot) => slot.id).sort((a, b) => Number(Boolean(files[a])) - Number(Boolean(files[b])));
     const errors = [];
+    let loaded = 0;
     for (const [index, file] of incoming.slice(0, targets.length).entries()) {
       try {
         await load(file, targets[index]);
+        loaded++;
       } catch (err) {
         errors.push(err.message);
       }
     }
     if (incoming.length > targets.length) errors.push(`Only ${targets.length} file${targets.length > 1 ? 's' : ''} accepted`);
-    const loaded = SLOTS.filter((slot) => files[slot.id]).length;
-    setStatus(errors.length ? errors.join(' · ') : `${loaded} / ${SLOTS.length} files ready`, errors.length > 0);
-    onChange({ ...files });
+    setStatus(errors.length ? errors.join(' · ') : readyStatus(), errors.length > 0);
+    if (loaded) analyze();
   }
 
   // Ranuras
@@ -112,8 +213,8 @@ export function setupApiPanel({ onChange = () => {} } = {}) {
     remove.addEventListener('click', () => {
       files[slot.id] = null;
       renderSlot(slot);
-      setStatus(`${SLOTS.filter((s) => files[s.id]).length} / ${SLOTS.length} files ready`);
-      onChange({ ...files });
+      setStatus(readyStatus());
+      analyze(); // con un archivo menos se vacían los resultados (y se descarta la petición en curso)
     });
     item.append(button, remove);
     list.appendChild(item);
@@ -171,13 +272,13 @@ export function setupApiPanel({ onChange = () => {} } = {}) {
   function setVisible(visible) {
     panel.classList.toggle('is-hidden', !visible);
     panel.setAttribute('aria-hidden', String(!visible));
+    if (visible) updateScrollEnd(); // el tamaño pudo cambiar mientras estaba oculto
   }
 
-  setStatus(`0 / ${SLOTS.length} files ready`);
+  setStatus(readyStatus());
 
   return {
     show: () => setVisible(true),
-    hide: () => setVisible(false),
-    files
+    hide: () => setVisible(false)
   };
 }

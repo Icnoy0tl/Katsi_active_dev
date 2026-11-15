@@ -182,7 +182,14 @@ export const PHOTO_TEXTURES = {
  * Si la petición falla o tarda más de `timeoutMs`, el panel ofrece reintentar.
  */
 const IS_LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
+const API_BASE = IS_LOCAL ? 'http://localhost:8080' : '';
 export const ANALOGS_API = {
-  url: IS_LOCAL ? 'http://localhost:8080/api/analog' : '/api/analog',
+  url: `${API_BASE}/api/analog`,
   timeoutMs: 8000
+};
+
+/** Análogos de los datos propios del usuario (`POST /api/analog/custom`, en backend/custom.go) */
+export const CUSTOM_ANALOGS_API = {
+  url: `${API_BASE}/api/analog/custom`,
+  timeoutMs: 12000
 };

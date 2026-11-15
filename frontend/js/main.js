@@ -85,11 +85,7 @@ const regionBody = new Map(); // regionId → nombre del cuerpo ('moon' | 'mars'
 
 // Panel de misiones: visible solo mientras se enfoca un cuerpo con misiones ya cargadas
 // Vista API (satélite): panel derecho para soltar los JSON
-const apiPanel = setupApiPanel({
-  onChange: () => {
-    // TODO: enviar los JSON al backend cuando esté definido su formato
-  }
-});
+const apiPanel = setupApiPanel();
 
 const missionsPanel = setupMissionsPanel({ onSelect: (region) => goToMission(region) });
 

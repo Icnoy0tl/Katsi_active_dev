@@ -1,4 +1,4 @@
-import { ANALOGS_API } from './config.js';
+import { ANALOGS_API, CUSTOM_ANALOGS_API } from './config.js';
 
 /**
  * Los `count` análogos terrestres de la región `regionId` de `planet` según el backend
@@ -22,4 +22,26 @@ export async function fetchClosestAnalogs(regionId, planet, earthRegions, count 
     region: byId.get(regionId) ?? region,
     similarity
   }));
+}
+
+/**
+ * Análogos terrestres de los datos propios del usuario (`POST /api/analog/custom`): envía los dos
+ * JSON tal cual. Si el backend los rechaza, el error lleva su mensaje (pensado para el usuario).
+ *
+ * @returns { mission, results: [{ selectedRegion, matches, extrapolation, dataCoverage }] }
+ */
+export async function fetchCustomAnalogs(characteristics, mission) {
+  const response = await fetch(CUSTOM_ANALOGS_API.url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ characteristics, mission }),
+    signal: AbortSignal.timeout(CUSTOM_ANALOGS_API.timeoutMs)
+  });
+  const payload = await response.json().catch(() => null);
+  if (!response.ok) {
+    const error = new Error(payload?.error ?? `Analogs API: HTTP ${response.status}`);
+    error.fromBackend = Boolean(payload?.error);
+    throw error;
+  }
+  return payload;
 }

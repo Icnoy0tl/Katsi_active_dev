@@ -1,6 +1,6 @@
 import { isScrolledToEnd, setupScrollFade } from './utils/scrollFade.js';
 import { formatLatLon } from './utils/format.js';
-import { missionCardContent } from './missionCard.js';
+import { missionCardContent, EARTH_ICON, RETRY_ICON } from './missionCard.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -87,10 +87,6 @@ function comparisonGroup(title, variables, labels, analog) {
     </tbody>`;
 }
 
-// Mismos trazos que los iconos del menú principal y de la lista de misiones
-const EARTH_ICON =
-  '<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.1 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.1-3.6-8.5S9.6 5.8 12 3.5Z"/></svg>';
-
 /** Tarjeta de análogo: igual que las de misiones (icono | divisor | nombre y datos) con el % al final */
 function analogCard(analog, index) {
   const { name, regionId, coordinates } = analog.region;
@@ -131,9 +127,6 @@ function skeletonCard(index) {
       </div>
     </li>`;
 }
-
-const RETRY_ICON =
-  '<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4.5v4.2h-4.2"/></svg>';
 
 /** Tarjeta única cuando el backend no respondió: pulsarla repite la petición */
 function errorCard() {

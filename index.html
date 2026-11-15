@@ -469,6 +469,45 @@
     .api-status.is-error {
       color: #fca5a5;
     }
+    /* Resultados: análogos terrestres de los datos del usuario */
+    .api-results {
+      margin-top: 2.2rem;
+    }
+    .api-region {
+      margin: 1.6rem 0 0.4rem;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.85rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(226, 232, 240, 0.85);
+    }
+    .api-note {
+      margin: 0 0 0.9rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: rgba(148, 163, 184, 0.8);
+    }
+    .api-note.is-warning {
+      color: #fcd34d;
+    }
+    /* Tarjeta informativa (sin acción): no se desplaza al pasar el mouse */
+    #api-panel div.api-result {
+      cursor: default;
+    }
+    #api-panel div.api-result:hover {
+      transform: none;
+    }
+    .api-result.is-error .mission-meta {
+      color: #fca5a5;
+      text-transform: none;
+      letter-spacing: 0.02em;
+      line-height: 1.5;
+    }
+    #api-panel .api-result[data-retry]:hover,
+    #api-panel .api-result[data-retry]:focus-visible {
+      transform: translateX(-6px);
+    }
 
     /* ---------- Panel de misiones (izquierda, mismo lenguaje visual que el menú) ---------- */
     #missions-panel {
@@ -1508,13 +1547,14 @@
       id="api-panel"
       aria-label="API data upload"
       aria-hidden="true"
-      class="is-hidden fixed top-1/2 right-4 sm:right-6 z-20 w-[min(26rem,calc(100vw-2rem))] max-h-[calc(100vh-8rem)] overflow-y-auto overflow-x-hidden pl-3 pr-1 py-1"
+      class="is-hidden fixed top-1/2 right-4 sm:right-6 z-20 w-[min(26rem,calc(100vw-2rem))] max-h-[calc(100vh-8rem)] overflow-y-auto overflow-x-hidden scroll-fade pl-3 pr-1 py-1"
     >
       <h2 class="missions-title menu-enter" style="--i: 0">API · <b>Upload data</b></h2>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
       <ul id="api-slots" class="menu-options"></ul>
       <p id="api-status" class="api-status menu-enter" style="--i: 4" aria-live="polite"></p>
       <input id="api-file-input" type="file" accept=".json,application/json" hidden />
+      <section id="api-results" class="api-results" aria-live="polite" hidden></section>
     </aside>
 
     <!-- Hologramas de terreno (Luna o Marte, y Tierra): los construye frontend/js/hologram.js -->
