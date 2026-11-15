@@ -1,0 +1,9 @@
+{
+  "name": "Ice prospecting rover",
+  "profile": {
+    "VOL": 0.4,
+    "MEC": 0.3,
+    "GEO": 0.2,
+    "NAV": 0.1
+  }
+}
