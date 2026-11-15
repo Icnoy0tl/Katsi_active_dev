@@ -510,6 +510,23 @@
     /* ---------- Información del terreno seleccionado (izquierda) ---------- */
     #mission-info {
       transition: opacity 0.3s ease, transform 0.3s ease;
+      overscroll-behavior: none;
+    }
+    /* En la comparación el panel no hace scroll: título y cabecera de la tabla quedan quietos y
+       solo las filas (.cmp-scroll) se desplazan. Con position: sticky la cabecera se recolocaba
+       en el hilo principal (ocupado con la escena 3D) y llegaba tarde: «rebotaba» */
+    #mission-info.is-comparison {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    #mission-info.is-comparison #mission-info-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
     }
     #mission-info.is-hidden {
       transform: translateX(-12px);
@@ -616,92 +633,153 @@
     }
 
     .cmp-detail {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
       margin-top: 1.3rem;
     }
+    .cmp-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: none;
+    }
 
-    /* Tabla comparativa: variable | cuerpo | Tierra */
+    /* Viñeta de la comparativa: oscurece de izquierda a derecha hasta donde termina la tabla para
+       que las estrellas no se confundan con datos. Elemento fijo aparte (no dentro del panel, que
+       tiene scroll y mask-image) y solo con opacidad animada: no repinta al hacer scroll */
+    #cmp-vignette {
+      --cmp-end: calc(1.5rem + min(30rem, 100vw - 2rem));
+      position: fixed;
+      inset: 0;
+      z-index: 15;
+      pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        rgba(3, 6, 12, 0.94) 0,
+        rgba(3, 6, 12, 0.94) var(--cmp-end),
+        rgba(3, 6, 12, 0.5) calc(var(--cmp-end) + 3rem),
+        rgba(3, 6, 12, 0) calc(var(--cmp-end) + 9rem)
+      );
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    /* El borde derecho del panel (sm:left-6) */
+    @media (max-width: 639px) {
+      #cmp-vignette {
+        --cmp-end: calc(1rem + min(30rem, 100vw - 2rem));
+      }
+    }
+    #cmp-vignette.is-visible {
+      opacity: 1;
+    }
+
+    /* Tabla comparativa minimalista: variable | cuerpo | Tierra, sin fondos ni bordes duros */
+    /* Dos tablas (cabecera fuera del scroll y filas dentro) con las mismas columnas fijas */
     .cmp-table {
       width: 100%;
+      table-layout: fixed;
       border-collapse: collapse;
-      font-size: 0.86rem;
+      font-size: 0.84rem;
       font-variant-numeric: tabular-nums;
     }
-    .cmp-table thead th {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      padding: 0.7rem 0.9rem;
-      background: rgba(6, 18, 32, 0.92);
+    .cmp-table col.cmp-col-value {
+      width: 24%;
+    }
+    /* Cabecera visible: fuera de la zona con scroll, nunca se mueve */
+    .cmp-head th {
+      padding: 0 0 0.8rem 1rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
       font-family: 'Montserrat', 'Inter', sans-serif;
       font-weight: 500;
-      font-size: 0.66rem;
-      letter-spacing: 0.16em;
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       text-align: right;
-      color: rgba(203, 213, 225, 0.75);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+      color: rgba(203, 213, 225, 0.55);
     }
-    .cmp-table thead th:first-child {
-      text-align: left;
+    /* La tabla de filas conserva su cabecera solo para lectores de pantalla */
+    .cmp-scroll thead th {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+    .cmp-head th:first-child {
       padding-left: 0;
+      text-align: left;
     }
-    .cmp-table thead .cmp-col-body {
-      color: #93c5fd;
+    /* Punto de color en lugar de columnas tintadas */
+    .cmp-col-body::before,
+    .cmp-col-earth::before {
+      content: '';
+      display: inline-block;
+      width: 0.4rem;
+      height: 0.4rem;
+      margin-right: 0.45rem;
+      border-radius: 50%;
+      vertical-align: 0.08em;
     }
-    .cmp-table thead .cmp-col-earth {
-      color: #a5f3fc;
+    .cmp-col-body::before {
+      background: #93c5fd;
+    }
+    .cmp-col-earth::before {
+      background: #67e8f9;
     }
     /* Terreno concreto bajo el nombre de cada columna */
     .cmp-col-sub {
       display: block;
-      margin-top: 0.25rem;
+      margin-top: 0.3rem;
       font-family: 'Inter', sans-serif;
       font-size: 0.6rem;
-      letter-spacing: 0.08em;
-      color: rgba(148, 163, 184, 0.8);
+      letter-spacing: 0.06em;
+      text-transform: none;
+      color: rgba(148, 163, 184, 0.55);
     }
     .cmp-group th {
-      padding: 1.4rem 0 0.6rem;
+      padding: 1.6rem 0 0.5rem;
       font-family: 'Montserrat', 'Inter', sans-serif;
       font-weight: 500;
-      font-size: 0.64rem;
+      font-size: 0.6rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       text-align: left;
-      color: rgba(147, 197, 253, 0.9);
+      color: rgba(148, 163, 184, 0.6);
     }
-    .cmp-table tbody tr:not(.cmp-group) {
-      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    /* Primer grupo pegado a la cabecera, que ya marca el inicio de la tabla */
+    .cmp-scroll thead + tbody .cmp-group th {
+      padding-top: 1rem;
     }
-    .cmp-table tbody tr:not(.cmp-group):hover {
-      background: rgba(148, 163, 184, 0.07);
+    .cmp-table tbody tr:not(.cmp-group) + tr:not(.cmp-group) {
+      border-top: 1px solid rgba(148, 163, 184, 0.08);
     }
     .cmp-table tbody th[scope='row'] {
-      padding: 0.7rem 1rem 0.7rem 0;
+      padding: 0.6rem 1rem 0.6rem 0;
       font-weight: 400;
       text-align: left;
-      color: rgba(226, 232, 240, 0.85);
+      color: rgba(226, 232, 240, 0.78);
     }
+    /* Unidad junto al nombre, en tono apagado */
     .cmp-unit {
-      display: block;
-      margin-top: 0.2rem;
+      margin-left: 0.4rem;
       font-size: 0.7rem;
-      color: rgba(148, 163, 184, 0.75);
+      color: rgba(148, 163, 184, 0.5);
     }
     .cmp-table td {
-      width: 22%;
-      padding: 0.7rem 0.9rem;
+      padding: 0.6rem 0 0.6rem 1rem;
       text-align: right;
       white-space: nowrap;
       color: #f1f5f9;
     }
-    /* Columna de la Tierra ligeramente tintada para distinguirla de un vistazo */
     .cmp-table td.cmp-earth {
-      background: rgba(103, 232, 249, 0.05);
       color: #cffafe;
     }
     .cmp-empty {
-      color: rgba(148, 163, 184, 0.55);
+      color: rgba(148, 163, 184, 0.35);
     }
     .sr-only {
       position: absolute;
@@ -1249,6 +1327,8 @@
   <!-- Panel de misiones disponibles (se muestra al enfocar la Luna o Marte) -->
   <div data-scene-ui>
     <div id="missions-backdrop" class="is-hidden" aria-hidden="true"></div>
+    <!-- Viñeta tras la tabla comparativa (la muestra js/missionInfo.js) -->
+    <div id="cmp-vignette" aria-hidden="true"></div>
     <aside
       id="missions-panel"
       aria-label="Misiones disponibles"

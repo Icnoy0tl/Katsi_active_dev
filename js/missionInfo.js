@@ -50,6 +50,9 @@ function mergeDepth(variables) {
   return entries;
 }
 
+/** Columnas comunes a la cabecera y a las filas: así quedan alineadas aun siendo dos tablas */
+const COLUMNS = '<colgroup><col /><col class="cmp-col-value" /><col class="cmp-col-value" /></colgroup>';
+
 /** Número de análogos terrestres que se ofrecen por misión */
 const ANALOG_SLOTS = 3;
 
@@ -132,7 +135,27 @@ function pendingCard(index) {
 export function setupMissionInfo({ onAnalogChange } = {}) {
   const panel = $('mission-info');
   const body = $('mission-info-body');
+  const vignette = $('cmp-vignette');
   const updateScrollEnd = setupScrollFade(panel);
+  const setVignette = (visible) => vignette.classList.toggle('is-visible', visible);
+
+  // Zona con scroll de la comparación (se recrea en cada render): difuminado inferior propio
+  let cmpScroll = null;
+  const updateCmpFade = () => {
+    if (!cmpScroll) return;
+    const atEnd = cmpScroll.scrollTop + cmpScroll.clientHeight >= cmpScroll.scrollHeight - 4;
+    cmpScroll.classList.toggle('is-scroll-end', atEnd);
+  };
+  window.addEventListener('resize', updateCmpFade);
+
+  /** En la comparación el panel deja de hacer scroll y solo se desplazan las filas de la tabla */
+  function setComparisonLayout(on) {
+    panel.classList.toggle('is-comparison', on);
+    cmpScroll = on ? body.querySelector('.cmp-scroll') : null;
+    if (!cmpScroll) return;
+    cmpScroll.addEventListener('scroll', updateCmpFade, { passive: true });
+    updateCmpFade();
+  }
 
   let region = null;
   let bodyLabel = '';
@@ -150,6 +173,8 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
     const cards = Array.from({ length: ANALOG_SLOTS }, (_, i) =>
       analogs[i] ? analogCard(analogs[i], i) : pendingCard(i)
     ).join('');
+    setVignette(false);
+    setComparisonLayout(false);
     render(`
       <p class="info-section info-lead menu-enter" style="--i: 1">Análogos terrestres más parecidos a</p>
       <h2 class="info-name menu-enter" style="--i: 2">${region.name}</h2>
@@ -164,24 +189,33 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
     const analog = analogs[index];
     const { name, regionId, coordinates } = analog.region;
     const percent = Math.round(analog.similarity * 100);
+    // Misma fila en la cabecera visible y, oculta, en la tabla de filas (para lectores de pantalla)
+    const headerRow = `<tr>
+        <th scope="col">Variable</th>
+        <th scope="col" class="cmp-col-body">${bodyLabel}<span class="cmp-col-sub">${region.regionId}</span></th>
+        <th scope="col" class="cmp-col-earth">Tierra<span class="cmp-col-sub">${regionId}</span></th>
+      </tr>`;
+    setVignette(true);
     render(`
       <h2 class="info-name menu-enter" style="--i: 2">${name}</h2>
       <p class="info-coords menu-enter" style="--i: 3">${regionId} · ${formatCoord(coordinates.latitude, 'N', 'S')} · ${formatCoord(coordinates.longitude, 'E', 'O')} · ${percent}&nbsp;% de similitud</p>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
       <section class="cmp-detail menu-enter" style="--i: 4">
-        <table class="cmp-table">
-          <caption class="sr-only">Comparación de variables entre ${region.name} (${bodyLabel}) y ${name} (Tierra)</caption>
-          <thead>
-            <tr>
-              <th scope="col">Variable</th>
-              <th scope="col" class="cmp-col-body">${bodyLabel}<span class="cmp-col-sub">${region.regionId}</span></th>
-              <th scope="col" class="cmp-col-earth">Tierra<span class="cmp-col-sub">${regionId}</span></th>
-            </tr>
-          </thead>
-          ${comparisonGroup('Variables principales', region.coreVariables ?? {}, CORE_VARIABLES, analog)}
-          ${comparisonGroup('Variables de auditoría', region.auditVariables ?? {}, AUDIT_VARIABLES, analog)}
+        <table class="cmp-table cmp-head" aria-hidden="true">
+          ${COLUMNS}
+          <thead>${headerRow}</thead>
         </table>
+        <div class="cmp-scroll scroll-fade">
+          <table class="cmp-table">
+            <caption class="sr-only">Comparación de variables entre ${region.name} (${bodyLabel}) y ${name} (Tierra)</caption>
+            ${COLUMNS}
+            <thead>${headerRow}</thead>
+            ${comparisonGroup('Variables principales', region.coreVariables ?? {}, CORE_VARIABLES, analog)}
+            ${comparisonGroup('Variables de auditoría', region.auditVariables ?? {}, AUDIT_VARIABLES, analog)}
+          </table>
+        </div>
       </section>`);
+    setComparisonLayout(true);
   }
 
   body.addEventListener('click', (event) => {
@@ -220,6 +254,8 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
       region = null;
       analogs = [];
       shown = -1;
+      setVignette(false);
+      setComparisonLayout(false);
       panel.classList.add('is-hidden');
       panel.setAttribute('aria-hidden', 'true');
     }
