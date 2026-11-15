@@ -32,7 +32,8 @@ const AUDIT_VARIABLES = {
   surface_pressure_kpa: ['Surface pressure', 'kPa'],
   wind_typical_ms: ['Typical wind', 'm/s'],
   wind_gust_ms: ['Wind gusts', 'm/s'],
-  abrasive_mohs: ['Abrasiveness (Mohs)', '']
+  abrasive_mohs: ['Abrasiveness (Mohs)', ''],
+  ground_ice_index: ['Ground ice index', '']
 };
 
 const BODY_LABELS = { moon: 'Moon', mars: 'Mars' };
@@ -52,25 +53,49 @@ function mergeDepth(variables) {
 }
 
 /** Columnas comunes a la cabecera y a las filas: así quedan alineadas aun siendo dos tablas */
-const COLUMNS = '<colgroup><col /><col class="cmp-col-value" /><col class="cmp-col-value" /></colgroup>';
+const COLUMNS =
+  '<colgroup><col /><col class="cmp-col-value" /><col class="cmp-col-value" /><col class="cmp-col-match" /></colgroup>';
 
 /** Número de análogos terrestres que se ofrecen por misión */
 const ANALOG_SLOTS = 3;
 
-/**
- * Valores del análogo terrestre para la comparación.
- * TODO: aún no hay datos reales de la Tierra; cuando lleguen, devolver aquí
- * `mergeDepth({ ...analog.region.coreVariables, ...analog.region.auditVariables })`.
- */
-function earthValues(analog, keys) {
-  return Object.fromEntries(keys.map((key) => [key, null]));
+/** Valores del análogo terrestre, con la misma forma que los del terreno (profundidad combinada) */
+function earthValues(analog) {
+  const { coreVariables = {}, auditVariables = {} } = analog.region;
+  return mergeDepth({ ...coreVariables, ...auditVariables });
 }
 
-/** Bloque de la tabla: fila de título del grupo + una fila por variable (cuerpo | Tierra) */
+/**
+ * Índice de compatibilidad (0–1) de cada variable según el backend (knn.CompareFeatures):
+ * 1 − diferencia normalizada en el rango de los sitios terrestres; null si falta un valor.
+ * La profundidad a roca madre combina sus dos extremos (media de los observados).
+ */
+function compatibilities(analog) {
+  const byName = Object.fromEntries((analog.features ?? []).map((f) => [f.name, f.compatibility]));
+  const depth = [byName.depth_to_bedrock_min_m, byName.depth_to_bedrock_max_m].filter((x) => x != null);
+  byName.depth_to_bedrock = depth.length ? depth.reduce((a, b) => a + b, 0) / depth.length : null;
+  return byName;
+}
+
+/**
+ * Celda de compatibilidad en porcentaje. El color del texto se mezcla de forma continua entre
+ * las tres paradas de la paleta (--match-low 0 %, --match-mid 50 %, --match-high 100 %, en
+ * index.html) en espacio OKLCH, para que los tonos intermedios no se ensucien
+ */
+function matchCell(compatibility) {
+  if (compatibility == null) return '<td class="cmp-match"><span class="cmp-empty">—</span></td>';
+  const percent = Math.round(compatibility * 100);
+  const [to, from, t] =
+    percent >= 50 ? ['--match-high', '--match-mid', (percent - 50) * 2] : ['--match-mid', '--match-low', percent * 2];
+  return `<td class="cmp-match" style="color: color-mix(in oklch, var(${to}) ${t}%, var(${from}))">${percent}%</td>`;
+}
+
+/** Bloque de la tabla: fila de título del grupo + una fila por variable (cuerpo | Tierra | compatibilidad) */
 function comparisonGroup(title, variables, labels, analog) {
   const own = mergeDepth(variables);
   const keys = Object.keys(own);
-  const earth = earthValues(analog, keys);
+  const earth = earthValues(analog);
+  const match = compatibilities(analog);
   const rows = keys
     .map((key) => {
       const [label, unit] = labels[key] ?? [key, ''];
@@ -78,11 +103,12 @@ function comparisonGroup(title, variables, labels, analog) {
         <th scope="row">${label}${unit ? `<span class="cmp-unit">${unit}</span>` : ''}</th>
         <td>${formatValue(own[key])}</td>
         <td class="cmp-earth">${formatValue(earth[key])}</td>
+        ${matchCell(match[key])}
       </tr>`;
     })
     .join('');
   return `<tbody>
-      <tr class="cmp-group"><th colspan="3" scope="colgroup">${title}</th></tr>
+      <tr class="cmp-group"><th colspan="4" scope="colgroup">${title}</th></tr>
       ${rows}
     </tbody>`;
 }
@@ -245,6 +271,7 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
         <th scope="col">Variable</th>
         <th scope="col" class="cmp-col-body">${bodyLabel}<span class="cmp-col-sub">${region.regionId}</span></th>
         <th scope="col" class="cmp-col-earth">Earth<span class="cmp-col-sub">${regionId}</span></th>
+        <th scope="col" title="How close the two values are within the range of Earth sites">Match</th>
       </tr>`;
     setVignette(true);
     render(`

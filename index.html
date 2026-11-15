@@ -970,7 +970,10 @@
       font-variant-numeric: tabular-nums;
     }
     .cmp-table col.cmp-col-value {
-      width: 24%;
+      width: 21%;
+    }
+    .cmp-table col.cmp-col-match {
+      width: 17%;
     }
     /* Cabecera visible: fuera de la zona con scroll, nunca se mueve */
     .cmp-head th {
@@ -1062,6 +1065,17 @@
     }
     .cmp-table td.cmp-earth {
       color: #cffafe;
+    }
+    /* Compatibilidad de la variable (backend: knn.CompareFeatures). Paleta en la familia de tonos
+       claros de la interfaz (azul #93c5fd, cian #67e8f9, ámbar #fcd34d): el color se mezcla entre
+       las tres paradas según el porcentaje (frontend/js/missionInfo.js, matchCell) */
+    .cmp-table {
+      --match-high: #5eead4; /* verde agua: cerca del cian de la Tierra */
+      --match-mid: #fcd34d; /* ámbar: el mismo de los avisos */
+      --match-low: #fda4af; /* coral suave */
+    }
+    .cmp-table td.cmp-match {
+      font-size: 0.74rem;
     }
     .cmp-empty {
       color: rgba(148, 163, 184, 0.35);

@@ -20,7 +20,8 @@ const topK = 3
 
 type MatchResponse struct {
 	knn.Match
-	Region jsonParser.Region `json:"region"` // datos completos de la región de la Tierra
+	Region   jsonParser.Region   `json:"region"`             // datos completos de la región de la Tierra
+	Features []knn.FeatureCompat `json:"features,omitempty"` // desglose por variable (índice de compatibilidad)
 }
 
 type AnalogResponse struct {
@@ -81,7 +82,7 @@ func analogHandler(parser *jsonParser.Parser) http.HandlerFunc {
 		}
 
 		// 3. Normalización (mismas stats para objetivo y Tierra, columna por columna)
-		target, pool, err := knn.Prepare(selected, earth)
+		target, pool, stats, err := knn.PrepareWithStats(selected, earth)
 		if err != nil {
 			log.Printf("error normalizando: %v", err)
 			writeError(w, http.StatusUnprocessableEntity, "datos de región inválidos")
@@ -101,14 +102,25 @@ func analogHandler(parser *jsonParser.Parser) http.HandlerFunc {
 			return
 		}
 
-		// 5. Respuesta: cada match con los datos completos de su región terrestre
+		// 5. Respuesta: cada match con los datos completos de su región terrestre y el desglose
+		//    por variable (mismos vectores normalizados, estadísticas y pesos que el KNN)
 		byID := make(map[string]jsonParser.Region, len(earth))
 		for _, e := range earth {
 			byID[e.RegionId] = e
 		}
+		candByID := make(map[string]knn.Candidate, len(pool))
+		for _, c := range pool {
+			candByID[c.ID] = c
+		}
 		resp := AnalogResponse{Planet: info.Planet, Filter: filter, SelectedRegion: selected}
 		for _, m := range matches {
-			resp.Matches = append(resp.Matches, MatchResponse{Match: m, Region: byID[m.RegionID]})
+			features, err := knn.CompareFeatures(selected, byID[m.RegionID], target, candByID[m.RegionID], stats, weights)
+			if err != nil {
+				log.Printf("error en desglose %s: %v", m.RegionID, err)
+				writeError(w, http.StatusInternalServerError, "error interno")
+				return
+			}
+			resp.Matches = append(resp.Matches, MatchResponse{Match: m, Region: byID[m.RegionID], Features: features})
 		}
 		writeJSON(w, http.StatusOK, resp)
 	}
