@@ -1,0 +1,559 @@
+{
+  "regions": [
+    {
+      "regionId": "EARTH-001",
+      "name": "Atacama Desert - Yungay hyperarid core",
+      "coordinates": {
+        "latitude": -24.1,
+        "longitude": -70.0
+      },
+      "coreVariables": {
+        "slope": 3.0,
+        "radar_roughness": 0.2,
+        "apparent_thermal_inertia": 450,
+        "soil_moisture": 0.01,
+        "visual_texture": 0.15,
+        "low_sun_shadows": 8,
+        "line_of_sight": 85,
+        "diurnal_thermal_range": 40,
+        "dust_aerosols": 0.05,
+        "insolation": 336
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 5,
+        "grain_size_um": 300,
+        "angle_of_repose_deg": 34,
+        "depth_to_bedrock_min_m": 5,
+        "depth_to_bedrock_max_m": 50,
+        "vrm_microrelief": 0.003,
+        "dielectric_constant": 4.0,
+        "salinity_wt_pct": 3.0,
+        "diffuse_ratio": 0.2,
+        "albedo": 0.28,
+        "vegetation_ndvi": 0.02,
+        "surface_pressure_kpa": 90.0,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 15,
+        "abrasive_mohs": 6.5
+      }
+    },
+    {
+      "regionId": "EARTH-002",
+      "name": "Devon Island - Haughton Crater",
+      "coordinates": {
+        "latitude": 75.37,
+        "longitude": -89.68
+      },
+      "coreVariables": {
+        "slope": 5.0,
+        "radar_roughness": 0.55,
+        "apparent_thermal_inertia": 550,
+        "soil_moisture": 0.08,
+        "visual_texture": 0.4,
+        "low_sun_shadows": 20,
+        "line_of_sight": 80,
+        "diurnal_thermal_range": 20,
+        "dust_aerosols": 0.05,
+        "insolation": 100
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 20,
+        "grain_size_um": 2000,
+        "angle_of_repose_deg": 38,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 2,
+        "vrm_microrelief": 0.01,
+        "dielectric_constant": 5.0,
+        "salinity_wt_pct": 0.1,
+        "diffuse_ratio": 0.35,
+        "albedo": 0.25,
+        "vegetation_ndvi": 0.05,
+        "surface_pressure_kpa": 99.5,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 20,
+        "abrasive_mohs": 3.5
+      }
+    },
+    {
+      "regionId": "EARTH-003",
+      "name": "Mojave Desert - Cima Volcanic Field",
+      "coordinates": {
+        "latitude": 35.25,
+        "longitude": -115.8
+      },
+      "coreVariables": {
+        "slope": 8.0,
+        "radar_roughness": 0.65,
+        "apparent_thermal_inertia": 800,
+        "soil_moisture": 0.04,
+        "visual_texture": 0.65,
+        "low_sun_shadows": 30,
+        "line_of_sight": 55,
+        "diurnal_thermal_range": 35,
+        "dust_aerosols": 0.1,
+        "insolation": 235
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 25,
+        "grain_size_um": 1000,
+        "angle_of_repose_deg": 38,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 1,
+        "vrm_microrelief": 0.04,
+        "dielectric_constant": 5.5,
+        "salinity_wt_pct": 0.3,
+        "diffuse_ratio": 0.22,
+        "albedo": 0.18,
+        "vegetation_ndvi": 0.1,
+        "surface_pressure_kpa": 90.0,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 18,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "EARTH-004",
+      "name": "Rio Tinto - Iberian Pyrite Belt",
+      "coordinates": {
+        "latitude": 37.72,
+        "longitude": -6.55
+      },
+      "coreVariables": {
+        "slope": 9.0,
+        "radar_roughness": 0.5,
+        "apparent_thermal_inertia": 700,
+        "soil_moisture": 0.15,
+        "visual_texture": 0.6,
+        "low_sun_shadows": 35,
+        "line_of_sight": 40,
+        "diurnal_thermal_range": 25,
+        "dust_aerosols": 0.15,
+        "insolation": 195
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 15,
+        "grain_size_um": 200,
+        "angle_of_repose_deg": 32,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 2,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 6.0,
+        "salinity_wt_pct": 0.5,
+        "diffuse_ratio": 0.35,
+        "albedo": 0.15,
+        "vegetation_ndvi": 0.45,
+        "surface_pressure_kpa": 97.8,
+        "wind_typical_ms": 3,
+        "wind_gust_ms": 12,
+        "abrasive_mohs": 6.5
+      }
+    },
+    {
+      "regionId": "EARTH-005",
+      "name": "Mauna Kea - upper slopes and cinder cones",
+      "coordinates": {
+        "latitude": 19.76,
+        "longitude": -155.47
+      },
+      "coreVariables": {
+        "slope": 10.0,
+        "radar_roughness": 0.6,
+        "apparent_thermal_inertia": 350,
+        "soil_moisture": 0.08,
+        "visual_texture": 0.45,
+        "low_sun_shadows": 28,
+        "line_of_sight": 50,
+        "diurnal_thermal_range": 30,
+        "dust_aerosols": 0.02,
+        "insolation": 255
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 15,
+        "grain_size_um": 500,
+        "angle_of_repose_deg": 36,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 5,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 4.0,
+        "salinity_wt_pct": 0.02,
+        "diffuse_ratio": 0.25,
+        "albedo": 0.1,
+        "vegetation_ndvi": 0.05,
+        "surface_pressure_kpa": 68.4,
+        "wind_typical_ms": 7,
+        "wind_gust_ms": 30,
+        "abrasive_mohs": 5.5
+      }
+    },
+    {
+      "regionId": "EARTH-006",
+      "name": "McMurdo Dry Valleys - Wright Valley",
+      "coordinates": {
+        "latitude": -77.55,
+        "longitude": 161.6
+      },
+      "coreVariables": {
+        "slope": 14.0,
+        "radar_roughness": 0.5,
+        "apparent_thermal_inertia": 500,
+        "soil_moisture": 0.05,
+        "visual_texture": 0.5,
+        "low_sun_shadows": 45,
+        "line_of_sight": 35,
+        "diurnal_thermal_range": 25,
+        "dust_aerosols": 0.03,
+        "insolation": 120
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 25,
+        "grain_size_um": 400,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 2,
+        "vrm_microrelief": 0.04,
+        "dielectric_constant": 5.0,
+        "salinity_wt_pct": 1.0,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.2,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 97.8,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 30,
+        "abrasive_mohs": 6.5
+      }
+    },
+    {
+      "regionId": "EARTH-007",
+      "name": "Death Valley - salt flats and alluvial fans",
+      "coordinates": {
+        "latitude": 36.46,
+        "longitude": -116.87
+      },
+      "coreVariables": {
+        "slope": 4.0,
+        "radar_roughness": 0.35,
+        "apparent_thermal_inertia": 650,
+        "soil_moisture": 0.02,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 15,
+        "line_of_sight": 70,
+        "diurnal_thermal_range": 35,
+        "dust_aerosols": 0.1,
+        "insolation": 245
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 15,
+        "grain_size_um": 500,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 5,
+        "depth_to_bedrock_max_m": 50,
+        "vrm_microrelief": 0.02,
+        "dielectric_constant": 4.5,
+        "salinity_wt_pct": 3.0,
+        "diffuse_ratio": 0.2,
+        "albedo": 0.25,
+        "vegetation_ndvi": 0.02,
+        "surface_pressure_kpa": 102.0,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 18,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "EARTH-008",
+      "name": "Salar de Uyuni",
+      "coordinates": {
+        "latitude": -20.13,
+        "longitude": -67.49
+      },
+      "coreVariables": {
+        "slope": 0.3,
+        "radar_roughness": 0.15,
+        "apparent_thermal_inertia": 700,
+        "soil_moisture": 0.15,
+        "visual_texture": 0.1,
+        "low_sun_shadows": 2,
+        "line_of_sight": 95,
+        "diurnal_thermal_range": 30,
+        "dust_aerosols": 0.05,
+        "insolation": 250
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 0,
+        "grain_size_um": 100,
+        "angle_of_repose_deg": 30,
+        "depth_to_bedrock_min_m": 50,
+        "depth_to_bedrock_max_m": 120,
+        "vrm_microrelief": 0.001,
+        "dielectric_constant": 8.0,
+        "salinity_wt_pct": 20.0,
+        "diffuse_ratio": 0.22,
+        "albedo": 0.5,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 65.7,
+        "wind_typical_ms": 6,
+        "wind_gust_ms": 20,
+        "abrasive_mohs": 2.5
+      }
+    },
+    {
+      "regionId": "EARTH-009",
+      "name": "Askja caldera - Icelandic Highlands",
+      "coordinates": {
+        "latitude": 65.05,
+        "longitude": -16.75
+      },
+      "coreVariables": {
+        "slope": 7.0,
+        "radar_roughness": 0.55,
+        "apparent_thermal_inertia": 600,
+        "soil_moisture": 0.15,
+        "visual_texture": 0.5,
+        "low_sun_shadows": 25,
+        "line_of_sight": 50,
+        "diurnal_thermal_range": 12,
+        "dust_aerosols": 0.05,
+        "insolation": 105
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 20,
+        "grain_size_um": 800,
+        "angle_of_repose_deg": 36,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 5,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 5.5,
+        "salinity_wt_pct": 0.05,
+        "diffuse_ratio": 0.45,
+        "albedo": 0.12,
+        "vegetation_ndvi": 0.02,
+        "surface_pressure_kpa": 89.4,
+        "wind_typical_ms": 7,
+        "wind_gust_ms": 25,
+        "abrasive_mohs": 5.5
+      }
+    },
+    {
+      "regionId": "EARTH-010",
+      "name": "Pinacate Volcanic Field",
+      "coordinates": {
+        "latitude": 31.77,
+        "longitude": -113.5
+      },
+      "coreVariables": {
+        "slope": 6.0,
+        "radar_roughness": 0.6,
+        "apparent_thermal_inertia": 750,
+        "soil_moisture": 0.03,
+        "visual_texture": 0.55,
+        "low_sun_shadows": 25,
+        "line_of_sight": 55,
+        "diurnal_thermal_range": 35,
+        "dust_aerosols": 0.12,
+        "insolation": 240
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 20,
+        "grain_size_um": 800,
+        "angle_of_repose_deg": 36,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 5,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 5.5,
+        "salinity_wt_pct": 0.2,
+        "diffuse_ratio": 0.2,
+        "albedo": 0.17,
+        "vegetation_ndvi": 0.05,
+        "surface_pressure_kpa": 94.4,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 17,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "EARTH-011",
+      "name": "Namib Desert - Sossusvlei dunes",
+      "coordinates": {
+        "latitude": -24.73,
+        "longitude": 15.29
+      },
+      "coreVariables": {
+        "slope": 10.0,
+        "radar_roughness": 0.2,
+        "apparent_thermal_inertia": 400,
+        "soil_moisture": 0.02,
+        "visual_texture": 0.2,
+        "low_sun_shadows": 15,
+        "line_of_sight": 60,
+        "diurnal_thermal_range": 30,
+        "dust_aerosols": 0.1,
+        "insolation": 255
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 1,
+        "grain_size_um": 250,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 5,
+        "depth_to_bedrock_max_m": 50,
+        "vrm_microrelief": 0.02,
+        "dielectric_constant": 3.5,
+        "salinity_wt_pct": 0.1,
+        "diffuse_ratio": 0.2,
+        "albedo": 0.3,
+        "vegetation_ndvi": 0.03,
+        "surface_pressure_kpa": 96.6,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 18,
+        "abrasive_mohs": 7.0
+      }
+    },
+    {
+      "regionId": "EARTH-012",
+      "name": "Lanzarote - Timanfaya lava field",
+      "coordinates": {
+        "latitude": 29.0,
+        "longitude": -13.75
+      },
+      "coreVariables": {
+        "slope": 8.0,
+        "radar_roughness": 0.65,
+        "apparent_thermal_inertia": 750,
+        "soil_moisture": 0.05,
+        "visual_texture": 0.6,
+        "low_sun_shadows": 30,
+        "line_of_sight": 50,
+        "diurnal_thermal_range": 15,
+        "dust_aerosols": 0.2,
+        "insolation": 230
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 25,
+        "grain_size_um": 1500,
+        "angle_of_repose_deg": 37,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 5,
+        "vrm_microrelief": 0.04,
+        "dielectric_constant": 5.0,
+        "salinity_wt_pct": 0.3,
+        "diffuse_ratio": 0.25,
+        "albedo": 0.12,
+        "vegetation_ndvi": 0.03,
+        "surface_pressure_kpa": 98.9,
+        "wind_typical_ms": 6,
+        "wind_gust_ms": 20,
+        "abrasive_mohs": 5.5
+      }
+    },
+    {
+      "regionId": "EARTH-013",
+      "name": "Dasht-e Lut",
+      "coordinates": {
+        "latitude": 30.5,
+        "longitude": 59.0
+      },
+      "coreVariables": {
+        "slope": 5.0,
+        "radar_roughness": 0.4,
+        "apparent_thermal_inertia": 650,
+        "soil_moisture": 0.02,
+        "visual_texture": 0.45,
+        "low_sun_shadows": 18,
+        "line_of_sight": 65,
+        "diurnal_thermal_range": 35,
+        "dust_aerosols": 0.2,
+        "insolation": 250
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 10,
+        "grain_size_um": 300,
+        "angle_of_repose_deg": 34,
+        "depth_to_bedrock_min_m": 5,
+        "depth_to_bedrock_max_m": 50,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 4.5,
+        "salinity_wt_pct": 2.0,
+        "diffuse_ratio": 0.22,
+        "albedo": 0.28,
+        "vegetation_ndvi": 0.01,
+        "surface_pressure_kpa": 97.8,
+        "wind_typical_ms": 6,
+        "wind_gust_ms": 20,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "EARTH-014",
+      "name": "Qaidam Basin",
+      "coordinates": {
+        "latitude": 37.5,
+        "longitude": 93.0
+      },
+      "coreVariables": {
+        "slope": 3.0,
+        "radar_roughness": 0.35,
+        "apparent_thermal_inertia": 600,
+        "soil_moisture": 0.03,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 10,
+        "line_of_sight": 75,
+        "diurnal_thermal_range": 30,
+        "dust_aerosols": 0.12,
+        "insolation": 230
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 8,
+        "grain_size_um": 150,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 20,
+        "depth_to_bedrock_max_m": 200,
+        "vrm_microrelief": 0.02,
+        "dielectric_constant": 6.0,
+        "salinity_wt_pct": 10.0,
+        "diffuse_ratio": 0.25,
+        "albedo": 0.3,
+        "vegetation_ndvi": 0.02,
+        "surface_pressure_kpa": 72.7,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 20,
+        "abrasive_mohs": 4.5
+      }
+    },
+    {
+      "regionId": "EARTH-015",
+      "name": "Danakil Depression - Dallol",
+      "coordinates": {
+        "latitude": 14.24,
+        "longitude": 40.3
+      },
+      "coreVariables": {
+        "slope": 2.0,
+        "radar_roughness": 0.3,
+        "apparent_thermal_inertia": 700,
+        "soil_moisture": 0.05,
+        "visual_texture": 0.4,
+        "low_sun_shadows": 8,
+        "line_of_sight": 80,
+        "diurnal_thermal_range": 25,
+        "dust_aerosols": 0.3,
+        "insolation": 250
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 5,
+        "grain_size_um": 200,
+        "angle_of_repose_deg": 32,
+        "depth_to_bedrock_min_m": 50,
+        "depth_to_bedrock_max_m": 300,
+        "vrm_microrelief": 0.01,
+        "dielectric_constant": 7.0,
+        "salinity_wt_pct": 15.0,
+        "diffuse_ratio": 0.22,
+        "albedo": 0.35,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 102.8,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 20,
+        "abrasive_mohs": 3.0
+      }
+    }
+  ]
+}
