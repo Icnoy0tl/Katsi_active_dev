@@ -48,7 +48,7 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 	writeJSON(w, status, map[string]string{"error": msg})
 }
 
-// GET /api/analog?planet=mars&regionId=XXX&filter=rover
+// GET /api/analog?planet=mars&regionId=XXX&filter=mobility
 func analogHandler(parser *jsonParser.Parser) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()
@@ -168,6 +168,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/analog", analogHandler(parser))
 	mux.HandleFunc("GET /api/missions", missionsHandler)
+	mux.HandleFunc("GET /api/regions", regionsHandler(parser))
 	mux.HandleFunc("POST /api/analog/custom", customAnalogHandler(parser))
 
 	srv := &http.Server{

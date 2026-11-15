@@ -74,10 +74,12 @@ var Mu = map[string]map[string]float64{
 }
 
 var Missions = map[string]map[string]float64{
-	"rover":    {"GEO": .30, "MEC": .35, "VOL": .20, "NAV": .10, "ENE": .05},
-	"edl":      {"GEO": .35, "ATM": .35, "NAV": .10, "MEC": .10, "ENE": .05, "TER": .05},
-	"habitat":  {"TER": .20, "ENE": .20, "ATM": .15, "MEC": .15, "VOL": .15, "GEO": .10, "NAV": .05},
-	"agua_bio": {"VOL": .50, "MEC": .20, "TER": .15, "GEO": .10, "ENE": .05},
+	// traversing the terrain: slope, rocks, soil bearing and traction
+	"mobility": {"MEC": .45, "GEO": .35, "NAV": .10, "ENE": .05, "ATM": .05},
+	// seeing and localizing: line of sight, texture, shadows, illumination, dust
+	"perception": {"NAV": .45, "GEO": .25, "ENE": .20, "ATM": .10},
+	// staying alive: thermal cycle, energy, pressure/wind, local resources
+	"environmental_survival": {"TER": .30, "ENE": .25, "ATM": .25, "VOL": .15, "MEC": .05},
 }
 
 var ErrUnknownFilter = errors.New("filtro desconocido")

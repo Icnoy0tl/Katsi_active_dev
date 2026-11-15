@@ -16,7 +16,7 @@ package main
 // single region object { "regionId", "name", "coordinates", "coreVariables", "auditVariables" }.
 // Any variable may be omitted or null: KNN treats it as missing data (see knn.WeightedDistance).
 //
-// mission: a predefined mission ("rover" or { "mission": "rover" }), or a custom demand
+// mission: a predefined mission ("mobility" or { "mission": "mobility" }), or a custom demand
 // profile over the weight-model categories:
 //
 //	{ "name": "My mission", "profile": { "GEO": 0.4, "MEC": 0.3, "VOL": 0.3 } }

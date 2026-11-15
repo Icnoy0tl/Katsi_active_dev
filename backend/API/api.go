@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strings"
 
 	"spaceapps/jsonParser"
 	"spaceapps/knn"
@@ -100,7 +101,7 @@ func Calculate(ParserInstance *jsonParser.Parser) http.HandlerFunc {
 		// 4. Get mission weights and calculate Top 3 matches via KNN
 		Weights, err := knn.WeightsFor(Req.Missions.Filter, knn.FeatureNames())
 		if err != nil {
-			WriteError(w, http.StatusBadRequest, "Filter must be rover, ice_and_volatiles, thermal_cycles, or empty")
+			WriteError(w, http.StatusBadRequest, "Filter must be "+strings.Join(knn.MissionNames(), ", ")+", or empty")
 			return
 		}
 		Matches, err := knn.FindMostSimilar(Target, Pool, Weights, TopK)

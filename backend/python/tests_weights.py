@@ -132,7 +132,7 @@ deg("minimum weight", wm.VARIABLE_TYPES, {"GEO": 1, "MEC": 1e-300}, wm.CATEGORIE
 # one-hot profile (H=0) in each category
 for c in wm.CATEGORIES:
     deg(f"one-hot {c}", wm.VARIABLE_TYPES, {c: 1}, wm.CATEGORIES)
-# the 4 project missions
+# the project missions
 for k, prof in wm.MISSIONS.items():
     deg(f"mission {k}", wm.VARIABLE_TYPES, prof, wm.CATEGORIES)
  
@@ -156,7 +156,7 @@ must_fail("variable_types with unknown category", {"GEO": 1}, variable_types={"a
  
 # ---------------------------------------------------------------- calculation identity
 # dH/dbeta = -beta * Var_w(r)   (central finite difference vs formula)
-r = [v["affinity"] for v in wm.factors(wm.MISSIONS["rover"])["variables"].values()]
+r = [v["affinity"] for v in wm.factors(wm.MISSIONS["mobility"])["variables"].values()]
 for b in [0.5, 2, 11, 40]:
     h = 1e-6
     num = (wm.entropy(wm.softmax(r, b + h)) - wm.entropy(wm.softmax(r, b - h))) / (2 * h)

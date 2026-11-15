@@ -159,6 +159,19 @@ func (p *Parser) GetRegion(planet, regionID string) (PlanetInformation, error) {
 	return PlanetInformation{}, ErrRegionNotFound
 }
 
+// GetPlanetRegions returns every region of the Moon or Mars (the planet is sanitized).
+func (p *Parser) GetPlanetRegions(planet string) (PlanetInformation, error) {
+	planet, err := SanitizePlanet(planet)
+	if err != nil {
+		return PlanetInformation{}, err
+	}
+	regions, err := p.readFile(planetFiles[planet])
+	if err != nil {
+		return PlanetInformation{}, err
+	}
+	return PlanetInformation{Planet: planet, Regions: regions}, nil
+}
+
 // GetEarthRegions returns the whole planet region pool to procces using knn
 //TODO maybe if needed we can just make this one a generic function to get the information of a whole planet 
 func (p *Parser) GetEarthRegions() ([]Region, error) {
