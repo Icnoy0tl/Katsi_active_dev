@@ -160,12 +160,13 @@ export const FLIGHT = {
 
 /**
  * Texturas fotográficas (NASA Blue Marble / LRO-Clementine / Viking).
- * `local`: versión 4K servida desde ./textures; `fallback`: CDN de menor resolución
+ * `local`: versión 4K servida desde frontend/textures; `fallback`: CDN de menor resolución
  * (se usa si la local no está disponible, p. ej. sin servidor).
  */
 const THREE_CDN = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r164/examples/textures/planets/';
 const PLANETS_CDN = 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/';
-const LOCAL = './textures/';
+// Relativa a este módulo, así no depende de dónde esté index.html
+const LOCAL = new URL('../textures/', import.meta.url).href;
 
 export const PHOTO_TEXTURES = {
   earthDay: { local: LOCAL + 'earth_day_4k.jpg', fallback: THREE_CDN + 'earth_atmos_2048.jpg' },
