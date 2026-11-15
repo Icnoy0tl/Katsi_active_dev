@@ -537,7 +537,7 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
 });
 
-loadPhotoTextures({ anisotropy, earth, moon, mars });
+loadPhotoTextures({ renderer, scene, camera, anisotropy, earth, moon, mars });
 
 // --- Áreas de terreno de cada misión (coordenadas lat/lon de cada región) ---
 const bodyCenter = new THREE.Vector3();
@@ -800,7 +800,7 @@ function updateMissionView(delta) {
 const clock = new THREE.Clock();
 const spinningBodies = [earth.surface, moon.mesh, mars.mesh];
 
-renderer.setAnimationLoop(() => {
+function renderFrame() {
   const delta = clock.getDelta();
 
   // Solo rotación sobre su propio eje, a la misma velocidad para todos (los cuerpos no se trasladan)
@@ -835,4 +835,24 @@ renderer.setAnimationLoop(() => {
   if (selectedRegionId) updateMissionView(delta);
 
   renderer.render(scene, camera);
-});
+}
+
+/**
+ * Sube a la GPU las texturas de todos los materiales de la escena. Si no, cada objeto sube las
+ * suyas la primera vez que entra en cámara (p. ej. el rover al pasar por su tarjeta) y ese
+ * fotograma da un tirón.
+ */
+function uploadSceneTextures() {
+  scene.traverse(({ material }) => {
+    [material].flat().forEach((m) => m && Object.values(m).forEach((value) => value?.isTexture && renderer.initTexture(value)));
+  });
+}
+
+// Antes del primer fotograma: los shaders de toda la escena se compilan en paralelo
+// (KHR_parallel_shader_compile) mientras se suben las texturas; si no, el primer render se
+// queda bloqueado compilándolos uno a uno
+const shadersReady = renderer.compileAsync(scene, camera);
+uploadSceneTextures();
+shadersReady
+  .catch((err) => console.warn('Shader precompilation failed; compiling on first render.', err))
+  .finally(() => renderer.setAnimationLoop(renderFrame));
