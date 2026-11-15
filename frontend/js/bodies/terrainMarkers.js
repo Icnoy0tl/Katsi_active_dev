@@ -410,17 +410,19 @@ export function setupMarkerTooltip({ camera, domElement, markerSets, occluders, 
 
   /** Región bajo el puntero (solo cuenta el primer impacto: si es el cuerpo, el área está detrás) */
   function regionAt(event) {
-    const rect = domElement.getBoundingClientRect();
-    pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
-    raycaster.setFromCamera(pointer, camera);
     // El raycaster no respeta `visible`: las áreas ocultas (menú, otro cuerpo, otras misiones) no cuentan
     const sets = typeof markerSets === 'function' ? markerSets() : markerSets;
     const areaTargets = sets
       .filter((set) => set.group.visible)
       .flatMap((set) => set.hitTargets)
       .filter((target) => target.parent.visible);
-    const targets = [...occluders, ...areaTargets];
-    return raycaster.intersectObjects(targets, false)[0]?.object.userData.region ?? null;
+    // Sin áreas a la vista no hay nada que encontrar: se evita el raycast contra las esferas
+    // de los cuerpos (decenas de miles de triángulos) en cada movimiento del puntero
+    if (!areaTargets.length) return null;
+    const rect = domElement.getBoundingClientRect();
+    pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
+    raycaster.setFromCamera(pointer, camera);
+    return raycaster.intersectObjects([...occluders, ...areaTargets], false)[0]?.object.userData.region ?? null;
   }
 
   function pick() {
