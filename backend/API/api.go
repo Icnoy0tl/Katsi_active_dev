@@ -11,36 +11,37 @@ import (
 )
 
 func API() {
-	http.HandleFunc("/api/planetas", ObtenerPlanetasHandler)
+	http.HandleFunc("/api/Planets", GetPlanetsHandler)
 
-	fmt.Println("Servidor corriendo en http://localhost:8080/api/planetas")
+	fmt.Println("Server running at http://localhost:8080/api/Planets")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func ObtenerPlanetasHandler(w http.ResponseWriter, r *http.Request) {
+func GetPlanetsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 
-	nasaURL := "https://caltech.edu"
+	NasaURL := "https://caltech.edu"
 
-	resp, err := http.Get(nasaURL)
+	Resp, err := http.Get(NasaURL)
 	if err != nil {
-		http.Error(w, "Error conectando con la NASA", http.StatusBadGateway)
+		http.Error(w, "Error connecting to NASA", http.StatusBadGateway)
 		return
 	}
-	defer resp.Body.Close()
+	defer Resp.Body.Close()
 
-	datosCrudos, err := io.ReadAll(resp.Body)
+	RawData, err := io.ReadAll(Resp.Body)
 	if err != nil {
-		http.Error(w, "Error leyendo respuesta", http.StatusInternalServerError)
+		http.Error(w, "Error reading response", http.StatusInternalServerError)
 		return
 	}
 
-	datosLimpios, err := jsonParser.Parser(datosCrudos)
+	CleanData, err := jsonParser.Parser(RawData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	json.NewEncoder(w).Encode(datosLimpios)
+	json.NewEncoder(w).Encode(CleanData)
 }
+

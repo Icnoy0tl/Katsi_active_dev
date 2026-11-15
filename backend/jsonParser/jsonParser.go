@@ -5,94 +5,93 @@ import (
 	"fmt"
 )
 
-type FloatConFallback float64
+type FallbackFloat float64
 
-func (f *FloatConFallback) UnmarshalJSON(data []byte) error {
-
-	if string(data) == "null" {
-		*f = 0.1
+func (F *FallbackFloat) UnmarshalJSON(Data []byte) error {
+	if string(Data) == "null" {
+		*F = 0.1
 		return nil
 	}
 
-	var valor float64
-	if err := json.Unmarshal(data, &valor); err != nil {
+	var Value float64
+	if err := json.Unmarshal(Data, &Value); err != nil {
 		return err
 	}
-	*f = FloatConFallback(valor)
+	*F = FallbackFloat(Value)
 	return nil
 }
 
-type DatasetPlaneta struct {
+type PlanetDataset struct {
 	Regions []Region `json:"regions"`
 }
 
 type Region struct {
 	RegionID       string         `json:"regionId"`
 	Name           string         `json:"name"`
-	Coordinates    Coordenadas    `json:"coordinates"`
+	Coordinates    Coordinates    `json:"coordinates"`
 	CoreVariables  CoreVariables  `json:"coreVariables"`
 	AuditVariables AuditVariables `json:"auditVariables"`
 }
 
-type Coordenadas struct {
+type Coordinates struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 }
 
 type CoreVariables struct {
-	Slope                  FloatConFallback `json:"slope"`
-	RadarRoughness         FloatConFallback `json:"radar_roughness"`
-	ApparentThermalInertia FloatConFallback `json:"apparent_thermal_inertia"`
-	SoilMoisture           FloatConFallback `json:"soil_moisture"`
-	VisualTexture          FloatConFallback `json:"visual_texture"`
-	LowSunShadows          FloatConFallback `json:"low_sun_shadows"`
-	LineOfSight            FloatConFallback `json:"line_of_sight"`
-	DiurnalThermalRange    FloatConFallback `json:"diurnal_thermal_range"`
-	DustAerosols           FloatConFallback `json:"dust_aerosols"`
-	Insolation             FloatConFallback `json:"insolation"`
+	Slope                  FallbackFloat `json:"slope"`
+	RadarRoughness         FallbackFloat `json:"radar_roughness"`
+	ApparentThermalInertia FallbackFloat `json:"apparent_thermal_inertia"`
+	SoilMoisture           FallbackFloat `json:"soil_moisture"`
+	VisualTexture          FallbackFloat `json:"visual_texture"`
+	LowSunShadows          FallbackFloat `json:"low_sun_shadows"`
+	LineOfSight            FallbackFloat `json:"line_of_sight"`
+	DiurnalThermalRange    FallbackFloat `json:"diurnal_thermal_range"`
+	DustAerosols           FallbackFloat `json:"dust_aerosols"`
+	Insolation             FallbackFloat `json:"insolation"`
 }
 
 type AuditVariables struct {
-	RockAbundancePct   FloatConFallback `json:"rock_abundance_pct"`
-	GrainSizeUm        FloatConFallback `json:"grain_size_um"`
-	AngleOfReposeDeg   FloatConFallback `json:"angle_of_repose_deg"`
-	DepthToBedrockMinM FloatConFallback `json:"depth_to_bedrock_min_m"`
-	DepthToBedrockMaxM FloatConFallback `json:"depth_to_bedrock_max_m"`
-	VrmMicrorelief     FloatConFallback `json:"vrm_microrelief"`
-	DielectricConstant FloatConFallback `json:"dielectric_constant"`
-	SalinityWtPct      FloatConFallback `json:"salinity_wt_pct"`
-	DiffuseRatio       FloatConFallback `json:"diffuse_ratio"`
-	Albedo             FloatConFallback `json:"albedo"`
-	VegetationNdvi     FloatConFallback `json:"vegetation_ndvi"`
-	SurfacePressureKpa FloatConFallback `json:"surface_pressure_kpa"`
-	WindTypicalMs      FloatConFallback `json:"wind_typical_ms"`
-	WindGustMs         FloatConFallback `json:"wind_gust_ms"`
-	AbrasiveMohs       FloatConFallback `json:"abrasive_mohs"`
+	RockAbundancePct   FallbackFloat `json:"rock_abundance_pct"`
+	GrainSizeUm        FallbackFloat `json:"grain_size_um"`
+	AngleOfReposeDeg   FallbackFloat `json:"angle_of_repose_deg"`
+	DepthToBedrockMinM FallbackFloat `json:"depth_to_bedrock_min_m"`
+	DepthToBedrockMaxM FallbackFloat `json:"depth_to_bedrock_max_m"`
+	VrmMicrorelief     FallbackFloat `json:"vrm_microrelief"`
+	DielectricConstant FallbackFloat `json:"dielectric_constant"`
+	SalinityWtPct      FallbackFloat `json:"salinity_wt_pct"`
+	DiffuseRatio       FallbackFloat `json:"diffuse_ratio"`
+	Albedo             FallbackFloat `json:"albedo"`
+	VegetationNdvi     FallbackFloat `json:"vegetation_ndvi"`
+	SurfacePressureKpa FallbackFloat `json:"surface_pressure_kpa"`
+	WindTypicalMs      FallbackFloat `json:"wind_typical_ms"`
+	WindGustMs         FallbackFloat `json:"wind_gust_ms"`
+	AbrasiveMohs       FallbackFloat `json:"abrasive_mohs"`
 }
 
-func Parser(datosCrudos []byte) ([]Region, error) {
-	var dataset DatasetPlaneta
+func Parser(RawData []byte) ([]Region, error) {
+	var Dataset PlanetDataset
 
-	err := json.Unmarshal(datosCrudos, &dataset)
+	err := json.Unmarshal(RawData, &Dataset)
 	if err != nil {
-		return nil, fmt.Errorf("error al parsear el JSON de regiones: %w", err)
+		return nil, fmt.Errorf("error parsing regions JSON: %w", err)
 	}
 
-	return dataset.Regions, nil
+	return Dataset.Regions, nil
 }
 
-func (r Region) ObtenerVectorKNN() []float64 {
-	c := r.CoreVariables
+func (R Region) GetKNNVector() []float64 {
+	C := R.CoreVariables
 	return []float64{
-		float64(c.Slope),
-		float64(c.RadarRoughness),
-		float64(c.ApparentThermalInertia),
-		float64(c.SoilMoisture),
-		float64(c.VisualTexture),
-		float64(c.LowSunShadows),
-		float64(c.LineOfSight),
-		float64(c.DiurnalThermalRange),
-		float64(c.DustAerosols),
-		float64(c.Insolation),
+		float64(C.Slope),
+		float64(C.RadarRoughness),
+		float64(C.ApparentThermalInertia),
+		float64(C.SoilMoisture),
+		float64(C.VisualTexture),
+		float64(C.LowSunShadows),
+		float64(C.LineOfSight),
+		float64(C.DiurnalThermalRange),
+		float64(C.DustAerosols),
+		float64(C.Insolation),
 	}
 }
