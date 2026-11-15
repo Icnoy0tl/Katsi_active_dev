@@ -370,6 +370,106 @@
       mask-image: none;
     }
 
+    /* ---------- Vista API: panel derecho para soltar los JSON ---------- */
+    #api-panel {
+      transform: translateY(-50%);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #api-panel.is-hidden {
+      transform: translate(12px, -50%);
+    }
+    #api-panel:not(.is-hidden) .menu-enter {
+      animation: menu-enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(0.05s + var(--i, 0) * 0.08s);
+    }
+    #api-panel:not(.is-hidden) .missions-accent {
+      animation: menu-accent-grow 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+    }
+    .api-slot {
+      position: relative;
+    }
+    /* Ranura vacía: marco tenue visible siempre, para que se lea como zona de soltar */
+    .api-drop {
+      min-height: 5.6rem;
+    }
+    .api-drop::before {
+      opacity: 0.22;
+    }
+    .api-drop::after {
+      opacity: 0.7;
+    }
+    .api-drop .menu-arrow {
+      opacity: 0.6;
+    }
+    .api-drop.is-loaded {
+      color: #e2e8f0;
+    }
+    .api-drop.is-loaded::before {
+      opacity: 0.6;
+    }
+    .api-drop.is-loaded .menu-icon {
+      color: #60a5fa;
+    }
+    /* Arrastrando sobre el panel: todas las ranuras se avivan y la de debajo se resalta */
+    #api-panel.is-dragging .api-drop::before {
+      opacity: 0.6;
+    }
+    #api-panel .api-drop.is-drag-over {
+      color: #f1f5f9;
+      filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.65));
+      transform: translateX(-6px);
+    }
+    #api-panel .api-drop.is-drag-over::before,
+    #api-panel .api-drop.is-drag-over::after {
+      opacity: 1;
+    }
+    /* El panel está a la derecha: la tarjeta se desplaza hacia dentro (izquierda) */
+    #api-panel .api-drop:hover,
+    #api-panel .api-drop:focus-visible {
+      transform: translateX(-6px);
+    }
+    .api-remove {
+      position: absolute;
+      top: 50%;
+      right: 1rem;
+      width: 2rem;
+      height: 2rem;
+      display: grid;
+      place-items: center;
+      transform: translateY(-50%);
+      border: 0;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.6);
+      color: rgba(203, 213, 225, 0.7);
+      cursor: pointer;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+    .api-remove[hidden] {
+      display: none;
+    }
+    .api-remove:hover,
+    .api-remove:focus-visible {
+      outline: none;
+      color: #f1f5f9;
+      background: rgba(239, 68, 68, 0.35);
+    }
+    .api-remove svg {
+      width: 1rem;
+      height: 1rem;
+    }
+    .api-status {
+      margin: 1.2rem 0 0;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(148, 163, 184, 0.8);
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+    }
+    .api-status.is-error {
+      color: #fca5a5;
+    }
+
     /* ---------- Panel de misiones (izquierda, mismo lenguaje visual que el menú) ---------- */
     #missions-panel {
       transition: opacity 0.3s ease, transform 0.3s ease;
@@ -1323,12 +1423,12 @@
         </button>
       </li>
       <li class="menu-enter" style="--i: 5">
-        <button class="menu-tag" data-action="docs">
+        <button class="menu-tag" data-action="api">
           <span class="menu-icon-box">
-            <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5Z"/><path d="M14 3v4.5h4.5M9 12.5h6M9 16h6"/></svg>
+            <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 5l-3 14"/></svg>
           </span>
           <span class="menu-divider"></span>
-          <span class="menu-label">Documentation</span>
+          <span class="menu-label">API</span>
           <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="m14 6 6 6-6 6"/></svg>
         </button>
       </li>
@@ -1402,6 +1502,20 @@
       </button>
       <p class="analog-switcher-label" aria-live="polite">Next analog<b><span id="analog-switcher-current">1</span> / <span id="analog-switcher-total">3</span></b></p>
     </div>
+
+    <!-- Vista API (satélite): arrastrar y soltar los JSON (lo gestiona frontend/js/apiPanel.js) -->
+    <aside
+      id="api-panel"
+      aria-label="API data upload"
+      aria-hidden="true"
+      class="is-hidden fixed top-1/2 right-4 sm:right-6 z-20 w-[min(26rem,calc(100vw-2rem))] max-h-[calc(100vh-8rem)] overflow-y-auto overflow-x-hidden pl-3 pr-1 py-1"
+    >
+      <h2 class="missions-title menu-enter" style="--i: 0">API · <b>Upload data</b></h2>
+      <div class="menu-accent missions-accent" aria-hidden="true"></div>
+      <ul id="api-slots" class="menu-options"></ul>
+      <p id="api-status" class="api-status menu-enter" style="--i: 4" aria-live="polite"></p>
+      <input id="api-file-input" type="file" accept=".json,application/json" hidden />
+    </aside>
 
     <!-- Hologramas de terreno (Luna o Marte, y Tierra): los construye frontend/js/hologram.js -->
     <div id="holograms"></div>

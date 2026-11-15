@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"spaceapps/jsonParser"
@@ -90,7 +91,7 @@ func analogHandler(parser *jsonParser.Parser) http.HandlerFunc {
 		// 4. Pesos del filtro + KNN
 		weights, err := knn.WeightsFor(filter, knn.FeatureNames())
 		if err != nil {
-			writeError(w, http.StatusBadRequest, "filter debe ser rover, ice_and_volatiles, thermal_cycles o vacío")
+			writeError(w, http.StatusBadRequest, "filter debe ser "+strings.Join(knn.MissionNames(), ", ")+" o vacío")
 			return
 		}
 		matches, err := knn.FindMostSimilar(target, pool, weights, topK)
@@ -132,7 +133,7 @@ func cors(allowedOrigin string, next http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 		}
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
@@ -154,6 +155,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/analog", analogHandler(parser))
+	mux.HandleFunc("GET /api/missions", missionsHandler)
+	mux.HandleFunc("POST /api/analog/custom", customAnalogHandler(parser))
 
 	srv := &http.Server{
 		Addr:              addr,

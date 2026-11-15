@@ -325,3 +325,24 @@ func WeightsFor(filter string, names []string) (Vector, error) {
 	}
 	return expand(reportPerVar(rep), names)
 }
+
+// MissionReport returns the precomputed weight report of a predefined mission.
+func MissionReport(name string) (WeightReport, bool) {
+	rep, ok := missionReports[name]
+	return rep, ok
+}
+
+// WeightsForProfile computes the weights of a custom mission demand profile (keys from
+// Categories, values ≥ 0, normalized automatically) with the same F2′ model as the
+// predefined missions, expanded to the KNN dimensions in `names`.
+func WeightsForProfile(profile map[string]float64, names []string) (Vector, WeightReport, error) {
+	rep, err := ComputeWeights(profile, Mu, Categories)
+	if err != nil {
+		return nil, WeightReport{}, err
+	}
+	w, err := expand(reportPerVar(rep), names)
+	if err != nil {
+		return nil, WeightReport{}, err
+	}
+	return w, rep, nil
+}

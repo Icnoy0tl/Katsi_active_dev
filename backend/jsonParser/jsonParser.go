@@ -15,36 +15,39 @@ type Coordinates struct {
 	Longitude float64 `json:"longitude"`
 }
 
-//TODO every field passed to be float64: for convenience. All use cases so far didnt used the full capacity of an int and floats made overall calculations easier. Further testing is needed
+// Variables as *float64: a field missing (or null) in the JSON stays nil and KNN treats it as
+// missing data (weight renormalized over the observed ones, see knn.WeightedDistance)
+// instead of a fake 0.
 type CoreVariables struct {
-	Slope                  float64 `json:"slope"`
-	RadarRoughness         float64 `json:"radar_roughness"`
-	ApparentThermalInertia float64 `json:"apparent_thermal_inertia"`
-	SoilMoisture           float64 `json:"soil_moisture"`
-	VisualTexture          float64 `json:"visual_texture"`
-	LowSunShadows          float64 `json:"low_sun_shadows"`
-	LineOfSight            float64 `json:"line_of_sight"`
-	DiurnalThermalRange    float64 `json:"diurnal_thermal_range"`
-	DustAerosols           float64 `json:"dust_aerosols"`
-	Insolation             float64 `json:"insolation"`
+	Slope                  *float64 `json:"slope"`
+	RadarRoughness         *float64 `json:"radar_roughness"`
+	ApparentThermalInertia *float64 `json:"apparent_thermal_inertia"`
+	SoilMoisture           *float64 `json:"soil_moisture"`
+	VisualTexture          *float64 `json:"visual_texture"`
+	LowSunShadows          *float64 `json:"low_sun_shadows"`
+	LineOfSight            *float64 `json:"line_of_sight"`
+	DiurnalThermalRange    *float64 `json:"diurnal_thermal_range"`
+	DustAerosols           *float64 `json:"dust_aerosols"`
+	Insolation             *float64 `json:"insolation"`
 }
 
 type AuditVariables struct {
-	RockAbundancePct   float64 `json:"rock_abundance_pct"`
-	GrainSizeUm        float64 `json:"grain_size_um"`
-	AngleOfReposeDeg   float64 `json:"angle_of_repose_deg"`
-	DepthToBedrockMinM float64 `json:"depth_to_bedrock_min_m"`
-	DepthToBedrockMaxM float64 `json:"depth_to_bedrock_max_m"`
-	VrmMicrorelief     float64 `json:"vrm_microrelief"`
-	DielectricConstant float64 `json:"dielectric_constant"`
-	SalinityWtPct      float64 `json:"salinity_wt_pct"`
-	DiffuseRatio       float64 `json:"diffuse_ratio"`
-	Albedo             float64 `json:"albedo"`
-	VegetationNdvi     float64 `json:"vegetation_ndvi"`
-	SurfacePressureKpa float64 `json:"surface_pressure_kpa"`
-	WindTypicalMs      float64 `json:"wind_typical_ms"`
-	WindGustMs         float64 `json:"wind_gust_ms"`
-	AbrasiveMohs       float64 `json:"abrasive_mohs"`
+	RockAbundancePct   *float64 `json:"rock_abundance_pct"`
+	GrainSizeUm        *float64 `json:"grain_size_um"`
+	AngleOfReposeDeg   *float64 `json:"angle_of_repose_deg"`
+	DepthToBedrockMinM *float64 `json:"depth_to_bedrock_min_m"`
+	DepthToBedrockMaxM *float64 `json:"depth_to_bedrock_max_m"`
+	VrmMicrorelief     *float64 `json:"vrm_microrelief"`
+	DielectricConstant *float64 `json:"dielectric_constant"`
+	SalinityWtPct      *float64 `json:"salinity_wt_pct"`
+	DiffuseRatio       *float64 `json:"diffuse_ratio"`
+	Albedo             *float64 `json:"albedo"`
+	VegetationNdvi     *float64 `json:"vegetation_ndvi"`
+	SurfacePressureKpa *float64 `json:"surface_pressure_kpa"`
+	WindTypicalMs      *float64 `json:"wind_typical_ms"`
+	WindGustMs         *float64 `json:"wind_gust_ms"`
+	AbrasiveMohs       *float64 `json:"abrasive_mohs"`
+	GroundIceIndex     *float64 `json:"ground_ice_index"`
 }
 
 type Region struct {

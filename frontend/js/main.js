@@ -12,6 +12,7 @@ import { createCameraNavigator } from './camera.js';
 import { loadPhotoTextures } from './textures/photo.js';
 import { setupMainMenu } from './menu.js';
 import { createMenuTour } from './menuTour.js';
+import { setupApiPanel } from './apiPanel.js';
 import { setupMissionsPanel } from './missions.js';
 import { setupMissionInfo } from './missionInfo.js';
 import { createHologram } from './hologram.js';
@@ -83,9 +84,18 @@ const missionBodies = {
 const regionBody = new Map(); // regionId → nombre del cuerpo ('moon' | 'mars')
 
 // Panel de misiones: visible solo mientras se enfoca un cuerpo con misiones ya cargadas
+// Vista API (satélite): panel derecho para soltar los JSON
+const apiPanel = setupApiPanel({
+  onChange: () => {
+    // TODO: enviar los JSON al backend cuando esté definido su formato
+  }
+});
+
 const missionsPanel = setupMissionsPanel({ onSelect: (region) => goToMission(region) });
 
 function updateMissionsPanel(name) {
+  if (name === 'satellite') apiPanel.show();
+  else apiPanel.hide();
   const regions = missionBodies[name]?.regions;
   if (regions) missionsPanel.show(regions);
   else missionsPanel.hide();
@@ -192,8 +202,7 @@ const mainMenu = setupMainMenu({
   actions: {
     moon: leaveMenuTo('moon'),
     mars: leaveMenuTo('mars'),
-    // TODO: pantalla de documentación; por ahora lleva a la vista del satélite
-    docs: leaveMenuTo('satellite')
+    api: leaveMenuTo('satellite') // vista del satélite con el panel para soltar los JSON
   },
   onToggle: (isOpen) => {
     // En el menú la escena es solo fondo: sin arrastre ni zoom
