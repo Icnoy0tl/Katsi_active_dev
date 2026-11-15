@@ -1,0 +1,51 @@
+# Render Blueprint: backend (Go) + frontend (static site).
+# Dashboard → New → Blueprint → pick this repo; Render creates both services.
+#
+# Service URLs come from their names: https://<name>.onrender.com. If a name
+# is taken, Render appends a suffix; then update ALLOWED_ORIGIN and the
+# /api/* rewrite destination below with the real URLs.
+#
+# STANDBY: meant to be used once `frontend` is merged into `main` and the
+# backend integration is done (PRs #12 and #13).
+
+services:
+  # ------------------------------------------------------------- backend
+  - type: web
+    name: nasa-space-app-api
+    runtime: go
+    plan: free
+    branch: main
+    rootDir: backend # go.mod lives here; DATA_DIR defaults to "data" (backend/data)
+    buildCommand: go build -o app .
+    startCommand: ./app # no --own-regions: uploads would be public and in-memory only
+    healthCheckPath: /api/status
+    autoDeploy: true
+    envVars:
+      # main.go reads ADDR (not PORT); Render routes traffic to port 10000.
+      - key: ADDR
+        value: 0.0.0.0:10000
+      # Only the frontend may call the API from a browser (CORS).
+      - key: ALLOWED_ORIGIN
+        value: https://nasa-space-app.onrender.com
+
+  # ------------------------------------------------------------ frontend
+  - type: web
+    name: nasa-space-app
+    runtime: static
+    branch: main
+    # Publish only what the browser needs, keeping the repo paths:
+    #   index.html, frontend/ (JS, icons, textures) and backend/data/*.json
+    #   (main.js loads ./backend/data/{earth,moon,mars}.json directly).
+    buildCommand: >-
+      rm -rf public && mkdir -p public/backend &&
+      cp index.html public/ &&
+      cp -r frontend public/ &&
+      cp -r backend/data public/backend/
+    staticPublishPath: public
+    autoDeploy: true
+    routes:
+      # In production config.js uses API_BASE = '' (same origin), so /api/*
+      # is forwarded to the backend service.
+      - type: rewrite
+        source: /api/*
+        destination: https://nasa-space-app-api.onrender.com/api/*
