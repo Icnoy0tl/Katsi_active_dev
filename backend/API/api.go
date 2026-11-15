@@ -1,4 +1,4 @@
-package main
+package API
 
 import (
 	"encoding/json"
@@ -10,14 +10,14 @@ import (
 	"backend/jsonParser"
 )
 
-func main() {
-	http.HandleFunc("/api/planetas", obtenerPlanetasHandler)
+func API() {
+	http.HandleFunc("/api/planetas", ObtenerPlanetasHandler)
 
 	fmt.Println("Servidor corriendo en http://localhost:8080/api/planetas")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func obtenerPlanetasHandler(w http.ResponseWriter, r *http.Request) {
+func ObtenerPlanetasHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 
