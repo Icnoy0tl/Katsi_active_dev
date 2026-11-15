@@ -1,13 +1,9 @@
 import { setupScrollFade } from './utils/scrollFade.js';
-import { formatLatLon } from './utils/format.js';
-import { ARROW_ICON, RETRY_ICON, missionCardContent } from './missionCard.js';
+import { escapeHtml, formatLatLon } from './utils/format.js';
+import { ARROW_ICON, PIN_ICON, RETRY_ICON, missionCardContent } from './missionCard.js';
 import { MISSION_FILTERS } from './config.js';
 
 const $ = (id) => document.getElementById(id);
-
-// Mismos trazos que los iconos del menú principal
-const PIN_ICON =
-  '<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/></svg>';
 
 /** Tarjetas esqueleto mientras el backend calcula los terrenos de la misión */
 const SKELETON_CARDS = 4;
@@ -30,7 +26,7 @@ function regionCard({ region, score, bestAnalog }, index) {
   return `<li class="menu-enter" style="--i: ${index + 3}">
       <button type="button" class="menu-tag menu-tag--mission" data-index="${index}">${missionCardContent({
         icon: PIN_ICON,
-        title: region.name,
+        title: escapeHtml(region.name),
         meta: ranked
           ? `${region.regionId} · Earth: ${bestAnalog.name}`
           : `${region.regionId} · ${formatLatLon(region.coordinates)}`,

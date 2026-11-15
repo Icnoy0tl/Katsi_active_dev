@@ -282,7 +282,7 @@ func customAnalogHandler(parser *jsonParser.Parser) http.HandlerFunc {
 
 		resp := customResponse{Mission: report, Results: make([]customResult, 0, len(regions))}
 		for _, region := range regions {
-			target, pool, err := knn.Prepare(region, earth)
+			target, pool, stats, err := knn.PrepareWithStats(region, earth)
 			if err != nil {
 				writeError(w, http.StatusUnprocessableEntity, err.Error())
 				return
@@ -305,9 +305,20 @@ func customAnalogHandler(parser *jsonParser.Parser) http.HandlerFunc {
 				writeError(w, http.StatusInternalServerError, "internal error")
 				return
 			}
+			candByID := make(map[string]knn.Candidate, len(pool))
+			for _, c := range pool {
+				candByID[c.ID] = c
+			}
 			result := customResult{SelectedRegion: region, Extrapolation: extrap, DataCoverage: coverage}
 			for _, m := range matches {
-				result.Matches = append(result.Matches, MatchResponse{Match: m, Region: byID[m.RegionID]})
+				// Desglose por variable, como en GET /api/analog (columna Match de la comparativa)
+				features, err := knn.CompareFeatures(region, byID[m.RegionID], target, candByID[m.RegionID], stats, weights)
+				if err != nil {
+					log.Printf("custom breakdown %s: %v", m.RegionID, err)
+					writeError(w, http.StatusInternalServerError, "internal error")
+					return
+				}
+				result.Matches = append(result.Matches, MatchResponse{Match: m, Region: byID[m.RegionID], Features: features})
 			}
 			resp.Results = append(resp.Results, result)
 		}

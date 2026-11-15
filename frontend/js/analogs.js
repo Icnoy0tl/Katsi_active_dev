@@ -82,3 +82,53 @@ export async function fetchCustomAnalogs(characteristics, mission) {
   }
   return payload;
 }
+
+/** Mínimo de peso de la misión con datos (knn.MinCoverage): igual criterio que GET /api/regions */
+const MIN_COVERAGE = 0.5;
+
+/** Análogos de los terrenos propios por misión: la región guardada no cambia, así que se reutilizan */
+const customCache = new Map();
+
+/** Análogos de un terreno propio con una misión predefinida (POST /api/analog/custom con esa misión) */
+function customResult(region, filter) {
+  const key = `${filter}|${JSON.stringify(region)}`;
+  if (!customCache.has(key)) {
+    const request = fetchCustomAnalogs(region, filter).then(({ results = [] }) => results[0] ?? null);
+    request.catch(() => customCache.delete(key));
+    customCache.set(key, request);
+  }
+  return customCache.get(key);
+}
+
+const toAnalog = (earthById) => ({ regionId, region, similarity, features = [] }) => ({
+  region: earthById.get(regionId) ?? region,
+  similarity,
+  features
+});
+
+/**
+ * Análogos de un terreno propio (customRegions.js), con la misma forma que fetchClosestAnalogs.
+ * Sin filtro se usan los que se guardaron (calculados con la misión del usuario); con un filtro
+ * de misión se piden al backend con esa misión.
+ */
+export async function fetchSavedRegionAnalogs(region, savedMatches, earthRegions, filter = '', count = 3) {
+  const earthById = new Map(earthRegions?.map((r) => [r.regionId, r]));
+  const matches = filter ? ((await customResult(region, filter))?.matches ?? []) : savedMatches;
+  return matches.slice(0, count).map(toAnalog(earthById));
+}
+
+/**
+ * Terrenos propios que sirven para la misión `filter`, con la misma forma que fetchMissionRegions
+ * para mezclarlos en el ranking. Los que el backend rechaza o no tienen datos suficientes se
+ * quedan fuera (como los `excluded` de GET /api/regions).
+ */
+export async function rankSavedRegions(regions, filter) {
+  const settled = await Promise.allSettled(regions.map((region) => customResult(region, filter)));
+  return settled.flatMap((outcome, i) => {
+    const result = outcome.status === 'fulfilled' ? outcome.value : null;
+    const best = result?.matches?.[0];
+    if (!best || result.dataCoverage < MIN_COVERAGE || best.coverage < MIN_COVERAGE) return [];
+    const { regionId, name, similarity, coverage } = best;
+    return [{ region: regions[i], score: similarity, bestAnalog: { regionId, name, similarity, coverage } }];
+  });
+}

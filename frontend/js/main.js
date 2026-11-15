@@ -16,7 +16,8 @@ import { setupApiPanel } from './apiPanel.js';
 import { setupMissionsPanel } from './missions.js';
 import { setupMissionInfo } from './missionInfo.js';
 import { createHologram } from './hologram.js';
-import { fetchClosestAnalogs, fetchMissionRegions } from './analogs.js';
+import { fetchClosestAnalogs, fetchMissionRegions, fetchSavedRegionAnalogs, rankSavedRegions } from './analogs.js';
+import { customRegions } from './customRegions.js';
 import { createEarthMiniature } from './bodies/earthMiniature.js';
 import { createTerrainMarkers, loadRegions, setupMarkerTooltip } from './bodies/terrainMarkers.js';
 import { createViewShift, shiftIfWide } from './viewShift.js';
@@ -74,18 +75,56 @@ orion.faceTowards(cameraNavigator.viewPosition('orion'));
 cameraNavigator.focus('orion', true);
 
 /**
- * Cuerpos con misiones (regiones de backend/data): al enfocarlos aparece su panel de misiones.
- * `regions` y `markers` se rellenan al cargar los JSON.
+ * Cuerpos con misiones (regiones de backend/data + las propias del usuario): al enfocarlos aparece
+ * su panel de misiones. `builtin`, `regions` y `markers` se rellenan al cargar los JSON.
  */
 const missionBodies = {
-  moon: { group: moon.group, mesh: moon.mesh, config: MOON, kicker: 'Lunar terrain', regions: null, markers: null },
-  mars: { group: mars.group, mesh: mars.mesh, config: MARS, kicker: 'Martian terrain', regions: null, markers: null }
+  moon: { group: moon.group, mesh: moon.mesh, config: MOON, kicker: 'Lunar terrain', builtin: null, regions: null, markers: null },
+  mars: { group: mars.group, mesh: mars.mesh, config: MARS, kicker: 'Martian terrain', builtin: null, regions: null, markers: null }
 };
 const regionBody = new Map(); // regionId → nombre del cuerpo ('moon' | 'mars')
+const savedByRegion = new Map(); // regionId en el sistema → entrada de customRegions (terrenos propios)
 
-// Panel de misiones: visible solo mientras se enfoca un cuerpo con misiones ya cargadas
-// Vista API (satélite): panel derecho para soltar los JSON
-const apiPanel = setupApiPanel();
+/**
+ * Terrenos de cada cuerpo: los de backend/data y, detrás, los que el usuario añadió desde la vista
+ * API. Se rehacen las áreas del cuerpo cada vez que cambian. Si un terreno propio repite el id de
+ * uno del sistema, se muestra con el sufijo -USER para no pisarlo.
+ */
+function applyBodyRegions() {
+  if (!missionBodies.moon.builtin) return; // aún cargando los JSON
+  regionBody.clear();
+  savedByRegion.clear();
+  Object.entries(missionBodies).forEach(([name, mission]) => {
+    const taken = new Set(mission.builtin.map((region) => region.regionId));
+    const own = customRegions
+      .all()
+      .filter((entry) => entry.body === name)
+      .map((entry) => {
+        const { regionId } = entry.region;
+        const region = taken.has(regionId) ? { ...entry.region, regionId: `${regionId}-USER` } : entry.region;
+        taken.add(region.regionId);
+        savedByRegion.set(region.regionId, entry);
+        return region;
+      });
+    mission.regions = [...mission.builtin, ...own];
+    mission.markers?.dispose();
+    mission.markers = createTerrainMarkers({ body: mission.mesh, radius: mission.config.radius, regions: mission.regions });
+    mission.regions.forEach((region) => regionBody.set(region.regionId, name));
+  });
+}
+
+/** Id con el que se muestra en el sistema un terreno guardado (ver applyBodyRegions) */
+const systemRegionId = (savedId) =>
+  [...savedByRegion].find(([, entry]) => entry.region.regionId === savedId)?.[0] ?? null;
+
+// Vista API (satélite): panel derecho para soltar los JSON; desde él se va a un terreno guardado
+const apiPanel = setupApiPanel({
+  onOpenSaved: (savedId) => {
+    const regionId = systemRegionId(savedId);
+    const region = missionBodies[regionBody.get(regionId)]?.regions.find((r) => r.regionId === regionId);
+    if (region) goToMission(region);
+  }
+});
 
 const missionsPanel = setupMissionsPanel({
   onSelect: (region) => goToMission(region),
@@ -108,7 +147,10 @@ function requestRanking(name) {
     Object.values(missionBodies).forEach((body) => body.markers?.setAllowed(null));
     return;
   }
-  fetchMissionRegions(name, filter, mission.regions)
+  // Los terrenos propios no los conoce GET /api/regions: se puntúan aparte y se mezclan
+  const own = mission.regions.filter((region) => savedByRegion.has(region.regionId));
+  Promise.all([fetchMissionRegions(name, filter, mission.builtin), rankSavedRegions(own, filter)])
+    .then(([builtin, saved]) => [...builtin, ...saved].sort((a, b) => b.score - a.score))
     .then((ranked) => {
       if (request !== rankingRequest) return;
       missionsPanel.setRanking(ranked);
@@ -378,7 +420,12 @@ function requestAnalogs() {
   const request = ++analogsRequest;
   const regionId = selectedRegionId;
   const isCurrent = () => request === analogsRequest && selectedRegionId === regionId;
-  fetchClosestAnalogs(regionId, missionBodyName, earthRegions, missionsPanel.filter)
+  const saved = savedByRegion.get(regionId);
+  const region = saved && missionBodies[missionBodyName].regions.find((r) => r.regionId === regionId);
+  const analogs = saved
+    ? fetchSavedRegionAnalogs(region, saved.matches, earthRegions, missionsPanel.filter)
+    : fetchClosestAnalogs(regionId, missionBodyName, earthRegions, missionsPanel.filter);
+  analogs
     .then((analogs) => isCurrent() && missionInfo.setAnalogs(analogs))
     .catch((err) => {
       if (!isCurrent()) return;
@@ -412,7 +459,9 @@ function goToMission(region) {
   });
   // Los 3 análogos más parecidos, del backend, con tarjetas esqueleto mientras llegan; la Tierra
   // no aparece hasta entrar en uno de ellos
-  missionInfo.show(region, null, name, missionsPanel.filter);
+  // Terreno propio sin filtro: sus análogos son los de la misión con la que se analizó
+  const saved = savedByRegion.get(region.regionId);
+  missionInfo.show(region, null, name, missionsPanel.filter || saved?.mission || '');
   requestAnalogs();
   analogRegionId = null;
 
@@ -441,17 +490,21 @@ Promise.all([loadRegions('./backend/data/moon.json'), loadRegions('./backend/dat
     earthRegions = terrestrialRegions;
     earthMarkers = createTerrainMarkers({ body: earthMini.surface, radius: earthMini.areaRadius, regions: earthRegions });
 
-    Object.entries({ moon: moonRegions, mars: marsRegions }).forEach(([name, regions]) => {
-      const mission = missionBodies[name];
-      mission.regions = regions;
-      mission.markers = createTerrainMarkers({ body: mission.mesh, radius: mission.config.radius, regions });
-      regions.forEach((region) => regionBody.set(region.regionId, name));
+    missionBodies.moon.builtin = moonRegions;
+    missionBodies.mars.builtin = marsRegions;
+    applyBodyRegions();
+    // Al añadir o quitar terrenos propios (vista API) se rehacen las áreas y la lista de misiones
+    customRegions.subscribe(() => {
+      if (selectedRegionId) closeMission();
+      applyBodyRegions();
+      updateMissionsPanel(cameraNavigator.currentFocus);
+      updateTerrainAreas(cameraNavigator.currentFocus, mainMenu.isOpen);
     });
 
     setupMarkerTooltip({
       camera,
       domElement: renderer.domElement,
-      markerSets: [missionBodies.moon.markers, missionBodies.mars.markers],
+      markerSets: () => [missionBodies.moon.markers, missionBodies.mars.markers],
       occluders: [moon.mesh, mars.mesh],
       onSelect: goToMission
     });

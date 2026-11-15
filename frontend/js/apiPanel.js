@@ -1,6 +1,7 @@
-import { EARTH_ICON, RETRY_ICON, missionCardContent } from './missionCard.js';
+import { ARROW_ICON, EARTH_ICON, PIN_ICON, RETRY_ICON, missionCardContent } from './missionCard.js';
 import { fetchCustomAnalogs } from './analogs.js';
-import { formatLatLon } from './utils/format.js';
+import { BODIES, customRegions, guessBody } from './customRegions.js';
+import { escapeHtml, formatLatLon } from './utils/format.js';
 import { setupScrollFade } from './utils/scrollFade.js';
 
 const $ = (id) => document.getElementById(id);
@@ -9,6 +10,10 @@ const FILE_ICON =
   '<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5Z"/><path d="M14 3v4.5h4.5M10 12.5l-2 2 2 2M14 12.5l2 2-2 2"/></svg>';
 const UPLOAD_ICON =
   '<svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m6 10 6-6 6 6"/><path d="M4 20h16"/></svg>';
+const TRASH_ICON =
+  '<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13h9l1-13M10.5 10.5v5.5M13.5 10.5v5.5"/></svg>';
+const CHECK_ICON =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
 const REMOVE_ICON =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
 
@@ -20,10 +25,11 @@ const SLOTS = [
   { id: 'characteristics', title: 'Region characteristics' },
   { id: 'mission', title: 'Mission' }
 ];
-const ANALOGS_PER_REGION = 3; // los que devuelve el backend (topK)
+
+const BODY_LABELS = { moon: 'Moon', mars: 'Mars' };
+const CLEAR_CONFIRM_MS = 4000; // «Remove my implementations» pide un segundo clic dentro de este plazo
 
 const formatSize = (bytes) => (bytes < 1024 ? `${bytes} B` : `${(bytes / 1024).toFixed(1)} KB`);
-const escapeHtml = (text) => String(text).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const percent = (x) => Math.round(x * 100);
 
 /** Tarjeta de análogo terrestre (mismo diseño que en la comparativa, sin acción) */
@@ -35,17 +41,6 @@ function analogCard({ region, similarity }, i) {
         title: escapeHtml(region.name),
         meta: `${escapeHtml(region.regionId)} · ${formatLatLon(region.coordinates)}`,
         trailing: `<span class="menu-score" style="--score: ${score}" aria-label="${score}% similarity"><b>${score}%</b></span>`
-      })}</div>
-    </li>`;
-}
-
-function skeletonCard(i) {
-  return `<li class="menu-enter" style="--i: ${i}">
-      <div class="menu-tag menu-tag--mission is-pending is-skeleton" aria-hidden="true">${missionCardContent({
-        icon: EARTH_ICON,
-        title: '<span class="skeleton-bar"></span>',
-        meta: '<span class="skeleton-bar skeleton-bar--short"></span>',
-        trailing: '<span class="menu-score" style="--score: 0"></span>'
       })}</div>
     </li>`;
 }
@@ -64,8 +59,47 @@ function errorCard(error) {
     </li>`;
 }
 
-/** Bloque de una región del usuario: nombre, cobertura de sus datos y sus análogos */
-function regionResult(result, multiple) {
+/**
+ * Botón para mostrar los análogos: apagado mientras el backend verifica los datos y activo
+ * cuando los aceptó (los resultados ya están calculados, al pulsarlo aparecen al instante)
+ */
+function revealCard(ready) {
+  const meta = ready
+    ? `Data verified · ${ready.analogs} analog${ready.analogs === 1 ? '' : 's'}${ready.regions > 1 ? ` in ${ready.regions} regions` : ''}`
+    : 'Verifying data…';
+  return `<li class="menu-enter" style="--i: 0">
+      <button type="button" class="menu-tag menu-tag--mission api-result api-reveal${ready ? '' : ' is-pending'}"
+        data-reveal${ready ? '' : ' disabled aria-disabled="true"'}>${missionCardContent({
+          icon: EARTH_ICON,
+          title: 'Show Earth analogs',
+          meta,
+          trailing: ARROW_ICON
+        })}</button>
+    </li>`;
+}
+
+/**
+ * Acciones de una región analizada: añadirla al sistema (al cuerpo que indiquen sus datos, o a
+ * elegir si no lo dicen) o, si ya está guardada con esta misión, ir a verla
+ */
+function saveActions(result, index, missionName, planet) {
+  const { selectedRegion } = result;
+  const saved = customRegions.get(selectedRegion.regionId);
+  if (saved && saved.mission === missionName) {
+    return `<span class="api-saved-tag">${CHECK_ICON}Added to ${BODY_LABELS[saved.body]}</span>
+      <button type="button" class="api-action" data-open="${escapeHtml(selectedRegion.regionId)}">View it</button>`;
+  }
+  const body = guessBody(selectedRegion, planet);
+  return (body ? [body] : BODIES)
+    .map(
+      (b) =>
+        `<button type="button" class="api-action" data-save="${index}" data-body="${b}">${saved ? 'Update on' : 'Add to'} ${BODY_LABELS[b]}</button>`
+    )
+    .join('');
+}
+
+/** Bloque de una región del usuario: nombre, cobertura de sus datos, sus análogos y guardarla */
+function regionResult(result, index, multiple) {
   const { selectedRegion, matches = [], dataCoverage, extrapolation } = result;
   const notes = [`Data covers ${percent(dataCoverage)}% of the mission weight`];
   if (extrapolation?.dominant) notes.push('mostly outside the range of any Earth site');
@@ -74,27 +108,64 @@ function regionResult(result, multiple) {
     : '';
   return `${heading}
     <p class="api-note menu-enter${dataCoverage < 0.5 || extrapolation?.dominant ? ' is-warning' : ''}" style="--i: 0">${notes.join(' · ')}</p>
-    <ul class="menu-options">${matches.map(analogCard).join('')}</ul>`;
+    <ul class="menu-options">${matches.map(analogCard).join('')}</ul>
+    <div class="api-save-row menu-enter" style="--i: ${matches.length}" data-save-row="${index}"></div>`;
+}
+
+/** Terreno guardado en «My implementations»: pulsarlo lleva a él; la X lo quita del sistema */
+function savedCard({ body, region, mission }, i) {
+  const id = escapeHtml(region.regionId);
+  return `<li class="menu-enter api-slot" style="--i: ${i}">
+      <button type="button" class="menu-tag menu-tag--mission api-saved-item" data-open="${id}" aria-label="Go to ${escapeHtml(region.name)} on ${BODY_LABELS[body]}">${missionCardContent({
+        icon: PIN_ICON,
+        title: escapeHtml(region.name),
+        meta: `${BODY_LABELS[body]} · ${id} · ${escapeHtml(mission)}`,
+        trailing: ''
+      })}</button>
+      <button type="button" class="api-remove" data-remove="${id}" aria-label="Remove ${escapeHtml(region.name)} from the system">${REMOVE_ICON}</button>
+    </li>`;
+}
+
+function clearCard(count, confirming, i) {
+  const plural = count === 1 ? '' : 's';
+  return `<li class="menu-enter" style="--i: ${i}">
+      <button type="button" class="menu-tag menu-tag--mission api-clear${confirming ? ' is-confirming' : ''}" data-clear>${missionCardContent({
+        icon: TRASH_ICON,
+        title: 'Remove my implementations',
+        meta: confirming ? 'Click again to remove them all' : `${count} terrain${plural} saved in this browser`,
+        trailing: ''
+      })}</button>
+    </li>`;
 }
 
 /**
  * Panel derecho de la vista API (satélite): arrastrar y soltar los dos JSON y ver los análogos
  * terrestres que calcula el backend. Se pueden soltar ambos de golpe sobre el panel (rellenan
  * las ranuras libres en orden) o uno sobre una ranura concreta; también se pueden elegir con el
- * explorador al pulsarla. Con los dos cargados se envían solos; cambiar uno repite el cálculo.
+ * explorador al pulsarla. Con los dos cargados se verifican solos en el backend y, si los acepta,
+ * aparece un botón que muestra las tarjetas; cambiar o quitar un archivo vuelve a empezar.
  *
+ * Cada región analizada se puede añadir al sistema (customRegions.js: Luna o Marte, guardada en
+ * este navegador). La sección «My implementations» lista las guardadas, lleva a ellas y permite
+ * quitarlas una a una o todas («Remove my implementations», con confirmación).
+ *
+ * @param onOpenSaved(regionId) se llama al pulsar un terreno guardado (o «View it»)
  * @returns { show(), hide() }
  */
-export function setupApiPanel() {
+export function setupApiPanel({ onOpenSaved } = {}) {
   const panel = $('api-panel');
   const list = $('api-slots');
   const status = $('api-status');
   const input = $('api-file-input');
   const results = $('api-results');
+  const savedSection = $('api-saved');
+  const savedList = $('api-saved-list');
   const files = Object.fromEntries(SLOTS.map((slot) => [slot.id, null]));
   const buttons = {};
   let pickTarget = null; // ranura que abrió el explorador de archivos
   let request = 0; // petición más reciente (las anteriores se descartan)
+  let shown = null; // análogos a la vista (los de `ready` tras pulsar «Show Earth analogs»)
+  let ready = null; // análogos verificados a la espera de que se pulse «Show Earth analogs»
   const updateScrollEnd = setupScrollFade(panel);
 
   function renderSlot(slot) {
@@ -122,29 +193,40 @@ export function setupApiPanel() {
   function showResults(html, title = 'Earth analogs') {
     results.hidden = !html;
     results.innerHTML = html
-      ? `<h2 class="missions-title menu-enter" style="--i: 0">${title}</h2>
+      ? `<h2 class="missions-title menu-enter" style="--i: 0" tabindex="-1">${title}</h2>
          <div class="menu-accent missions-accent" aria-hidden="true"></div>${html}`
       : '';
     updateScrollEnd();
   }
 
-  /** Envía los dos JSON al backend y pinta los análogos de cada región */
+  /**
+   * Envía los dos JSON al backend, que los verifica y calcula los análogos. Si los acepta, se
+   * guardan y se ofrece el botón para mostrarlos; si no, se enseña el motivo (o reintentar).
+   */
   async function analyze() {
     const id = ++request;
+    ready = null;
+    shown = null;
     if (loadedCount() < SLOTS.length) {
       showResults('');
       return;
     }
     results.setAttribute('aria-busy', 'true');
-    showResults(`<ul class="menu-options">${Array.from({ length: ANALOGS_PER_REGION }, (_, i) => skeletonCard(i)).join('')}</ul>`);
+    showResults(`<ul class="menu-options">${revealCard(null)}</ul>`);
     try {
       const { mission, results: regions = [] } = await fetchCustomAnalogs(files.characteristics.data, files.mission.data);
       if (id !== request) return;
       const multiple = regions.length > 1;
-      showResults(
-        regions.map((result) => regionResult(result, multiple)).join(''),
-        `Earth analogs · <b>${escapeHtml(mission?.mission ?? 'custom')}</b>`
-      );
+      ready = {
+        html: regions.map((result, index) => regionResult(result, index, multiple)).join(''),
+        title: `Earth analogs · <b>${escapeHtml(mission?.mission ?? 'custom')}</b>`,
+        results: regions,
+        missionName: mission?.mission ?? 'custom',
+        planet: files.characteristics.data?.planet,
+        regions: regions.length,
+        analogs: regions.reduce((sum, result) => sum + (result.matches?.length ?? 0), 0)
+      };
+      showResults(`<ul class="menu-options">${revealCard(ready)}</ul>`);
     } catch (error) {
       if (id !== request) return;
       showResults(`<ul class="menu-options">${errorCard(error)}</ul>`);
@@ -153,9 +235,74 @@ export function setupApiPanel() {
     }
   }
 
+  /** Sustituye el botón por las tarjetas ya calculadas (con su entrada escalonada) */
+  function reveal() {
+    if (!ready) return;
+    showResults(ready.html, ready.title);
+    shown = ready;
+    syncSaveRows();
+    results.querySelector('h2')?.focus({ preventScroll: true });
+  }
+
+  /** Botones de guardar de cada región, según lo que ya esté en el sistema */
+  function syncSaveRows() {
+    if (!shown) return;
+    results.querySelectorAll('[data-save-row]').forEach((row) => {
+      const index = Number(row.dataset.saveRow);
+      row.innerHTML = saveActions(shown.results[index], index, shown.missionName, shown.planet);
+    });
+  }
+
+  function saveRegion(index, body) {
+    const { selectedRegion, matches = [] } = shown.results[index];
+    customRegions.save({ body, region: selectedRegion, mission: shown.missionName, matches });
+    setStatus(`${selectedRegion.name} added to ${BODY_LABELS[body]}`);
+  }
+
   results.addEventListener('click', (event) => {
-    if (event.target.closest('[data-retry]')) analyze();
+    const target = event.target.closest('[data-retry], [data-reveal], [data-save], [data-open]');
+    if (!target) return;
+    if ('retry' in target.dataset) analyze();
+    else if ('reveal' in target.dataset) reveal();
+    else if ('save' in target.dataset) saveRegion(Number(target.dataset.save), target.dataset.body);
+    else onOpenSaved?.(target.dataset.open);
   });
+
+  // «My implementations»: terrenos guardados en este navegador
+  let confirmTimer = 0;
+  function renderSaved(confirming = false) {
+    const entries = customRegions.all();
+    clearTimeout(confirmTimer);
+    savedSection.hidden = !entries.length;
+    savedList.innerHTML = entries.length
+      ? entries.map(savedCard).join('') + clearCard(entries.length, confirming, entries.length)
+      : '';
+    if (confirming) confirmTimer = setTimeout(() => renderSaved(false), CLEAR_CONFIRM_MS);
+    updateScrollEnd();
+  }
+
+  savedList.addEventListener('click', (event) => {
+    const target = event.target.closest('[data-open], [data-remove], [data-clear]');
+    if (!target) return;
+    if ('open' in target.dataset) onOpenSaved?.(target.dataset.open);
+    else if ('remove' in target.dataset) {
+      const entry = customRegions.get(target.dataset.remove);
+      customRegions.remove(target.dataset.remove);
+      if (entry) setStatus(`${entry.region.name} removed from the system`);
+    } else if (!target.classList.contains('is-confirming')) {
+      renderSaved(true); // primer clic: pide confirmación
+      savedList.querySelector('[data-clear]')?.focus();
+    } else {
+      customRegions.clear();
+      setStatus('Your terrains were removed from the system');
+    }
+  });
+
+  customRegions.subscribe(() => {
+    renderSaved();
+    syncSaveRows();
+  });
+  renderSaved();
 
   async function load(file, slotId) {
     if (!/\.json$/i.test(file.name) && file.type !== 'application/json') {

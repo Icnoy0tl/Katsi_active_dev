@@ -505,8 +505,108 @@
       line-height: 1.5;
     }
     #api-panel .api-result[data-retry]:hover,
-    #api-panel .api-result[data-retry]:focus-visible {
+    #api-panel .api-result[data-retry]:focus-visible,
+    #api-panel .api-reveal:not(:disabled):hover,
+    #api-panel .api-reveal:not(:disabled):focus-visible {
       transform: translateX(-6px);
+    }
+    /* Botón «Show Earth analogs»: verificado, el icono y el marco se encienden */
+    .api-reveal:not(:disabled)::before {
+      opacity: 0.6;
+    }
+    .api-reveal:not(:disabled) .menu-icon {
+      color: #60a5fa;
+    }
+    .api-reveal:disabled .mission-meta {
+      animation: api-verifying 1.2s ease-in-out infinite alternate;
+    }
+    @keyframes api-verifying {
+      to {
+        opacity: 0.4;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .api-reveal:disabled .mission-meta {
+        animation: none;
+      }
+    }
+    .api-results h2:focus {
+      outline: none;
+    }
+    /* Añadir una región analizada al sistema (Luna o Marte) */
+    .api-save-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0.2rem 0 0.4rem;
+    }
+    .api-action {
+      padding: 0.55rem 0.9rem;
+      border: 1px solid rgba(96, 165, 250, 0.45);
+      border-radius: 2px;
+      background: rgba(59, 130, 246, 0.14);
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.66rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #dbeafe;
+      cursor: pointer;
+      transition: color 0.25s ease, border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .api-action:hover,
+    .api-action:focus-visible {
+      color: #fff;
+      border-color: #60a5fa;
+      background: rgba(59, 130, 246, 0.28);
+      box-shadow: 0 0 12px -4px rgba(59, 130, 246, 0.8);
+    }
+    .api-action:focus-visible {
+      outline: 2px solid #60a5fa;
+      outline-offset: 2px;
+    }
+    .api-saved-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-size: 0.66rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #86efac;
+    }
+    .api-saved-tag svg {
+      width: 1rem;
+      height: 1rem;
+    }
+    /* «My implementations»: terrenos guardados y botón para quitarlos todos */
+    .api-saved {
+      margin-top: 2.2rem;
+    }
+    .api-saved-item {
+      padding-right: 3.6rem;
+    }
+    .api-saved-item .menu-icon {
+      color: #60a5fa;
+    }
+    #api-panel .api-saved-item:hover,
+    #api-panel .api-saved-item:focus-visible,
+    #api-panel .api-clear:hover,
+    #api-panel .api-clear:focus-visible {
+      transform: translateX(-6px);
+    }
+    .api-clear .menu-icon {
+      color: rgba(252, 165, 165, 0.8);
+    }
+    #api-panel .api-clear:hover,
+    #api-panel .api-clear:focus-visible,
+    #api-panel .api-clear.is-confirming {
+      color: #fecaca;
+      filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.55));
+    }
+    .api-clear.is-confirming .mission-meta {
+      color: #fca5a5;
     }
 
     /* ---------- Panel de misiones (izquierda, mismo lenguaje visual que el menú) ---------- */
@@ -1611,6 +1711,12 @@
       <ul id="api-slots" class="menu-options"></ul>
       <p id="api-status" class="api-status menu-enter" style="--i: 4" aria-live="polite"></p>
       <input id="api-file-input" type="file" accept=".json,application/json" hidden />
+      <!-- Terrenos propios añadidos al sistema (guardados en este navegador) -->
+      <section id="api-saved" class="api-saved" aria-label="My implementations" hidden>
+        <h2 class="missions-title menu-enter" style="--i: 0">My <b>implementations</b></h2>
+        <div class="menu-accent missions-accent" aria-hidden="true"></div>
+        <ul id="api-saved-list" class="menu-options"></ul>
+      </section>
       <section id="api-results" class="api-results" aria-live="polite" hidden></section>
     </aside>
 

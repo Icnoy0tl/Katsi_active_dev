@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { createCanvas, createSeededRandom } from '../utils/canvas.js';
-import { formatLatLon } from '../utils/format.js';
+import { escapeHtml, formatLatLon } from '../utils/format.js';
 
 const deg = THREE.MathUtils.degToRad;
 
@@ -375,6 +375,16 @@ export function createTerrainMarkers({ body, radius, regions }) {
       const entry = areas.get(regionId);
       if (!entry) return null;
       return body.localToWorld(out.copy(entry.anchor).multiplyScalar(radius));
+    },
+    /** Quita las áreas del cuerpo y libera su memoria de GPU (al rehacerlas con otras regiones) */
+    dispose() {
+      group.removeFromParent();
+      group.traverse((object) => {
+        if (!object.isSprite) object.geometry?.dispose(); // la de los sprites la comparte three.js
+        if (object.material && object.material !== badgeMaterial) object.material.dispose();
+      });
+      badgeMaterial.map.dispose();
+      badgeMaterial.dispose();
     }
   };
 }
@@ -385,6 +395,7 @@ const CLICK_TOLERANCE = 5;
 /**
  * Etiqueta flotante con el nombre y coordenadas del terreno bajo el cursor, y clic sobre un
  * área → `onSelect(region)`. `occluders` son los cuerpos que tapan las áreas de la cara oculta.
+ * `markerSets`: lista de createTerrainMarkers, o función que la devuelve (si se rehacen).
  */
 export function setupMarkerTooltip({ camera, domElement, markerSets, occluders, onSelect }) {
   const tooltip = document.createElement('div');
@@ -403,7 +414,8 @@ export function setupMarkerTooltip({ camera, domElement, markerSets, occluders, 
     pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
     // El raycaster no respeta `visible`: las áreas ocultas (menú, otro cuerpo, otras misiones) no cuentan
-    const areaTargets = markerSets
+    const sets = typeof markerSets === 'function' ? markerSets() : markerSets;
+    const areaTargets = sets
       .filter((set) => set.group.visible)
       .flatMap((set) => set.hitTargets)
       .filter((target) => target.parent.visible);
@@ -419,7 +431,7 @@ export function setupMarkerTooltip({ camera, domElement, markerSets, occluders, 
       current = region;
       domElement.style.cursor = region ? 'pointer' : '';
       if (region) {
-        tooltip.innerHTML = `<strong>${region.name}</strong><span>${region.regionId} · ${formatLatLon(region.coordinates)}</span>`;
+        tooltip.innerHTML = `<strong>${escapeHtml(region.name)}</strong><span>${region.regionId} · ${formatLatLon(region.coordinates)}</span>`;
       }
       tooltip.classList.toggle('is-hidden', !region);
     }

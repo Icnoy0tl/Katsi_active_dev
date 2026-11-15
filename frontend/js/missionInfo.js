@@ -1,5 +1,5 @@
 import { isScrolledToEnd, setupScrollFade } from './utils/scrollFade.js';
-import { formatLatLon } from './utils/format.js';
+import { escapeHtml, formatLatLon } from './utils/format.js';
 import { missionCardContent, EARTH_ICON, RETRY_ICON } from './missionCard.js';
 import { MISSION_FILTERS } from './config.js';
 
@@ -181,7 +181,7 @@ function analogCards(analogs, failed) {
 }
 
 /** Nombre visible del filtro de misión (el que se eligió en el panel de terrenos) */
-const filterLabel = (id) => MISSION_FILTERS.find((f) => f.id === id)?.label ?? id;
+const filterLabel = (id) => MISSION_FILTERS.find((f) => f.id === id)?.label ?? escapeHtml(id);
 
 /** Texto para lectores de pantalla del estado de la lista */
 const listStatus = (analogs, failed) =>
@@ -259,7 +259,7 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
     setComparisonLayout(false);
     render(`
       <p class="info-section info-lead menu-enter" style="--i: 1">Closest Earth analogs${filter ? ` for ${filterLabel(filter)}` : ''} to</p>
-      <h2 class="info-name menu-enter" style="--i: 2">${region.name}</h2>
+      <h2 class="info-name menu-enter" style="--i: 2">${escapeHtml(region.name)}</h2>
       <p class="info-coords menu-enter" style="--i: 3">${region.regionId} · ${formatLatLon(region.coordinates, ' · ')}</p>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
       <section class="cmp-analogs">
@@ -291,7 +291,7 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
         </table>
         <div class="cmp-scroll scroll-fade">
           <table class="cmp-table">
-            <caption class="sr-only">Variable comparison between ${region.name} (${bodyLabel}) and ${name} (Earth)</caption>
+            <caption class="sr-only">Variable comparison between ${escapeHtml(region.name)} (${bodyLabel}) and ${name} (Earth)</caption>
             ${COLUMNS}
             <thead>${headerRow}</thead>
             ${comparisonGroup('Core variables', region.coreVariables ?? {}, CORE_VARIABLES, analog)}
