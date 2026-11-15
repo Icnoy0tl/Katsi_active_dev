@@ -1,6 +1,7 @@
 // Package API: HTTP endpoints of the backend.
 //
-//	GET    /api/status
+//	GET    /api/status                          HTML page: message + status image
+//	GET    /api/status/image                    data/status.png
 //	GET    /api/catalog                         categories, variables, missions, capabilities
 //	GET    /api/regions?planet=mars             built-in + custom regions ({ regions: [...] })
 //	GET    /api/analog?planet=&regionId=&filter= top-3 Earth analogs (used by the frontend)
@@ -23,6 +24,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -47,6 +49,7 @@ type Server struct {
 func (s *Server) Routes() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/status", Status)
+	mux.HandleFunc("GET /api/status/image", s.StatusImage)
 	mux.HandleFunc("GET /api/catalog", s.Catalog)
 	mux.HandleFunc("GET /api/regions", s.Regions)
 	mux.HandleFunc("GET /api/analog", s.AnalogGET)
@@ -124,12 +127,38 @@ func internal(format string, args ...any) *apiError {
 	return &apiError{http.StatusInternalServerError, "Internal server error"}
 }
 
-// Endpoint 1: Status -> Returns "Status: 200 ok" and an image
+// statusPage: HTML returned by GET /api/status (message + image).
+const statusPage = `<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API status</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+         align-items: center; justify-content: center; gap: 1rem;
+         font-family: system-ui, sans-serif; background: #0b0f1a; color: #e6e9f0; }
+  h1 { margin: 0; font-size: 1.5rem; }
+  img { max-width: min(447px, 90vw); height: auto; }
+</style>
+</head>
+<body>
+  <h1>Status: 200 ok</h1>
+  <img src="/api/status/image" alt="API status">
+</body>
+</html>
+`
+
+// Endpoint 1: Status -> HTML page with "Status: 200 ok" and the status image.
 func Status(w http.ResponseWriter, r *http.Request) {
-	WriteJSON(w, http.StatusOK, map[string]string{
-		"status": "Status: 200 ok",
-		"image":  "backend/data/status.png",
-	})
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte(statusPage))
+}
+
+// StatusImage: serves data/status.png (fixed filename, never taken from the request).
+func (s *Server) StatusImage(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, filepath.Join(s.Parser.DataDir(), "status.png"))
 }
 
 // snapshot: custom data, or an empty snapshot without --own-regions.

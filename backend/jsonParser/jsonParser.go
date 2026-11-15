@@ -124,6 +124,9 @@ func New(dataDir string) (*Parser, error) {
 	return &Parser{dataDir: abs}, nil
 }
 
+// DataDir: absolute path of the data directory.
+func (p *Parser) DataDir() string { return p.dataDir }
+
 // Sanitization function, filename can only come from constants in here, never accept arbitrary filenames from userr
 func (p *Parser) readFile(filename string) ([]Region, error) {
 	path := filepath.Join(p.dataDir, filename)
