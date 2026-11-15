@@ -1,6 +1,7 @@
 import { isScrolledToEnd, setupScrollFade } from './utils/scrollFade.js';
 import { formatLatLon } from './utils/format.js';
 import { missionCardContent, EARTH_ICON, RETRY_ICON } from './missionCard.js';
+import { MISSION_FILTERS } from './config.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -179,6 +180,9 @@ function analogCards(analogs, failed) {
   }).join('');
 }
 
+/** Nombre visible del filtro de misión (el que se eligió en el panel de terrenos) */
+const filterLabel = (id) => MISSION_FILTERS.find((f) => f.id === id)?.label ?? id;
+
 /** Texto para lectores de pantalla del estado de la lista */
 const listStatus = (analogs, failed) =>
   failed ? 'Earth analogs unavailable.' : analogs ? '' : 'Loading Earth analogs…';
@@ -192,7 +196,8 @@ const listStatus = (analogs, failed) =>
  * @param onAnalogChange(analog | null) se llama al entrar en un análogo (con él) y al volver a la
  *        lista (con null): la Tierra solo se muestra mientras se está dentro de un análogo
  * @param onRetry() se llama al pulsar «reintentar» tras un fallo del backend de análogos
- * @returns { show(region, analogs, bodyName), setAnalogs(analogs), setAnalogsError(), hide(), backToList(), inAnalog }
+ * @returns { show(region, analogs, bodyName, filter), setAnalogs(analogs), setAnalogsError(), hide(), backToList(), inAnalog }
+ *          `filter`: misión con la que se ponderaron los análogos ('' = sin filtro)
  *          `analogs` null en `show` = aún cargando (tarjetas esqueleto hasta `setAnalogs` o
  *          `setAnalogsError`)
  */
@@ -241,6 +246,7 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
   let analogs = null;
   let analogsFailed = false; // la última petición de análogos falló
   let shown = -1; // análogo en el que se ha entrado (-1 = lista)
+  let filter = ''; // misión con la que se pidieron los análogos
 
   function render(html) {
     body.innerHTML = html;
@@ -252,7 +258,7 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
     setVignette(false);
     setComparisonLayout(false);
     render(`
-      <p class="info-section info-lead menu-enter" style="--i: 1">Closest Earth analogs to</p>
+      <p class="info-section info-lead menu-enter" style="--i: 1">Closest Earth analogs${filter ? ` for ${filterLabel(filter)}` : ''} to</p>
       <h2 class="info-name menu-enter" style="--i: 2">${region.name}</h2>
       <p class="info-coords menu-enter" style="--i: 3">${region.regionId} · ${formatLatLon(region.coordinates, ' · ')}</p>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
@@ -276,7 +282,7 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
     setVignette(true);
     render(`
       <h2 class="info-name menu-enter" style="--i: 2">${name}</h2>
-      <p class="info-coords menu-enter" style="--i: 3">${regionId} · ${formatLatLon(coordinates, ' · ')} · ${percent}% similarity</p>
+      <p class="info-coords menu-enter" style="--i: 3">${regionId} · ${formatLatLon(coordinates, ' · ')} · ${percent}% similarity${filter ? ` · ${filterLabel(filter)}` : ''}</p>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
       <section class="cmp-detail menu-enter" style="--i: 4">
         <table class="cmp-table cmp-head" aria-hidden="true">
@@ -379,8 +385,9 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
       renderList();
       body.querySelector(`[data-index="${from}"]`)?.focus({ preventScroll: true });
     },
-    show(selectedRegion, foundAnalogs, bodyName) {
+    show(selectedRegion, foundAnalogs, bodyName, missionFilter = '') {
       region = selectedRegion;
+      filter = missionFilter;
       bodyLabel = BODY_LABELS[bodyName] ?? bodyName;
       analogs = foundAnalogs?.slice(0, ANALOG_SLOTS) ?? null;
       analogsFailed = false;

@@ -188,8 +188,26 @@ export const ANALOGS_API = {
   timeoutMs: 8000
 };
 
+/** Terrenos de la Luna o Marte ordenados para una misión (`GET /api/regions`, en backend/regions.go) */
+export const REGIONS_API = {
+  url: `${API_BASE}/api/regions`,
+  timeoutMs: 8000
+};
+
 /** Análogos de los datos propios del usuario (`POST /api/analog/custom`, en backend/custom.go) */
 export const CUSTOM_ANALOGS_API = {
   url: `${API_BASE}/api/analog/custom`,
   timeoutMs: 12000
 };
+
+/**
+ * Filtros de misión del panel de terrenos: `id` es el `filter` de `GET /api/regions` y de
+ * `GET /api/analog` (perfiles de backend/knn/mission.go); '' = sin filtro, todos los terrenos y
+ * todas las variables pesan igual.
+ */
+export const MISSION_FILTERS = [
+  { id: '', label: 'All', title: 'All variables weigh the same' },
+  { id: 'mobility', label: 'Mobility', title: 'Slope, rocks and soil mechanics: traversing the terrain' },
+  { id: 'perception', label: 'Perception', title: 'Line of sight, texture, shadows and illumination: navigation' },
+  { id: 'environmental_survival', label: 'Survival', title: 'Thermal cycle, energy, pressure and wind: environmental survival' }
+];

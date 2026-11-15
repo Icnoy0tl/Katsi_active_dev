@@ -340,12 +340,23 @@ export function createTerrainMarkers({ body, radius, regions }) {
 
   body.add(group);
 
+  let allowed = null; // regionIds del filtro de misión (null = todas)
+  let only = null; // área de la misión abierta (null = todas las permitidas)
+  const applyVisibility = () =>
+    areas.forEach((entry, id) => (entry.group.visible = only === null ? !allowed || allowed.has(id) : id === only));
+
   return {
     group,
     hitTargets,
-    /** Muestra solo el área de `regionId` (o todas con `null`) */
+    /** Muestra solo el área de `regionId` (o, con `null`, todas las que deja el filtro de misión) */
     showOnly(regionId) {
-      areas.forEach((entry, id) => (entry.group.visible = regionId === null || id === regionId));
+      only = regionId;
+      applyVisibility();
+    },
+    /** Áreas que deja ver el filtro de misión (`null` = todas) */
+    setAllowed(regionIds) {
+      allowed = regionIds ? new Set(regionIds) : null;
+      applyVisibility();
     },
     /** Base local del área (normal, este y norte) en coordenadas del cuerpo */
     localFrame(regionId) {

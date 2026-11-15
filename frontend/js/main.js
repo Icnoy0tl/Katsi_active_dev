@@ -16,7 +16,7 @@ import { setupApiPanel } from './apiPanel.js';
 import { setupMissionsPanel } from './missions.js';
 import { setupMissionInfo } from './missionInfo.js';
 import { createHologram } from './hologram.js';
-import { fetchClosestAnalogs } from './analogs.js';
+import { fetchClosestAnalogs, fetchMissionRegions } from './analogs.js';
 import { createEarthMiniature } from './bodies/earthMiniature.js';
 import { createTerrainMarkers, loadRegions, setupMarkerTooltip } from './bodies/terrainMarkers.js';
 import { createViewShift, shiftIfWide } from './viewShift.js';
@@ -87,14 +87,49 @@ const regionBody = new Map(); // regionId → nombre del cuerpo ('moon' | 'mars'
 // Vista API (satélite): panel derecho para soltar los JSON
 const apiPanel = setupApiPanel();
 
-const missionsPanel = setupMissionsPanel({ onSelect: (region) => goToMission(region) });
+const missionsPanel = setupMissionsPanel({
+  onSelect: (region) => goToMission(region),
+  onFilterChange: () => requestRanking(cameraNavigator.currentFocus),
+  onRetry: () => requestRanking(cameraNavigator.currentFocus)
+});
+
+let rankingRequest = 0; // petición de terrenos por misión más reciente (las anteriores se descartan)
+
+/**
+ * Filtro de misión del panel de terrenos: sin filtro se ven todos; con uno, el backend calcula
+ * qué terrenos del cuerpo sirven para la misión y en qué orden, y en el cuerpo solo quedan sus áreas
+ */
+function requestRanking(name) {
+  const mission = missionBodies[name];
+  if (!mission?.regions) return;
+  const request = ++rankingRequest;
+  const filter = missionsPanel.filter;
+  if (!filter) {
+    Object.values(missionBodies).forEach((body) => body.markers?.setAllowed(null));
+    return;
+  }
+  fetchMissionRegions(name, filter, mission.regions)
+    .then((ranked) => {
+      if (request !== rankingRequest) return;
+      missionsPanel.setRanking(ranked);
+      mission.markers.setAllowed(ranked.map(({ region }) => region.regionId));
+    })
+    .catch((err) => {
+      if (request !== rankingRequest) return;
+      console.error('Mission ranking unavailable.', err);
+      missionsPanel.setRankingError();
+      mission.markers.setAllowed(null);
+    });
+}
 
 function updateMissionsPanel(name) {
   if (name === 'satellite') apiPanel.show();
   else apiPanel.hide();
   const regions = missionBodies[name]?.regions;
-  if (regions) missionsPanel.show(regions);
-  else missionsPanel.hide();
+  if (regions) {
+    missionsPanel.show(regions);
+    if (missionsPanel.filter) requestRanking(name);
+  } else missionsPanel.hide();
   // Con la lista de misiones visible, el cuerpo se desplaza a la derecha para no pegarse a ella
   if (!mainMenu.isOpen && !selectedRegionId) viewShift.setTarget(regions ? shiftIfWide(MENU.missionsViewShift) : 0, 0);
 }
@@ -335,14 +370,15 @@ function showAnalog(analog) {
 }
 
 /**
- * Pide al backend los análogos de la misión abierta y los pasa al panel (o el error, para que
- * ofrezca reintentar). Se descarta la respuesta si mientras tanto cambió la misión.
+ * Pide al backend los análogos de la misión abierta, ponderados con el filtro de misión elegido en
+ * el panel de terrenos, y los pasa al panel (o el error, para que ofrezca reintentar). Se descarta
+ * la respuesta si mientras tanto cambió la misión.
  */
 function requestAnalogs() {
   const request = ++analogsRequest;
   const regionId = selectedRegionId;
   const isCurrent = () => request === analogsRequest && selectedRegionId === regionId;
-  fetchClosestAnalogs(regionId, missionBodyName, earthRegions)
+  fetchClosestAnalogs(regionId, missionBodyName, earthRegions, missionsPanel.filter)
     .then((analogs) => isCurrent() && missionInfo.setAnalogs(analogs))
     .catch((err) => {
       if (!isCurrent()) return;
@@ -376,7 +412,7 @@ function goToMission(region) {
   });
   // Los 3 análogos más parecidos, del backend, con tarjetas esqueleto mientras llegan; la Tierra
   // no aparece hasta entrar en uno de ellos
-  missionInfo.show(region, null, name);
+  missionInfo.show(region, null, name, missionsPanel.filter);
   requestAnalogs();
   analogRegionId = null;
 

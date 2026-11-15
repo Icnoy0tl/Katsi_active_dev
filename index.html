@@ -677,6 +677,47 @@
     .cmp-analogs .menu-options {
       gap: 1.6rem;
     }
+    /* Filtro de misión: segmentos en fila sobre los análogos; el activo, con el azul del acento */
+    .mission-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      width: min(28rem, calc(100vw - 32px));
+    }
+    #missions-filter {
+      width: 100%;
+      margin-bottom: 1.6rem;
+    }
+    .mission-filter-option {
+      flex: 1 1 auto;
+      padding: 0.55rem 0.8rem;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 2px;
+      background: rgba(15, 23, 42, 0.35);
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.66rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(203, 213, 225, 0.65);
+      cursor: pointer;
+      transition: color 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+    }
+    .mission-filter-option:hover,
+    .mission-filter-option:focus-visible {
+      color: #eef2f8;
+      border-color: rgba(96, 165, 250, 0.6);
+    }
+    .mission-filter-option:focus-visible {
+      outline: 2px solid #60a5fa;
+      outline-offset: 2px;
+    }
+    .mission-filter-option[aria-pressed='true'] {
+      color: #eef2f8;
+      border-color: #60a5fa;
+      background: rgba(59, 130, 246, 0.22);
+      box-shadow: 0 0 12px -4px rgba(59, 130, 246, 0.8);
+    }
     /* Coordenadas bajo el nombre del terreno: más tenues que el título */
     #mission-info-body > .info-coords {
       color: rgba(203, 213, 225, 0.5);
@@ -1535,7 +1576,9 @@
     >
       <h2 class="missions-title menu-enter" style="--i: 0">Available missions · <b id="missions-count"></b></h2>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
-      <ul id="missions-list" class="menu-options"></ul>
+      <div id="missions-filter" class="mission-filter menu-enter" style="--i: 1" role="group" aria-label="Filter terrains by mission"></div>
+      <p id="missions-status" class="sr-only" role="status"></p>
+      <ul id="missions-list" class="menu-options" aria-label="Terrains: pick one to see its Earth analogs"></ul>
     </aside>
 
     <!-- Información del terreno seleccionado (sustituye a la lista de misiones) -->
