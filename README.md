@@ -1,4 +1,4 @@
-# Ixmati
+# Katsi
 
 **Mission-specific Earth analogs for Moon and Mars surface tests**
 NASA Space Apps Challenge 2026 · Local event: Puebla, Mexico · Team **Hackanenes**
@@ -101,7 +101,7 @@ Deployment: `render.yaml` creates the Go API and the static site as two Render s
 
 ## API: built for professional missions, companies, startups and universities
 
-Ixmati is an API first; the 3D interface is one of its clients. The same engine that ranks the built-in catalog also accepts **your own regions, your own variables and your own mission types**. The weights for whatever you upload are computed with the same mathematics (Section *How it works*), so a custom analysis is as unbiased and auditable as a built-in one.
+Katsi is an API first; the 3D interface is one of its clients. The same engine that ranks the built-in catalog also accepts **your own regions, your own variables and your own mission types**. The weights for whatever you upload are computed with the same mathematics (Section *How it works*), so a custom analysis is as unbiased and auditable as a built-in one.
 
 ### Who it is for
 
