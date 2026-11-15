@@ -24,7 +24,7 @@ type AnalogResponse struct {
 	Matches        []MatchResponse   `json:"matches"`
 }
 
-type CalculateRequest struct {
+type AnalogRequest struct {
 	Missions struct {
 		Filter string `json:"filter"`
 	} `json:"misiones"`
@@ -54,9 +54,9 @@ func Status(w http.ResponseWriter, r *http.Request) {
 }
 
 // Endpoint 2: Calculate -> Parsers both jsons, normalize data, and runs KNN
-func Calculate(ParserInstance *jsonParser.Parser) http.HandlerFunc {
+func Analog(ParserInstance *jsonParser.Parser) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var Req CalculateRequest
+		var Req AnalogRequest
 		if err := json.NewDecoder(r.Body).Decode(&Req); err != nil {
 			WriteError(w, http.StatusBadRequest, "Invalid JSON payload: "+err.Error())
 			return
