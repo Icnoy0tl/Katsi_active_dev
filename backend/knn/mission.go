@@ -58,7 +58,7 @@ var Mu = map[string]map[string]float64{
 	"rock_abundance_pct":       {"GEO": .6, "MEC": .4},
 	"grain_size_um":            {"MEC": 1},
 	"angle_of_repose_deg":      {"MEC": 1},
-	"depth_to_bedrock":         {"MEC": .8, "GEO": .2}, 
+	"depth_to_bedrock":         {"MEC": .8, "GEO": .2},
 	"vrm_microrelief":          {"GEO": 1},
 	"dielectric_constant":      {"VOL": .7, "MEC": .3},
 	"salinity_wt_pct":          {"VOL": 1},
@@ -83,21 +83,20 @@ var Missions = map[string]map[string]float64{
 var ErrUnknownFilter = errors.New("filtro desconocido")
 
 type VariableWeight struct {
-	Affinity float64 `json:"affinity"` 
-	Weight   float64 `json:"weight"`   
-	Factor   float64 `json:"factor"`   
+	Affinity float64 `json:"affinity"`
+	Weight   float64 `json:"weight"`
+	Factor   float64 `json:"factor"`
 }
 
 type WeightReport struct {
 	Mission    string                    `json:"mission"`
 	Profile    map[string]float64        `json:"profile"`
-	NEf        float64                   `json:"nEf"`     
-	NStar      float64                   `json:"nStar"`   
+	NEf        float64                   `json:"nEf"`
+	NStar      float64                   `json:"nStar"`
 	AngleDeg   float64                   `json:"angleDeg"`
-	NoAffinity bool                      `json:"noAffinity"` 
+	NoAffinity bool                      `json:"noAffinity"`
 	Variables  map[string]VariableWeight `json:"variables"`
 }
-
 
 func validateVector(vec map[string]float64, ok map[string]bool, name string, sumOne bool) error {
 	keys := make([]string, 0, len(vec))
@@ -167,7 +166,6 @@ func entropy(p []float64) float64 {
 	return h
 }
 
-
 func ComputeWeights(profile map[string]float64, mu map[string]map[string]float64, cats []string) (WeightReport, error) {
 	if err := validateModel(mu, profile, cats); err != nil {
 		return WeightReport{}, err
@@ -195,7 +193,7 @@ func ComputeWeights(profile map[string]float64, mu map[string]map[string]float64
 
 	w := make([]float64, n)
 	if !(mass > 0) {
-		
+
 		for i, v := range vars {
 			w[i] = 1 / float64(n)
 			rep.Variables[v] = VariableWeight{Weight: w[i], Factor: 1}
@@ -233,11 +231,10 @@ func ComputeWeights(profile map[string]float64, mu map[string]map[string]float64
 	return rep, nil
 }
 
-
-func validateFeatureMapping() error {
+func (m *Model) validateFeatureMapping() error {
 	shares := map[string]float64{}
-	for _, f := range features {
-		if _, ok := Mu[f.MuVar]; !ok {
+	for _, f := range m.features {
+		if _, ok := m.mu[f.MuVar]; !ok {
 			return fmt.Errorf("Dimension %q points to %q, which is not in mu", f.Name, f.MuVar)
 		}
 		if !(f.Share > 0 && f.Share <= 1) {
@@ -245,7 +242,7 @@ func validateFeatureMapping() error {
 		}
 		shares[f.MuVar] += f.Share
 	}
-	for _, v := range sortedKeys(Mu) {
+	for _, v := range sortedKeys(m.mu) {
 		if math.Abs(shares[v]-1) > 1e-12 {
 			return fmt.Errorf(" %q Mu has a Share total %v (Must be 1; 0 = not in vector)", v, shares[v])
 		}
@@ -253,11 +250,7 @@ func validateFeatureMapping() error {
 	return nil
 }
 
-
 var missionReports = func() map[string]WeightReport {
-	if err := validateFeatureMapping(); err != nil {
-		panic("knn: " + err.Error())
-	}
 	out := make(map[string]WeightReport, len(Missions))
 	for _, name := range sortedKeys(Missions) {
 		rep, err := ComputeWeights(Missions[name], Mu, Categories)
@@ -280,17 +273,16 @@ func MissionReports() []WeightReport {
 	return out
 }
 
-
-func expand(perVar map[string]float64, names []string) (Vector, error) {
-	byName := make(map[string]feature, len(features))
-	for _, f := range features {
+func (m *Model) expand(perVar map[string]float64, names []string) (Vector, error) {
+	byName := make(map[string]feature, len(m.features))
+	for _, f := range m.features {
 		byName[f.Name] = f
 	}
 	w := make(Vector, len(names))
 	for i, n := range names {
 		f, ok := byName[n]
 		if !ok {
-			
+
 			return nil, fmt.Errorf("Dimension %q is not in the model of weights", n)
 		}
 		w[i] = perVar[f.MuVar] * f.Share
@@ -298,10 +290,10 @@ func expand(perVar map[string]float64, names []string) (Vector, error) {
 	return w, nil
 }
 
-func uniformPerVar() map[string]float64 {
-	out := make(map[string]float64, len(Mu))
-	for v := range Mu {
-		out[v] = 1 / float64(len(Mu))
+func (m *Model) uniformPerVar() map[string]float64 {
+	out := make(map[string]float64, len(m.mu))
+	for v := range m.mu {
+		out[v] = 1 / float64(len(m.mu))
 	}
 	return out
 }
@@ -314,14 +306,13 @@ func reportPerVar(rep WeightReport) map[string]float64 {
 	return out
 }
 
-
 func WeightsFor(filter string, names []string) (Vector, error) {
 	if filter == "" {
-		return expand(uniformPerVar(), names)
+		return Default.expand(Default.uniformPerVar(), names)
 	}
 	rep, ok := missionReports[filter]
 	if !ok {
 		return nil, ErrUnknownFilter
 	}
-	return expand(reportPerVar(rep), names)
+	return Default.expand(reportPerVar(rep), names)
 }

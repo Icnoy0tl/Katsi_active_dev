@@ -35,22 +35,20 @@ import (
 // come out as null in JSON (never NaN, which would break encoding/json).
 type FeatureCompat struct {
 	Name  string `json:"name"`
-	Group string `json:"group"` 
+	Group string `json:"group"`
 
-	TargetValue *float64 `json:"targetValue"` 
-	EarthValue  *float64 `json:"earthValue"`   
-	TargetNorm  *float64 `json:"targetNorm"`   
+	TargetValue *float64 `json:"targetValue"`
+	EarthValue  *float64 `json:"earthValue"`
+	TargetNorm  *float64 `json:"targetNorm"`
 	EarthNorm   *float64 `json:"earthNorm"`
 
-	
 	TargetClamped bool `json:"targetClamped"`
-
 
 	Observed bool `json:"observed"`
 
-	Compatibility *float64 `json:"compatibility"` 
-	Weight        float64  `json:"weight"`       
-	LossShare     *float64 `json:"lossShare"`     
+	Compatibility *float64 `json:"compatibility"`
+	Weight        float64  `json:"weight"`
+	LossShare     *float64 `json:"lossShare"`
 }
 
 func finitePtr(x float64) *float64 {
@@ -66,15 +64,19 @@ func finitePtr(x float64) *float64 {
 // weights of the filter. It returns one entry per dimension, in the order of FeatureNames().
 
 func CompareFeatures(targetRegion, candRegion jsonParser.Region, target, cand Candidate, stats Stats, w Vector) ([]FeatureCompat, error) {
-	n := len(features)
+	return Default.CompareFeatures(targetRegion, candRegion, target, cand, stats, w)
+}
+
+func (m *Model) CompareFeatures(targetRegion, candRegion jsonParser.Region, target, cand Candidate, stats Stats, w Vector) ([]FeatureCompat, error) {
+	n := len(m.features)
 	if len(target.Vector) != n || len(cand.Vector) != n || len(w) != n || len(stats.Min) != n || len(stats.Max) != n {
 		return nil, errors.New("Vectors, weights or statistics of different length to the number of dimenstions")
 	}
-	tRaw, err := ToVector(targetRegion)
+	tRaw, err := m.ToVector(targetRegion)
 	if err != nil {
 		return nil, fmt.Errorf("region %s: %w", targetRegion.RegionId, err)
 	}
-	cRaw, err := ToVector(candRegion)
+	cRaw, err := m.ToVector(candRegion)
 	if err != nil {
 		return nil, fmt.Errorf("region %s: %w", candRegion.RegionId, err)
 	}
@@ -89,7 +91,6 @@ func CompareFeatures(targetRegion, candRegion jsonParser.Region, target, cand Ca
 	if !(total > 0) {
 		return nil, errors.New("Sum weights must be > 0")
 	}
-
 
 	q := make([]float64, n)
 	observed := make([]bool, n)
@@ -106,7 +107,7 @@ func CompareFeatures(targetRegion, candRegion jsonParser.Region, target, cand Ca
 	}
 
 	out := make([]FeatureCompat, n)
-	for i, f := range features {
+	for i, f := range m.features {
 		fc := FeatureCompat{
 			Name:        f.Name,
 			Group:       f.Group,

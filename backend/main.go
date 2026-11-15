@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"spaceapps/jsonParser"
@@ -15,6 +16,13 @@ import (
 )
 
 const topK = 3
+
+// Análisis de sensibilidad: ±20 % en cada componente del perfil de la misión, 200 ensayos, seed fijo.
+const (
+	robustEps    = 0.20
+	robustTrials = 200
+	robustSeed   = 2026
+)
 
 type MatchResponse struct {
 	knn.Match
@@ -26,6 +34,9 @@ type AnalogResponse struct {
 	Filter         string            `json:"filter"`
 	SelectedRegion jsonParser.Region `json:"selectedRegion"`
 	Matches        []MatchResponse   `json:"matches"`
+	Robustness     knn.Robustness    `json:"robustness"`
+	// Aspectos del objetivo que ningún sitio terrestre del catálogo cubre.
+	Extrapolation knn.Extrapolation `json:"extrapolation"`
 }
 
 func envOr(key, def string) string {
@@ -89,7 +100,7 @@ func analogHandler(parser *jsonParser.Parser) http.HandlerFunc {
 		// 4. Pesos del filtro + KNN
 		weights, err := knn.WeightsFor(filter, knn.FeatureNames())
 		if err != nil {
-			writeError(w, http.StatusBadRequest, "filter debe ser rover, ice_and_volatiles, thermal_cycles o vacío")
+			writeError(w, http.StatusBadRequest, "filter debe ser vacío o uno de: "+strings.Join(knn.MissionNames(), ", "))
 			return
 		}
 		matches, err := knn.FindMostSimilar(target, pool, weights, topK)
@@ -99,17 +110,36 @@ func analogHandler(parser *jsonParser.Parser) http.HandlerFunc {
 			return
 		}
 
+		rob, err := knn.AnalyzeRobustness(target, pool, filter, topK, robustEps, robustTrials, robustSeed)
+		if err != nil {
+			log.Printf("error en robustez: %v", err)
+			writeError(w, http.StatusInternalServerError, "error interno")
+			return
+		}
+
+		extra, err := knn.CheckExtrapolation(selected, earth, weights)
+		if err != nil {
+			log.Printf("error en extrapolación: %v", err)
+			writeError(w, http.StatusInternalServerError, "error interno")
+			return
+		}
+
 		// 5. Respuesta: cada match con los datos completos de su región terrestre
 		byID := make(map[string]jsonParser.Region, len(earth))
 		for _, e := range earth {
 			byID[e.RegionId] = e
 		}
-		resp := AnalogResponse{Planet: info.Planet, Filter: filter, SelectedRegion: selected}
+		resp := AnalogResponse{Planet: info.Planet, Filter: filter, SelectedRegion: selected, Robustness: rob, Extrapolation: extra}
 		for _, m := range matches {
 			resp.Matches = append(resp.Matches, MatchResponse{Match: m, Region: byID[m.RegionID]})
 		}
 		writeJSON(w, http.StatusOK, resp)
 	}
+}
+
+// GET /api/filters → pesos de cada misión (F1 afinidad, F2′ peso, N_ef, ángulo).
+func filtersHandler(w http.ResponseWriter, _ *http.Request) {
+	writeJSON(w, http.StatusOK, knn.MissionReports())
 }
 
 func cors(allowedOrigin string, next http.Handler) http.Handler {
@@ -137,6 +167,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/analog", analogHandler(parser))
+	mux.HandleFunc("GET /api/filters", filtersHandler)
 
 	srv := &http.Server{
 		Addr:              addr,

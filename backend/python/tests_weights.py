@@ -1,7 +1,11 @@
+
 """
+
 Property tests + fuzz. Run: python3 tests_pesos.py
 Each property corresponds to a theorem in the explanation.
+
 """
+
 import math
 import random
  
