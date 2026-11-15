@@ -18,6 +18,8 @@ type Coordinates struct {
 // Variables as *float64: a field missing (or null) in the JSON stays nil and KNN treats it as
 // missing data (weight renormalized over the observed ones, see knn.WeightedDistance)
 // instead of a fake 0.
+// Every variable is *float64: JSON null (or a missing key) means "no data" and stays nil,
+// instead of silently becoming 0. knn turns nil into NaN and treats it as missing (coverage).
 type CoreVariables struct {
 	Slope                  *float64 `json:"slope"`
 	RadarRoughness         *float64 `json:"radar_roughness"`
@@ -48,6 +50,7 @@ type AuditVariables struct {
 	WindGustMs         *float64 `json:"wind_gust_ms"`
 	AbrasiveMohs       *float64 `json:"abrasive_mohs"`
 	GroundIceIndex     *float64 `json:"ground_ice_index"`
+	GroundIceIndex     *float64 `json:"ground_ice_index"` // 1 low, 2 medium, 3 high; null = no data
 }
 
 type Region struct {
@@ -56,9 +59,12 @@ type Region struct {
 	Coords         Coordinates    `json:"coordinates"`
 	CoreVariables  CoreVariables  `json:"coreVariables"`
 	AuditVariables AuditVariables `json:"auditVariables"`
+
+	// CustomVariables: values of user-defined variables (--own-regions), by name.
+	CustomVariables map[string]*float64 `json:"customVariables,omitempty"`
 }
 
-type PlanetInformation struct { 
+type PlanetInformation struct {
 	Planet  string   `json:"planet"`
 	Regions []Region `json:"regions"`
 }
@@ -106,7 +112,7 @@ type Parser struct {
 	dataDir string
 }
 
-//constructor of the parser, checks for the data directory
+// constructor of the parser, checks for the data directory
 func New(dataDir string) (*Parser, error) {
 	abs, err := filepath.Abs(dataDir)
 	if err != nil {
@@ -119,7 +125,7 @@ func New(dataDir string) (*Parser, error) {
 	return &Parser{dataDir: abs}, nil
 }
 
-// Sanitization function, filename can only come from constants in here, never accept arbitrary filenames from userr 
+// Sanitization function, filename can only come from constants in here, never accept arbitrary filenames from userr
 func (p *Parser) readFile(filename string) ([]Region, error) {
 	path := filepath.Join(p.dataDir, filename)
 
@@ -174,6 +180,20 @@ func (p *Parser) GetPlanetRegions(planet string) (PlanetInformation, error) {
 
 // GetEarthRegions returns the whole planet region pool to procces using knn
 //TODO maybe if needed we can just make this one a generic function to get the information of a whole planet 
+// GetRegions returns every built-in region of a body: "moon", "mars" or "earth".
+func (p *Parser) GetRegions(planet string) ([]Region, error) {
+	planet = strings.ToLower(strings.TrimSpace(planet))
+	if planet == "earth" {
+		return p.readFile(earthFile)
+	}
+	planet, err := SanitizePlanet(planet)
+	if err != nil {
+		return nil, err
+	}
+	return p.readFile(planetFiles[planet])
+}
+
+// GetEarthRegions returns the whole Earth region pool to process using knn
 func (p *Parser) GetEarthRegions() ([]Region, error) {
 	regions, err := p.readFile(earthFile)
 	if err != nil {
