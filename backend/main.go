@@ -176,7 +176,7 @@ func healthHandler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// defaultAllowedOrigins: el front publicado. ALLOWED_ORIGIN (lista separada por comas) lo reemplaza.
+// defaultAllowedOrigins: el front publicado, siempre aceptado. ALLOWED_ORIGIN (lista separada por comas) agrega otros.
 const defaultAllowedOrigins = "https://katsi.onrender.com"
 
 // parseOrigins: "a, b/" → ["a", "b"] (sin espacios ni barra final, que el navegador nunca envía)
@@ -219,7 +219,7 @@ func cors(allowedOrigins []string, next http.Handler) http.Handler {
 func main() {
 	dataDir := envOr("DATA_DIR", "data") // relativo a donde corres el binario
 	addr := envOr("ADDR", ":8080")
-	origins := parseOrigins(envOr("ALLOWED_ORIGIN", defaultAllowedOrigins))
+	origins := append(parseOrigins(os.Getenv("ALLOWED_ORIGIN")), defaultAllowedOrigins)
 
 	parser, err := jsonParser.New(dataDir)
 	if err != nil {
