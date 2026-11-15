@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"spaceapps/jsonParser"
+	"spaceapps/knn"
 )
 
 func newTestServer(t *testing.T) *httptest.Server {
@@ -31,7 +32,7 @@ func TestAnalogStatusCodes(t *testing.T) {
 		query string
 		want  int
 	}{
-		{"planet=mars&regionId=MARS-001&filter=rover", http.StatusOK},
+		{"planet=mars&regionId=MARS-001&filter=mobility", http.StatusOK},
 		{"planet=MOON&regionId=MOON-003&filter=", http.StatusOK}, // planet is normalized to lowercase
 		{"planet=mars&regionId=MARS-001", http.StatusOK},         // no filter
 		{"planet=venus&regionId=MARS-001", http.StatusBadRequest},
@@ -56,10 +57,22 @@ func TestAnalogStatusCodes(t *testing.T) {
 
 func TestAnalogResponseShape(t *testing.T) {
 	srv := newTestServer(t)
-	resp, err := http.Get(srv.URL + "/api/analog?planet=mars&regionId=MARS-001&filter=rover")
-	if err != nil {
-		t.Fatal(err)
+	get := func(origin string) *http.Response {
+		req, _ := http.NewRequest(http.MethodGet, srv.URL+"/api/analog?planet=mars&regionId=MARS-001&filter=mobility", nil)
+		req.Header.Set("Origin", origin)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return resp
 	}
+	// CORS: the allowed origin is echoed back; any other origin gets no header
+	foreign := get("https://evil.example")
+	foreign.Body.Close()
+	if got := foreign.Header.Get("Access-Control-Allow-Origin"); got != "" {
+		t.Errorf("CORS for a foreign origin: %q, want none", got)
+	}
+	resp := get("http://localhost:5173")
 	defer resp.Body.Close()
 	if got := resp.Header.Get("Access-Control-Allow-Origin"); got != "http://localhost:5173" {
 		t.Errorf("CORS: %q", got)
@@ -109,7 +122,7 @@ func TestPreflightAndFilters(t *testing.T) {
 	}
 	defer resp.Body.Close()
 	var reps []map[string]any
-	if err := json.NewDecoder(resp.Body).Decode(&reps); err != nil || len(reps) != 4 {
+	if err := json.NewDecoder(resp.Body).Decode(&reps); err != nil || len(reps) != len(knn.MissionNames()) {
 		t.Fatalf("/api/filters: %v, %d missions", err, len(reps))
 	}
 }

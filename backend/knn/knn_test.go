@@ -42,7 +42,7 @@ func TestWeightsForErrors(t *testing.T) {
 	if _, err := WeightsFor("nope", FeatureNames()); !errors.Is(err, ErrUnknownFilter) {
 		t.Errorf("unknown filter: %v", err)
 	}
-	if _, err := WeightsFor("rover", append(FeatureNames(), "new_variable")); err == nil {
+	if _, err := WeightsFor("mobility", append(FeatureNames(), "new_variable")); err == nil {
 		t.Error("a dimension without a model must be an error, not a silent weight of 0")
 	}
 }
@@ -204,7 +204,7 @@ func TestPrepareNormalizesWithMissing(t *testing.T) {
 			}
 		}
 	}
-	w, _ := WeightsFor("rover", FeatureNames())
+	w, _ := WeightsFor("environmental_survival", FeatureNames())
 	ms, err := FindMostSimilar(target, pool, w, 2)
 	if err != nil {
 		t.Fatal(err)

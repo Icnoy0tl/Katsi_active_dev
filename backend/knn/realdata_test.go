@@ -142,9 +142,9 @@ func TestRealDataExtrapolation(t *testing.T) {
 			sort.Strings(names)
 			t.Logf("%-8s %-9s %3.0f%% without analog: %v", c.region.RegionId, f, 100*ex.Weight, names)
 			switch {
-			case c.region.RegionId == "MARS-001" && f == "rover" && ex.Weight > 0.05:
-				t.Errorf("Jezero/rover: expected almost no weight out of range, got %.0f%%", 100*ex.Weight)
-			case c.planet == "moon" && (f == "edl" || f == "habitat") && ex.Weight < 0.45:
+			case c.region.RegionId == "MARS-001" && f == "mobility" && ex.Weight > 0.05:
+				t.Errorf("Jezero/mobility: expected almost no weight out of range, got %.0f%%", 100*ex.Weight)
+			case c.planet == "moon" && f == "environmental_survival" && ex.Weight < 0.45:
 				t.Errorf("%s/%s: expected > 45%% out of range, got %.0f%%", c.region.RegionId, f, 100*ex.Weight)
 			}
 		}
@@ -202,9 +202,9 @@ func TestGapInvarianceOutOfRange(t *testing.T) {
 			}
 		}
 	}
-	w, _ := WeightsFor("edl", FeatureNames())
+	w, _ := WeightsFor("environmental_survival", FeatureNames())
 	ex, _ := CheckExtrapolation(far, earth, w)
 	if !ex.Dominant {
-		t.Error("Mare Tranquillitatis/edl must flag dominant extrapolation")
+		t.Error("Mare Tranquillitatis/environmental_survival must flag dominant extrapolation")
 	}
 }

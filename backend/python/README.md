@@ -12,7 +12,7 @@ The program maps variables across 7 categories, where each variable defines its 
 
 ## What the Scripts Do
 
-The codebase implements and rigorously tests a formal framework for calculating dynamic, unbiased weights for variables (such as terrain features, environmental parameters, and operational constraints) across different mission types (e.g., rover, EDL, habitat, water/bio research) without relying on specific regional data values[cite: 2, 3].
+The codebase implements and rigorously tests a formal framework for calculating dynamic, unbiased weights for variables (such as terrain features, environmental parameters, and operational constraints) across different mission types (e.g., mobility, perception, environmental survival) without relying on specific regional data values[cite: 2, 3].
 
 The calculation pipeline consists of three fundamental mathematical steps:
 
@@ -29,7 +29,7 @@ The calculation pipeline consists of three fundamental mathematical steps:
 
 ## What the Scripts Do
 
-The codebase implements and rigorously tests a formal framework for calculating dynamic, unbiased weights for variables (such as terrain features, environmental parameters, and operational constraints) across different mission types (e.g., rover, EDL, habitat, water/bio research) without relying on specific regional data values
+The codebase implements and rigorously tests a formal framework for calculating dynamic, unbiased weights for variables (such as terrain features, environmental parameters, and operational constraints) across different mission types (e.g., mobility, perception, environmental survival) without relying on specific regional data values
 
 The calculation pipeline consists of three fundamental mathematical steps:
 

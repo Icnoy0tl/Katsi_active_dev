@@ -15,6 +15,9 @@ type Coordinates struct {
 	Longitude float64 `json:"longitude"`
 }
 
+// Variables as *float64: a field missing (or null) in the JSON stays nil and KNN treats it as
+// missing data (weight renormalized over the observed ones, see knn.WeightedDistance)
+// instead of a fake 0.
 // Every variable is *float64: JSON null (or a missing key) means "no data" and stays nil,
 // instead of silently becoming 0. knn turns nil into NaN and treats it as missing (coverage).
 type CoreVariables struct {
@@ -161,6 +164,21 @@ func (p *Parser) GetRegion(planet, regionID string) (PlanetInformation, error) {
 	return PlanetInformation{}, ErrRegionNotFound
 }
 
+// GetPlanetRegions returns every region of the Moon or Mars (the planet is sanitized).
+func (p *Parser) GetPlanetRegions(planet string) (PlanetInformation, error) {
+	planet, err := SanitizePlanet(planet)
+	if err != nil {
+		return PlanetInformation{}, err
+	}
+	regions, err := p.readFile(planetFiles[planet])
+	if err != nil {
+		return PlanetInformation{}, err
+	}
+	return PlanetInformation{Planet: planet, Regions: regions}, nil
+}
+
+// GetEarthRegions returns the whole planet region pool to procces using knn
+//TODO maybe if needed we can just make this one a generic function to get the information of a whole planet 
 // GetRegions returns every built-in region of a body: "moon", "mars" or "earth".
 func (p *Parser) GetRegions(planet string) ([]Region, error) {
 	planet = strings.ToLower(strings.TrimSpace(planet))

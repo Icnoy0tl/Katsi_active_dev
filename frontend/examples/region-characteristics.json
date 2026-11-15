@@ -1,0 +1,62 @@
+{
+  "planet": "mars",
+  "regions": [
+    {
+      "regionId": "USER-MARS-01",
+      "name": "Arcadia Planitia ice-rich plains",
+      "coordinates": { "latitude": 46.2, "longitude": 192.5 },
+      "coreVariables": {
+        "slope": 2.0,
+        "radar_roughness": 0.35,
+        "apparent_thermal_inertia": 250,
+        "soil_moisture": 0.02,
+        "visual_texture": 0.3,
+        "low_sun_shadows": 15,
+        "line_of_sight": 85,
+        "diurnal_thermal_range": 75,
+        "dust_aerosols": 0.4,
+        "insolation": 110
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 6,
+        "grain_size_um": 150,
+        "angle_of_repose_deg": 32,
+        "depth_to_bedrock_min_m": 2,
+        "depth_to_bedrock_max_m": 10,
+        "vrm_microrelief": 0.01,
+        "dielectric_constant": 3.5,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.2,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.75,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 22,
+        "abrasive_mohs": 5.5,
+        "ground_ice_index": 0.8
+      }
+    },
+    {
+      "regionId": "USER-MOON-01",
+      "name": "Hypothetical south-pole ridge (partial data)",
+      "coordinates": { "latitude": -88.5, "longitude": 45.0 },
+      "coreVariables": {
+        "slope": 9.0,
+        "radar_roughness": 0.5,
+        "apparent_thermal_inertia": 55,
+        "soil_moisture": 0.0,
+        "low_sun_shadows": 60,
+        "diurnal_thermal_range": 150,
+        "dust_aerosols": 0.0,
+        "insolation": 30
+      },
+      "auditVariables": {
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "abrasive_mohs": 6.0
+      }
+    }
+  ]
+}

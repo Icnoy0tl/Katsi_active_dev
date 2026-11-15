@@ -68,13 +68,15 @@ VARIABLE_TYPES = {
 }
 
 # MISSIONS[k] = demand profile d_k: how much the mission "needs" of each category.
-# Example rover: 35% soil mechanics (not getting stuck), 30% geometry (slope, rocks)...
+# Example mobility: 45% soil mechanics (not getting stuck), 35% geometry (slope, rocks)...
 # It's enough that it's >= 0 with sum > 0 (normalized automatically).
 MISSIONS = {
-    "rover":    {"GEO": .30, "MEC": .35, "VOL": .20, "NAV": .10, "ENE": .05},
-    "edl":      {"GEO": .35, "ATM": .35, "NAV": .10, "MEC": .10, "ENE": .05, "TER": .05},
-    "habitat":  {"TER": .20, "ENE": .20, "ATM": .15, "MEC": .15, "VOL": .15, "GEO": .10, "NAV": .05},
-    "agua_bio": {"VOL": .50, "MEC": .20, "TER": .15, "GEO": .10, "ENE": .05},
+    # traversing the terrain: slope, rocks, soil bearing and traction
+    "mobility":               {"MEC": .45, "GEO": .35, "NAV": .10, "ENE": .05, "ATM": .05},
+    # seeing and localizing: line of sight, texture, shadows, illumination, dust
+    "perception":             {"NAV": .45, "GEO": .25, "ENE": .20, "ATM": .10},
+    # staying alive: thermal cycle, energy, pressure/wind, local resources
+    "environmental_survival": {"TER": .30, "ENE": .25, "ATM": .25, "VOL": .15, "MEC": .05},
 }
 
 # Numerical constants
@@ -216,10 +218,10 @@ def factors(profile, variable_types=VARIABLE_TYPES, cats=CATEGORIES):
     Returns dict with beta, effective_n, target_n, angle_deg, flags and, per variable:
         affinity r_j, factor f_j (mean 1), weight w_j (sum 1).
 
-    Example (mission 'rover', n=25 variables, C=7 categories):
-        r['grain_size_um']  = 1.0*0.35           = 0.350   (pure MEC type; rover demands MEC .35)
+    Example (mission 'mobility', n=25 variables, C=7 categories):
+        r['grain_size_um']  = 1.0*0.35           = 0.350   (pure MEC type; mobility demands MEC .45)
         r['soil_moisture']  = .5*.35 + .5*.20    = 0.275
-        r['wind_gust_ms']   = 1.0*0.0            = 0.000   (rover does not demand ATM)
+        r['wind_gust_ms']   = 1.0*0.0            = 0.000   (mobility demands ATM .05)
         N*  = 24*exp(H(d))/7 = 14.34  ->  beta = 11.0
         factor f = n*w:  grain 2.84 (goes up), soil_moisture 1.25 (goes up), wind_gust 0.06 (goes down)
     """
