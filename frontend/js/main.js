@@ -130,7 +130,7 @@ function setMissionButtons(inMission) {
 let missionBodyName = null; // cuerpo de la misión abierta ('moon' | 'mars')
 let selectedRegionId = null; // misión mostrada en el holograma
 let analogRegionId = null; // análogo terrestre elegido entre los más parecidos
-let isRotating = true; // los cuerpos giran hasta que se abre una misión
+let isRotating = true; // los cuerpos giran salvo con una misión abierta
 
 // Tierra en miniatura bajo el cuerpo durante la vista de misión (su tamaño depende del cuerpo)
 const earthMini = createEarthMiniature({ earth, radius: MOON.missionView.earth.radius });
@@ -153,6 +153,7 @@ function setAnalysisMode(active, keepVisible = null) {
 function closeMission() {
   if (!selectedRegionId) return;
   setAnalysisMode(false);
+  isRotating = true;
   missionBodies[missionBodyName].markers.showOnly(null);
   missionBodyName = null;
   selectedRegionId = null;
@@ -315,9 +316,9 @@ function goToMission(region) {
   if (!mission) return;
   const view = mission.config.missionView;
 
-  // Se pausa la rotación para que el área no se escape del haz
-  isRotating = false;
   focusBody(name); // cierra la misión anterior; la nueva se abre después
+  // Se pausa la rotación para que el área no se escape del haz (closeMission la reanuda)
+  isRotating = false;
   missionsPanel.hide();
 
   missionBodyName = name;
