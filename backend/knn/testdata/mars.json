@@ -1,0 +1,118 @@
+{
+  "regions": [
+    {
+      "regionId": "MARS-001",
+      "name": "Jezero Crater (Perseverance)",
+      "coordinates": {
+        "latitude": 18.44,
+        "longitude": 77.45
+      },
+      "coreVariables": {
+        "slope": 4.0,
+        "radar_roughness": 0.5,
+        "apparent_thermal_inertia": 380,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.55,
+        "low_sun_shadows": 20,
+        "line_of_sight": 55,
+        "diurnal_thermal_range": 90,
+        "dust_aerosols": 0.5,
+        "insolation": 125
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 12,
+        "grain_size_um": 200,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 3,
+        "vrm_microrelief": 0.02,
+        "dielectric_constant": 6.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.15,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.806,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 20,
+        "abrasive_mohs": 6.5,
+        "ground_ice_index": 0
+      }
+    },
+    {
+      "regionId": "MARS-002",
+      "name": "Gale Crater - Aeolis Mons base (Curiosity)",
+      "coordinates": {
+        "latitude": -4.59,
+        "longitude": 137.44
+      },
+      "coreVariables": {
+        "slope": 4.0,
+        "radar_roughness": 0.55,
+        "apparent_thermal_inertia": 340,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.6,
+        "low_sun_shadows": 25,
+        "line_of_sight": 45,
+        "diurnal_thermal_range": 80,
+        "dust_aerosols": 0.5,
+        "insolation": 140
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 10,
+        "grain_size_um": 150,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 2,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 5.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.16,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.958,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 15,
+        "abrasive_mohs": 6.0,
+        "ground_ice_index": 0
+      }
+    },
+    {
+      "regionId": "MARS-003",
+      "name": "Arcadia Planitia",
+      "coordinates": {
+        "latitude": 47.0,
+        "longitude": -176.0
+      },
+      "coreVariables": {
+        "slope": 1.5,
+        "radar_roughness": 0.3,
+        "apparent_thermal_inertia": 250,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.25,
+        "low_sun_shadows": 6,
+        "line_of_sight": 85,
+        "diurnal_thermal_range": 70,
+        "dust_aerosols": 0.4,
+        "insolation": 85
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 5,
+        "grain_size_um": 10,
+        "angle_of_repose_deg": 30,
+        "depth_to_bedrock_min_m": null,
+        "depth_to_bedrock_max_m": null,
+        "vrm_microrelief": 0.003,
+        "dielectric_constant": 3.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.27,
+        "albedo": 0.26,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.874,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 15,
+        "abrasive_mohs": 5.5,
+        "ground_ice_index": 1
+      }
+    }
+  ]
+}
