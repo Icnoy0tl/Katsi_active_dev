@@ -170,10 +170,7 @@ export const MENU = {
     stops: [
       { body: 'orion', hold: 5 },
       { body: 'moon', hold: 5, distanceScale: 0.8 },
-      { body: 'mars', hold: 5, distanceScale: 0.8 },
-      { body: 'rover', hold: 5 },
-      { body: 'antenna', hold: 5 },
-      { body: 'solarPanel', hold: 5 }
+      { body: 'mars', hold: 5, distanceScale: 0.8 }
     ],
     driftSpeed: 0.012 // rad/s (≈ 0.7°/s) de giro alrededor del cuerpo
   }
