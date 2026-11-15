@@ -1,5 +1,5 @@
-// analogaudit: corre todas las regiones de Marte y la Luna contra todos los
-// filtros y explica cada top-1 (qué variables pesan más en la distancia).
+// analogaudit: runs all regions of Mars and the Moon against all
+// filters and explains each top-1 (which variables weigh the most in distance).
 //
 //	go run ./tools/analogaudit -data data
 package main
