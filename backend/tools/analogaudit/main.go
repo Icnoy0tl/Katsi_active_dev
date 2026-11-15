@@ -51,7 +51,7 @@ func main() {
 				}
 				label := f
 				if label == "" {
-					label = "(parejo)"
+					label = "(uniform)"
 				}
 				// Contribution by var
 				var top1 knn.Candidate

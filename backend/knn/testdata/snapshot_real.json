@@ -1,5 +1,5 @@
 {
- "MARS-001/(parejo)": [
+ "MARS-001/(uniform)": [
   "EARTH-003",
   "EARTH-004",
   "EARTH-005"
@@ -24,7 +24,7 @@
   "EARTH-004",
   "EARTH-003"
  ],
- "MARS-002/(parejo)": [
+ "MARS-002/(uniform)": [
   "EARTH-005",
   "EARTH-003",
   "EARTH-004"
@@ -49,7 +49,7 @@
   "EARTH-003",
   "EARTH-004"
  ],
- "MARS-003/(parejo)": [
+ "MARS-003/(uniform)": [
   "EARTH-001",
   "EARTH-002",
   "EARTH-005"
@@ -74,7 +74,7 @@
   "EARTH-002",
   "EARTH-005"
  ],
- "MOON-001/(parejo)": [
+ "MOON-001/(uniform)": [
   "EARTH-005",
   "EARTH-006",
   "EARTH-003"
@@ -99,7 +99,7 @@
   "EARTH-006",
   "EARTH-003"
  ],
- "MOON-002/(parejo)": [
+ "MOON-002/(uniform)": [
   "EARTH-001",
   "EARTH-005",
   "EARTH-003"
@@ -124,7 +124,7 @@
   "EARTH-005",
   "EARTH-002"
  ],
- "MOON-003/(parejo)": [
+ "MOON-003/(uniform)": [
   "EARTH-005",
   "EARTH-003",
   "EARTH-001"
