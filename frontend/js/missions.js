@@ -129,7 +129,7 @@ export function setupMissionsPanel({ onSelect, onFilterChange, onRetry, onPrevie
       items = regions.map((region) => ({ region }));
       html = items.map(regionCard).join('');
     } else if (failed) {
-      html = messageCard({ title: 'Mission ranking unavailable', meta: 'The analogs service did not respond · Retry', retry: true });
+      html = messageCard({ title: 'Mission ranking unavailable', meta: 'Free server may be waking up · Retry', retry: true });
       status.textContent = 'Mission ranking unavailable.';
     } else if (!ranked) {
       html = Array.from({ length: SKELETON_CARDS }, (_, i) => skeletonCard(i)).join('');

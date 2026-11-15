@@ -162,22 +162,49 @@ func isLocalOrigin(origin string) bool {
 	return host == "localhost" || host == "127.0.0.1"
 }
 
-// cors: con ALLOWED_ORIGIN vacío se acepta cualquier origen local (desarrollo); si se define,
-// solo ese origen (producción en otro dominio).
 // GET /api/filters → pesos de cada misión (F1 afinidad, F2′ peso, N_ef, ángulo).
 func filtersHandler(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, knn.MissionReports())
 }
 
-func cors(allowedOrigin string, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origin := r.Header.Get("Origin")
-		if origin != "" && (origin == allowedOrigin || (allowedOrigin == "" && isLocalOrigin(origin))) {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
-			w.Header().Set("Vary", "Origin")
+// GET /api/health → 204 sin cuerpo. El front lo llama al cargar para despertar el servicio
+// (Render apaga el plan gratuito tras ~15 min sin tráfico y tarda 30–50 s en arrancar).
+func healthHandler(w http.ResponseWriter, _ *http.Request) {
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// defaultAllowedOrigins: el front publicado. ALLOWED_ORIGIN (lista separada por comas) lo reemplaza.
+const defaultAllowedOrigins = "https://katsi.onrender.com"
+
+// parseOrigins: "a, b/" → ["a", "b"] (sin espacios ni barra final, que el navegador nunca envía)
+func parseOrigins(list string) []string {
+	var origins []string
+	for _, o := range strings.Split(list, ",") {
+		if o = strings.TrimRight(strings.TrimSpace(o), "/"); o != "" {
+			origins = append(origins, o)
 		}
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	}
+	return origins
+}
+
+// cors: acepta los orígenes de la lista exacta y, para desarrollo, cualquier localhost/127.0.0.1.
+// La API no usa cookies ni credenciales, así que no se envía Allow-Credentials.
+// Max-Age guarda el preflight de POST /api/analog/custom (Chrome lo limita a 2 h).
+func cors(allowedOrigins []string, next http.Handler) http.Handler {
+	allowed := make(map[string]bool, len(allowedOrigins))
+	for _, o := range allowedOrigins {
+		allowed[o] = true
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		h := w.Header()
+		h.Add("Vary", "Origin") // la respuesta cambia según el origen: que ninguna caché la mezcle
+		origin := r.Header.Get("Origin")
+		if origin != "" && (allowed[origin] || isLocalOrigin(origin)) {
+			h.Set("Access-Control-Allow-Origin", origin)
+			h.Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+			h.Set("Access-Control-Allow-Headers", "Content-Type")
+			h.Set("Access-Control-Max-Age", "7200")
+		}
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return
@@ -189,7 +216,7 @@ func cors(allowedOrigin string, next http.Handler) http.Handler {
 func main() {
 	dataDir := envOr("DATA_DIR", "data") // relativo a donde corres el binario
 	addr := envOr("ADDR", ":8080")
-	origin := os.Getenv("ALLOWED_ORIGIN") // vacío = cualquier localhost
+	origins := parseOrigins(envOr("ALLOWED_ORIGIN", defaultAllowedOrigins))
 
 	parser, err := jsonParser.New(dataDir)
 	if err != nil {
@@ -202,14 +229,15 @@ func main() {
 	mux.HandleFunc("GET /api/regions", regionsHandler(parser))
 	mux.HandleFunc("POST /api/analog/custom", customAnalogHandler(parser))
 	mux.HandleFunc("GET /api/filters", filtersHandler)
+	mux.HandleFunc("GET /api/health", healthHandler)
 
 	srv := &http.Server{
 		Addr:              addr,
-		Handler:           cors(origin, mux),
+		Handler:           cors(origins, mux),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       10 * time.Second,
 		WriteTimeout:      10 * time.Second,
 	}
-	log.Printf("escuchando en %s (data: %s)", addr, dataDir)
+	log.Printf("escuchando en %s (data: %s, CORS: %v + localhost)", addr, dataDir, origins)
 	log.Fatal(srv.ListenAndServe())
 }

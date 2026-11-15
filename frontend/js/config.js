@@ -225,15 +225,26 @@ export const PHOTO_TEXTURES = {
 
 /**
  * Backend de análogos (`GET /api/analog`, en backend/main.go): es la única fuente de los análogos,
- * el front no los calcula. En local apunta al servidor de Go en el puerto 8080; en producción, a
- * `/api/analog` del mismo dominio (cambiar `url` si el backend se publica en otro).
+ * el front no los calcula. En local apunta al servidor de Go en el puerto 8080; en producción, al
+ * servicio de Render (otro dominio: su CORS solo acepta https://katsi.onrender.com y localhost).
  * Si la petición falla o tarda más de `timeoutMs`, el panel ofrece reintentar.
  */
 const IS_LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
-const API_BASE = IS_LOCAL ? 'http://localhost:8080' : '';
+const API_BASE = IS_LOCAL ? 'http://localhost:8080' : 'https://katsi-api.onrender.com';
 export const ANALOGS_API = {
   url: `${API_BASE}/api/analog`,
   timeoutMs: 8000
+};
+
+/**
+ * Despertar la API al cargar la página (`GET /api/health`, 204): en el plan gratuito de Render
+ * el servicio se apaga sin tráfico y tarda 30–50 s en arrancar. Las demás peticiones esperan a
+ * que termine (como mucho `timeoutMs`) antes de empezar a contar su propio timeout.
+ */
+export const API_WAKE = {
+  url: `${API_BASE}/api/health`,
+  timeoutMs: 60000,
+  slowMs: 4000 // a partir de aquí se avisa al usuario de que el servidor gratuito está arrancando
 };
 
 /** Terrenos de la Luna o Marte ordenados para una misión (`GET /api/regions`, en backend/regions.go) */

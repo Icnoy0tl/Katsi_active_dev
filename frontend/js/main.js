@@ -16,6 +16,7 @@ import { loadPhotoTextures } from './textures/photo.js';
 import { setupMainMenu } from './menu.js';
 import { createMenuTour } from './menuTour.js';
 import { setupApiPanel } from './apiPanel.js';
+import { setupApiNotice } from './apiNotice.js';
 import { setupMissionsPanel } from './missions.js';
 import { setupMissionInfo } from './missionInfo.js';
 import { createHologram } from './hologram.js';
@@ -126,6 +127,9 @@ function applyBodyRegions() {
 /** Id con el que se muestra en el sistema un terreno guardado (ver applyBodyRegions) */
 const systemRegionId = (savedId) =>
   [...savedByRegion].find(([, entry]) => entry.region.regionId === savedId)?.[0] ?? null;
+
+// Aviso flotante si la API (plan gratuito de Render) tarda en despertar o no responde
+setupApiNotice();
 
 // Vista API (satélite): panel derecho para soltar los JSON; desde él se va a un terreno guardado
 const apiPanel = setupApiPanel({

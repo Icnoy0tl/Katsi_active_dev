@@ -161,7 +161,7 @@ function errorCard() {
       <button type="button" class="menu-tag menu-tag--mission" data-retry>${missionCardContent({
         icon: RETRY_ICON,
         title: 'Earth analogs unavailable',
-        meta: 'The analogs service did not respond · Retry',
+        meta: 'Free server may be waking up · Retry',
         trailing: ''
       })}
       </button>

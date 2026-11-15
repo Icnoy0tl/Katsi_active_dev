@@ -1,4 +1,34 @@
-import { ANALOGS_API, CUSTOM_ANALOGS_API, REGIONS_API } from './config.js';
+import { ANALOGS_API, API_WAKE, CUSTOM_ANALOGS_API, REGIONS_API } from './config.js';
+
+/**
+ * Se lanza al importar el módulo, o sea, al cargar la página: si la API estaba dormida empieza a
+ * arrancar mientras el usuario ve el menú. Nunca falla (si no responde, cada petición falla sola
+ * con su timeout y el panel ofrece reintentar).
+ */
+const apiAwake = fetch(API_WAKE.url, { signal: AbortSignal.timeout(API_WAKE.timeoutMs) }).catch(() => {});
+
+/** Estado de la API para el aviso al usuario (apiNotice.js): 'slow' | 'failed' | 'ok' */
+const notify = (state) => window.dispatchEvent(new CustomEvent('katsi:api', { detail: state }));
+
+/**
+ * fetch que espera a que la API esté despierta antes de empezar a contar `timeoutMs`. Si tarda
+ * más de `API_WAKE.slowMs` avisa de que el servidor gratuito está arrancando; si no responde o
+ * responde 5xx (Render devuelve 502/503 mientras arranca), avisa para que se reintente.
+ */
+async function apiFetch(url, timeoutMs, options = {}) {
+  const slowTimer = setTimeout(() => notify('slow'), API_WAKE.slowMs);
+  try {
+    await apiAwake;
+    const response = await fetch(url, { ...options, signal: AbortSignal.timeout(timeoutMs) });
+    notify(response.status >= 500 ? 'failed' : 'ok');
+    return response;
+  } catch (error) {
+    notify('failed');
+    throw error;
+  } finally {
+    clearTimeout(slowTimer);
+  }
+}
 
 /**
  * Respuestas ya recibidas por URL: los datos del backend son estáticos, así que volver a un
@@ -9,7 +39,7 @@ const responseCache = new Map();
 
 function getJSON(url, timeoutMs) {
   if (!responseCache.has(url)) {
-    const request = fetch(url, { signal: AbortSignal.timeout(timeoutMs) }).then((response) => {
+    const request = apiFetch(url, timeoutMs).then((response) => {
       if (!response.ok) throw new Error(`Analogs API: HTTP ${response.status}`);
       return response.json();
     });
@@ -68,11 +98,10 @@ export async function fetchClosestAnalogs(regionId, planet, earthRegions, filter
  * @returns { mission, results: [{ selectedRegion, matches, extrapolation, dataCoverage }] }
  */
 export async function fetchCustomAnalogs(characteristics, mission) {
-  const response = await fetch(CUSTOM_ANALOGS_API.url, {
+  const response = await apiFetch(CUSTOM_ANALOGS_API.url, CUSTOM_ANALOGS_API.timeoutMs, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ characteristics, mission }),
-    signal: AbortSignal.timeout(CUSTOM_ANALOGS_API.timeoutMs)
+    body: JSON.stringify({ characteristics, mission })
   });
   const payload = await response.json().catch(() => null);
   if (!response.ok) {
