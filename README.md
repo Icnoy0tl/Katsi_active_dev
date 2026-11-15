@@ -235,7 +235,7 @@ index.html
 
 ## Use of AI
 
-We used Claude (Anthropic) to help write and review the Go backend, develop the weighting mathematics and its tests, organize the region catalogs, draft the initial data values as estimates, verify them against published sources, write the data-extraction tools, and draft the documentation. The AI is not the source of any confirmed value: those come from the publications cited in the catalog. The team reviewed and ran all code and is responsible for the content. Details and prompts are in Section 10 of the documentation.
+We used Claude (Anthropic) to help write and review the Go backend, develop the weighting mathematics and its tests, organize the region catalogs, draft the initial data values as estimates, verify them against published sources, write the data-extraction tools, and draft the documentation. The AI is not the source of any confirmed value: those come from the publications cited in the catalog. The team reviewed and ran all code and is responsible for the content. Details and prompts are in Section 10 of the documentation...
 
 ## References (selection)
 
