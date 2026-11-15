@@ -18,12 +18,6 @@ const missionCard = ({ id, card, title, showcase }, index) => `<li class="menu-e
     })}</button>
   </li>`;
 
-/** Paso 2: misión elegida sobre los terrenos; al pulsarla se vuelve a elegir misión */
-const chosenMission = (filter) => {
-  const { label } = MISSION_FILTERS.find((f) => f.id === filter);
-  return `<button type="button" class="mission-filter-option" data-change aria-pressed="true" title="Choose another mission">‹ ${filter ? label : 'Free'} mission · change</button>`;
-};
-
 /** Anillo con la similitud del mejor análogo terrestre del terreno para la misión */
 const scoreRing = (score) => {
   const percent = Math.round(score * 100);
@@ -67,8 +61,8 @@ const messageCard = ({ title, meta, retry }) => `<li class="menu-enter" style="-
  * 1. Tarjetas de misión (MISSION_FILTERS); al pasar por una se muestra su objeto (`onPreview`).
  * 2. Terrenos (regiones) del cuerpo para la misión elegida. En la misión libre se listan todos
  *    los del JSON; con otra, el backend calcula cuáles sirven y en qué orden (`setRanking`), y
- *    cada tarjeta muestra la similitud de su mejor análogo terrestre. Encima, la misión elegida
- *    permite volver al paso 1.
+ *    cada tarjeta muestra la similitud de su mejor análogo terrestre. Se vuelve al paso 1 con el
+ *    botón «Back to missions» (`chooseMission`).
  *
  * @param onSelect(region) se llama al pulsar un terreno
  * @param onFilterChange(filter) se llama al elegir misión (o al volver al paso 1, con ''): con una
@@ -78,17 +72,18 @@ const messageCard = ({ title, meta, retry }) => `<li class="menu-enter" style="-
  *        ('body' | 'rover' | 'antenna' | 'solarPanel' | null; ver MISSION_FILTERS)
  * @param onChoosingChange(choosing) se llama al entrar (true) o salir (false) del paso 1 con el
  *        panel visible: mientras se elige misión solo se ven el objeto y el espacio
- * @returns { show(regions), hide(), reset(), setRanking(ranked), setRankingError(), filter }
+ * @param onStepChange(step) se llama al cambiar el paso visible: 'mission' (paso 1), 'terrains'
+ *        (paso 2) o null (panel oculto)
+ * @returns { show(regions), hide(), reset(), chooseMission(), setRanking(ranked), setRankingError(), filter }
  *          `regions`: del JSON ({ regionId, name, coordinates });
  *          `ranked`: [{ region, score, bestAnalog }] de mejor a peor
  */
-export function setupMissionsPanel({ onSelect, onFilterChange, onRetry, onPreview, onChoosingChange }) {
+export function setupMissionsPanel({ onSelect, onFilterChange, onRetry, onPreview, onChoosingChange, onStepChange }) {
   const panel = $('missions-panel');
   const backdrop = $('missions-backdrop');
   const list = $('missions-list');
   const count = $('missions-count');
   const heading = $('missions-heading');
-  const filters = $('missions-filter');
   const status = $('missions-status');
   const updateScrollEnd = setupScrollFade(panel);
 
@@ -100,8 +95,14 @@ export function setupMissionsPanel({ onSelect, onFilterChange, onRetry, onPrevie
 
   let visible = false;
   let choosingShown = false; // último estado avisado con onChoosingChange
+  let stepShown = null; // último paso avisado con onStepChange
   const syncChoosing = () => {
-    const choosing = visible && filter === null;
+    const step = !visible ? null : filter === null ? 'mission' : 'terrains';
+    if (step !== stepShown) {
+      stepShown = step;
+      onStepChange?.(step);
+    }
+    const choosing = step === 'mission';
     if (choosing === choosingShown) return;
     choosingShown = choosing;
     onChoosingChange?.(choosing);
@@ -120,8 +121,6 @@ export function setupMissionsPanel({ onSelect, onFilterChange, onRetry, onPrevie
     items = [];
     const choosing = filter === null;
     heading.textContent = choosing ? 'Choose a mission' : 'Available terrains';
-    filters.innerHTML = choosing ? '' : chosenMission(filter);
-    filters.hidden = choosing;
     list.setAttribute('aria-label', choosing ? 'Missions: pick one to see its terrains' : 'Terrains: pick one to see its Earth analogs');
     if (choosing) {
       total = MISSION_FILTERS.length;
@@ -161,10 +160,6 @@ export function setupMissionsPanel({ onSelect, onFilterChange, onRetry, onPrevie
     render();
     onFilterChange?.(filter ?? '');
   }
-
-  filters.addEventListener('click', (event) => {
-    if (event.target.closest('button[data-change]')) setFilter(null);
-  });
 
   // Objeto de la misión bajo el puntero o con el foco; se recoge al salir de la lista
   const showcaseOf = (target) => {
@@ -213,6 +208,10 @@ export function setupMissionsPanel({ onSelect, onFilterChange, onRetry, onPrevie
     /** Perfil de misión elegido ('' = misión libre o aún sin elegir) */
     get filter() {
       return filter ?? '';
+    },
+    /** Vuelve al paso 1 desde los terrenos (botón «Back to missions») */
+    chooseMission() {
+      setFilter(null);
     },
     /** Vuelve al paso 1 (elegir misión), p. ej. al llegar desde el menú principal */
     reset() {

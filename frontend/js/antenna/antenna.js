@@ -27,12 +27,24 @@ export function createAntenna({ renderer, anisotropy }) {
   }
 
   let elapsed = 0;
+  let held = false; // en el plano de misión: reflector quieto, para que siga de frente
+
+  /** Pausa (true) el barrido con el reflector en su posición base, o lo reanuda */
+  function hold(on) {
+    held = on;
+    if (on) {
+      alidade.rotation.y = 0;
+      elevation.rotation.x = Math.PI / 2 - ANTENNA.elevation;
+    }
+  }
+
   function update(delta) {
+    if (held) return;
     elapsed += delta;
     alidade.rotation.y = Math.sin(elapsed * ANTENNA.scanSpeed) * ANTENNA.azimuthSweep;
     elevation.rotation.x = Math.PI / 2 - ANTENNA.elevation + Math.sin(elapsed * ANTENNA.scanSpeed * 1.3) * ANTENNA.elevationSweep;
   }
   update(0);
 
-  return { group: root, model, placeAt, update };
+  return { group: root, model, placeAt, hold, update };
 }

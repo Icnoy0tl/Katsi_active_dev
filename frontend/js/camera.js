@@ -18,16 +18,13 @@ function sideView(elevation, distance) {
   };
 }
 
-const orbitCenter = new THREE.Vector3();
-
 /**
- * Vista de una nave en órbita baja: desde fuera de la órbita (`outwardDistance` alejándose del
- * cuerpo que orbita, `sideDistance` de costado y `lift` hacia arriba), con ese cuerpo de fondo.
- * `centerOf(out)` da el centro del cuerpo orbitado (la Tierra, en el origen, si no se indica).
+ * Vista de una nave en órbita baja: desde fuera de la órbita (`outwardDistance` alejándose de la
+ * Tierra, `sideDistance` de costado y `lift` hacia arriba), con la Tierra de fondo
  */
-function orbitView(outwardDistance, sideDistance, lift, centerOf) {
+function orbitView(outwardDistance, sideDistance, lift) {
   return (target, out) => {
-    outward.copy(target).sub(centerOf ? centerOf(orbitCenter) : orbitCenter.set(0, 0, 0)).normalize();
+    outward.copy(target).normalize();
     side.set(-outward.z, 0, outward.x).normalize();
     out.copy(target).addScaledVector(outward, outwardDistance).addScaledVector(side, sideDistance);
     out.y += lift;
@@ -39,7 +36,7 @@ function orbitView(outwardDistance, sideDistance, lift, centerOf) {
  * Destinos de cámara. `zoom` limita el acercamiento/alejamiento (nunca lo suficiente para ver
  * todo el sistema) y `near` es el plano cercano de la cámara.
  */
-function createFocusViews(bodies, orbitCenterOf) {
+function createFocusViews(bodies) {
   return {
     earth: {
       object: bodies.earth,
@@ -73,19 +70,19 @@ function createFocusViews(bodies, orbitCenterOf) {
     },
     rover: {
       object: bodies.rover,
-      cameraPosition: orbitView(0.3, 0.22, 0.1, (out) => orbitCenterOf(out)),
+      cameraPosition: orbitView(0.3, 0.22, 0.1),
       zoom: [0.08, 3.0],
       near: 0.005
     },
     antenna: {
       object: bodies.antenna,
-      cameraPosition: orbitView(0.45, 0.25, 0.12, (out) => orbitCenterOf(out)),
+      cameraPosition: orbitView(0.45, 0.25, 0.12),
       zoom: [0.12, 3.0],
       near: 0.01
     },
     solarPanel: {
       object: bodies.solarPanel,
-      cameraPosition: orbitView(0.45, -0.3, 0.15, (out) => orbitCenterOf(out)),
+      cameraPosition: orbitView(0.45, -0.3, 0.15),
       zoom: [0.12, 3.0],
       near: 0.01
     }
@@ -98,11 +95,9 @@ function createFocusViews(bodies, orbitCenterOf) {
  *
  * @param bodies    objetos a enfocar: { earth, moon, mars, satellite, orion }
  * @param obstacles esferas que el vuelo no atraviesa: [{ object, safeRadius }]
- * @param missionOrbitCenter(out) centro del cuerpo que orbitan el rover, la antena y el panel
- *        (por defecto la Tierra, en el origen)
  */
-export function createCameraNavigator({ camera, controls, bodies, obstacles, missionOrbitCenter = (out) => out.set(0, 0, 0) }) {
-  const views = createFocusViews(bodies, missionOrbitCenter);
+export function createCameraNavigator({ camera, controls, bodies, obstacles }) {
+  const views = createFocusViews(bodies);
   const flight = {
     active: false,
     t: 0,
@@ -149,15 +144,28 @@ export function createCameraNavigator({ camera, controls, bodies, obstacles, mis
     const view = views[name];
     currentFocus = name;
 
-    camera.near = view.near;
-    camera.updateProjectionMatrix();
-
     view.object.getWorldPosition(flight.toTarget);
     view.cameraPosition(flight.toTarget, flight.toCamera);
     if (distanceScale !== 1) {
       flight.toCamera.sub(flight.toTarget).multiplyScalar(distanceScale).add(flight.toTarget);
     }
-    flight.zoom = view.zoom;
+    startFlight(view.zoom, view.near, instant);
+  }
+
+  /**
+   * Vuela hasta una pose concreta (cámara en `position` mirando a `target`) sin cambiar el
+   * cuerpo enfocado (`currentFocus`): planos de presentación sobre un cuerpo
+   */
+  function focusPose(position, target, zoom, near) {
+    flight.toCamera.copy(position);
+    flight.toTarget.copy(target);
+    startFlight(zoom, near, false);
+  }
+
+  function startFlight(zoom, near, instant) {
+    camera.near = near;
+    camera.updateProjectionMatrix();
+    flight.zoom = zoom;
 
     if (instant) {
       camera.position.copy(flight.toCamera);
@@ -229,6 +237,7 @@ export function createCameraNavigator({ camera, controls, bodies, obstacles, mis
 
   return {
     focus,
+    focusPose,
     focusFrom,
     update,
     get isFlying() {

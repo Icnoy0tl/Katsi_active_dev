@@ -29,11 +29,20 @@ export function createSolarPanel({ renderer, anisotropy }) {
   const parentQuaternionInverse = new THREE.Quaternion();
   const localLight = new THREE.Vector3();
 
+  let held = false; // en el plano de misión: celdas de frente, sin seguir la luz
+
+  /** Fija (true) las celdas mirando a +Z del modelo, o vuelve a seguir la luz */
+  function hold(on) {
+    held = on;
+    if (on) array.rotation.x = 0;
+  }
+
   function update(delta, lightDirection) {
+    if (held) return;
     array.parent.getWorldQuaternion(parentQuaternionInverse).invert();
     localLight.copy(lightDirection).applyQuaternion(parentQuaternionInverse);
     turnTowardsLight(array, localLight, 1 - Math.exp(-SOLAR_TRACKING_RATE * delta));
   }
 
-  return { group: root, model, placeAt, update };
+  return { group: root, model, placeAt, hold, update };
 }
