@@ -7,49 +7,57 @@ import (
 	"spaceapps/jsonParser"
 )
 
-// feature es una dimensión del vector que compara el KNN.
+// feature is a dimension of the vector compared by KNN.
 //
-// MuVar es la variable del modelo de pesos (tabla Mu en mission.go) a la que
-// pertenece la dimensión, y Share la fracción del peso de esa variable que
-// recibe. Casi todas tienen Share = 1. La excepción es depth_to_bedrock: en Mu
-// es UNA variable (un intervalo [min, max]), pero en el JSON son dos números.
-// Cada extremo recibe la mitad del peso, y eso equivale a comparar el centro y
-// el semiancho del intervalo, cada uno con el peso completo:
+// MuVar is the weight model variable (Mu table in mission.go) to which
+// the dimension belongs, and Share is the fraction of that variable's weight that
+// it receives. Almost all have Share = 1. The exception is depth_to_bedrock: in Mu
+// it is ONE variable (an interval [min, max]), but in the JSON they are two numbers.
+// Each endpoint receives half of the weight, and that is equivalent to comparing the center and
+// the semi-width of the interval, each with full weight:
 //
-//	(Δmin² + Δmax²) / 2 = Δcentro² + Δsemiancho²
+//  (Δmin² + Δmax²) / 2 = Δcenter² + Δsemiwidth²
 //
-// (con centro = (min+max)/2 y semiancho = (max−min)/2; test en mission_test.go).
+// (with center = (min+max)/2 and semiwidth = (max−min)/2; test in mission_test.go).
+//
+// Group indicates which block of the JSON it comes from ("core" = coreVariables,
+// "audit" = auditVariables); the API exposes it for frontend grouping.
+
 type feature struct {
 	Name  string
+	Group string
 	MuVar string
 	Share float64
 	Get   func(r *jsonParser.Region) *float64
 }
 
-func one(name string, get func(r *jsonParser.Region) *float64) feature {
-	return feature{Name: name, MuVar: name, Share: 1, Get: get}
+func core(name string, get func(r *jsonParser.Region) *float64) feature {
+	return feature{Name: name, Group: "core", MuVar: name, Share: 1, Get: get}
 }
 
-// 10 core + 16 audit = 26 dimensiones = 25 variables del modelo de pesos.
+func one(name string, get func(r *jsonParser.Region) *float64) feature {
+	return feature{Name: name, Group: "audit", MuVar: name, Share: 1, Get: get}
+}
+
 var features = []feature{
 	// --- core
-	one("slope", func(r *jsonParser.Region) *float64 { return r.CoreVariables.Slope }),
-	one("radar_roughness", func(r *jsonParser.Region) *float64 { return r.CoreVariables.RadarRoughness }),
-	one("apparent_thermal_inertia", func(r *jsonParser.Region) *float64 { return r.CoreVariables.ApparentThermalInertia }),
-	one("soil_moisture", func(r *jsonParser.Region) *float64 { return r.CoreVariables.SoilMoisture }),
-	one("visual_texture", func(r *jsonParser.Region) *float64 { return r.CoreVariables.VisualTexture }),
-	one("low_sun_shadows", func(r *jsonParser.Region) *float64 { return r.CoreVariables.LowSunShadows }),
-	one("line_of_sight", func(r *jsonParser.Region) *float64 { return r.CoreVariables.LineOfSight }),
-	one("diurnal_thermal_range", func(r *jsonParser.Region) *float64 { return r.CoreVariables.DiurnalThermalRange }),
-	one("dust_aerosols", func(r *jsonParser.Region) *float64 { return r.CoreVariables.DustAerosols }),
-	one("insolation", func(r *jsonParser.Region) *float64 { return r.CoreVariables.Insolation }),
+	core("slope", func(r *jsonParser.Region) *float64 { return r.CoreVariables.Slope }),
+	core("radar_roughness", func(r *jsonParser.Region) *float64 { return r.CoreVariables.RadarRoughness }),
+	core("apparent_thermal_inertia", func(r *jsonParser.Region) *float64 { return r.CoreVariables.ApparentThermalInertia }),
+	core("soil_moisture", func(r *jsonParser.Region) *float64 { return r.CoreVariables.SoilMoisture }),
+	core("visual_texture", func(r *jsonParser.Region) *float64 { return r.CoreVariables.VisualTexture }),
+	core("low_sun_shadows", func(r *jsonParser.Region) *float64 { return r.CoreVariables.LowSunShadows }),
+	core("line_of_sight", func(r *jsonParser.Region) *float64 { return r.CoreVariables.LineOfSight }),
+	core("diurnal_thermal_range", func(r *jsonParser.Region) *float64 { return r.CoreVariables.DiurnalThermalRange }),
+	core("dust_aerosols", func(r *jsonParser.Region) *float64 { return r.CoreVariables.DustAerosols }),
+	core("insolation", func(r *jsonParser.Region) *float64 { return r.CoreVariables.Insolation }),
 	// --- audit
 	one("rock_abundance_pct", func(r *jsonParser.Region) *float64 { return r.AuditVariables.RockAbundancePct }),
 	one("grain_size_um", func(r *jsonParser.Region) *float64 { return r.AuditVariables.GrainSizeUm }),
 	one("angle_of_repose_deg", func(r *jsonParser.Region) *float64 { return r.AuditVariables.AngleOfReposeDeg }),
-	{Name: "depth_to_bedrock_min_m", MuVar: "depth_to_bedrock", Share: 0.5,
+	{Name: "depth_to_bedrock_min_m", Group: "audit", MuVar: "depth_to_bedrock", Share: 0.5,
 		Get: func(r *jsonParser.Region) *float64 { return r.AuditVariables.DepthToBedrockMinM }},
-	{Name: "depth_to_bedrock_max_m", MuVar: "depth_to_bedrock", Share: 0.5,
+	{Name: "depth_to_bedrock_max_m", Group: "audit", MuVar: "depth_to_bedrock", Share: 0.5,
 		Get: func(r *jsonParser.Region) *float64 { return r.AuditVariables.DepthToBedrockMaxM }},
 	one("vrm_microrelief", func(r *jsonParser.Region) *float64 { return r.AuditVariables.VrmMicrorelief }),
 	one("dielectric_constant", func(r *jsonParser.Region) *float64 { return r.AuditVariables.DielectricConstant }),
@@ -72,8 +80,6 @@ func FeatureNames() []string {
 	return names
 }
 
-// ToVector convierte una región en vector. Un dato ausente (null) queda como
-// NaN: la distancia lo omite y lo reporta en la cobertura (ver knn.go).
 func ToVector(r jsonParser.Region) (Vector, error) {
 	v := make(Vector, len(features))
 	for i, f := range features {
@@ -83,7 +89,7 @@ func ToVector(r jsonParser.Region) (Vector, error) {
 			continue
 		}
 		if math.IsNaN(*p) || math.IsInf(*p, 0) {
-			return nil, fmt.Errorf("valor inválido en %s", f.Name)
+			return nil, fmt.Errorf("Invalid value in %s", f.Name)
 		}
 		v[i] = *p
 	}
@@ -95,7 +101,7 @@ type Stats struct {
 	Max []float64
 }
 
-// ComputeStats calcula min y max por columna ignorando los datos ausentes.
+// ComputeStats computes min and max ignoreing empty columns
 func ComputeStats(vectors []Vector) Stats {
 	n := len(features)
 	stat := Stats{Min: make([]float64, n), Max: make([]float64, n)}
@@ -115,8 +121,7 @@ func ComputeStats(vectors []Vector) Stats {
 	return stat
 }
 
-// Apply normaliza min-max a [0, 1]. Los ausentes siguen como NaN. Una columna
-// constante (o sin datos) queda en 0 y no aporta distancia.
+// Normalize min-max a [0, 1]. 
 func (stat Stats) Apply(v Vector) Vector {
 	out := make(Vector, len(v))
 	for i, val := range v {
@@ -133,36 +138,43 @@ func (stat Stats) Apply(v Vector) Vector {
 	}
 	return out
 }
-
-// Prepare normaliza el objetivo y el catálogo terrestre.
+// Prepare normalizes the target and the terrestrial catalog.
 //
-// Proyección al rango terrestre. Si en una variable el objetivo cae fuera del
-// rango de todo el catálogo (p. ej. presión: Marte 0.8 kPa, Tierra 68–99.5),
-// ningún análogo puede acercarse más que el borde. Para x > max y un sitio e:
+// Projection to the terrestrial range. If for a variable the target falls outside the
+// range of the entire catalog (e.g., pressure: Mars 0.8 kPa, Earth 68–99.5),
+// no analog can get closer than the boundary. For x > max and a site e:
 //
-//	(x − e)² = (x − max)² + 2(x − max)(max − e) + (max − e)²
+//  (x − e)² = (x − max)² + 2(x − max)(max − e) + (max − e)²
 //
-// El 1.er término es igual para todos los sitios (no ordena nada) y el 2.º
-// amplifica las diferencias entre sitios en proporción a lo lejos que está el
-// objetivo. Solo el 3.º mide algo que un análogo terrestre puede reproducir.
-// Por eso el objetivo se proyecta a [min, max] de la Tierra antes de
-// normalizar: queda exactamente el 3.er término. Lo que ningún sitio cubre no
-// se pierde, se reporta aparte en CheckExtrapolation.
+// The 1st term is equal for all sites (it does not order anything) and the 2nd
+// amplifies the differences between sites in proportion to how far the target is.
+// Only the 3rd measures something that a terrestrial analog can reproduce.
+// Therefore, the target is projected to Earth's [min, max] before
+// normalizing: exactly the 3rd term remains. What no site covers is
+// not lost, it is reported separately in CheckExtrapolation.
 //
-// Como el objetivo proyectado siempre cae dentro del rango, las estadísticas
-// min-max salen solo del catálogo terrestre: el objetivo ya no comprime la
-// escala de la Tierra.
+// Since the projected target always falls within the range, the min-max
+// statistics come solely from the terrestrial catalog: the target no longer compresses
+// the Earth's scale
 func Prepare(target jsonParser.Region, earth []jsonParser.Region) (Candidate, []Candidate, error) {
+	t, pool, _, err := PrepareWithStats(target, earth)
+	return t, pool, err
+}
+
+// PrepareWithStats is Prepare and also returns the min-max statistics of the
+// terrestrial catalog, to be able to explain the comparison (breakdown.go) with
+// exactly the same scale used by the KNN.
+func PrepareWithStats(target jsonParser.Region, earth []jsonParser.Region) (Candidate, []Candidate, Stats, error) {
 	targetVec, err := ToVector(target)
 	if err != nil {
-		return Candidate{}, nil, fmt.Errorf("región %s: %w", target.RegionId, err)
+		return Candidate{}, nil, Stats{}, fmt.Errorf("región %s: %w", target.RegionId, err)
 	}
 
 	earthVecs := make([]Vector, len(earth))
 	for i, r := range earth {
 		v, err := ToVector(r)
 		if err != nil {
-			return Candidate{}, nil, fmt.Errorf("región tierra %s: %w", r.RegionId, err)
+			return Candidate{}, nil, Stats{}, fmt.Errorf("región tierra %s: %w", r.RegionId, err)
 		}
 		earthVecs[i] = v
 	}
@@ -173,11 +185,10 @@ func Prepare(target jsonParser.Region, earth []jsonParser.Region) (Candidate, []
 	for i, r := range earth {
 		pool[i] = Candidate{ID: r.RegionId, Name: r.Name, Vector: stats.Apply(earthVecs[i])}
 	}
-	return normTarget, pool, nil
+	return normTarget, pool, stats, nil
 }
 
-// Clamp proyecta cada valor al rango [Min, Max] (los ausentes siguen ausentes;
-// una columna sin datos en la Tierra no se toca).
+
 func (stat Stats) Clamp(v Vector) Vector {
 	out := make(Vector, len(v))
 	for i, x := range v {
@@ -192,34 +203,24 @@ func (stat Stats) Clamp(v Vector) Vector {
 	return out
 }
 
-// OutOfRangeVar: dimensión en la que el objetivo cae fuera del rango de TODO
-// el catálogo terrestre. Ningún análogo de la Tierra puede reproducir ese
-// aspecto; el KNN igual ordena, pero solo por "quién queda menos lejos".
 type OutOfRangeVar struct {
 	Name     string  `json:"name"`
 	Value    float64 `json:"value"`
 	EarthMin float64 `json:"earthMin"`
 	EarthMax float64 `json:"earthMax"`
-	Weight   float64 `json:"weight"` // peso de esta dimensión en el filtro
+	Weight   float64 `json:"weight"` 
 }
 
 type Extrapolation struct {
 	Variables []OutOfRangeVar `json:"variables"`
-	Weight    float64         `json:"weight"`   // fracción del peso total en variables sin análogo terrestre
-	Dominant  bool            `json:"dominant"` // Weight >= 0.5: más de la mitad de lo que pide la misión no existe en la Tierra
+	Weight    float64         `json:"weight"`   
+	Dominant  bool            `json:"dominant"` 
 }
 
-// OutOfRangeTolerance: margen relativo al rango terrestre antes de marcar una
-// variable (10 % del rango, para no marcar diferencias mínimas en el borde).
 const OutOfRangeTolerance = 0.10
 
-// DominantExtrapolation: a partir de esta fracción del peso sin análogo, el
-// resultado se compara con menos de la mitad de lo que la misión pide.
 const DominantExtrapolation = 0.5
 
-// CheckExtrapolation compara el objetivo con el rango crudo del catálogo
-// terrestre (sin incluir al objetivo) y reporta qué fracción del peso del
-// filtro cae en variables que la Tierra no cubre.
 func CheckExtrapolation(target jsonParser.Region, earth []jsonParser.Region, w Vector) (Extrapolation, error) {
 	tv, err := ToVector(target)
 	if err != nil {
@@ -245,7 +246,7 @@ func CheckExtrapolation(target jsonParser.Region, earth []jsonParser.Region, w V
 	for i, f := range features {
 		x, lo, hi := tv[i], st.Min[i], st.Max[i]
 		if math.IsNaN(x) || math.IsInf(lo, 0) || math.IsInf(hi, 0) {
-			continue // sin dato en el objetivo o en toda la Tierra
+			continue 
 		}
 		tol := OutOfRangeTolerance * (hi - lo)
 		if x < lo-tol || x > hi+tol {
