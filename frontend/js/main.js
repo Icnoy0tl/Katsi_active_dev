@@ -64,8 +64,12 @@ const solarPanel = createSolarPanel({ renderer, anisotropy });
 const antenna = createAntenna({ renderer, anisotropy });
 scene.add(starfield, earth.group, moon.group, mars.group, satellite.group, orion.group, rover.group, solarPanel.group, antenna.group);
 
+// Cuerpo que orbitan el rover, la antena y el panel (mesh de la Luna o Marte); null = la Tierra
+let missionOrbitMesh = null;
+
 // --- Navegación (arranca directamente en la Tierra, sin vista general) ---
 const cameraNavigator = createCameraNavigator({
+  missionOrbitCenter: (out) => (missionOrbitMesh ? missionOrbitMesh.getWorldPosition(out) : out.set(0, 0, 0)),
   camera,
   controls,
   bodies: { earth: earth.group, moon: moon.mesh, mars: mars.anchor, satellite: satellite.model, orion: orion.model, rover: rover.model, solarPanel: solarPanel.model, antenna: antenna.model },
@@ -248,11 +252,19 @@ function setAnalysisMode(active, keepVisible = null) {
 }
 
 /**
- * Elección del tipo de misión (paso 1 del panel): solo se ve lo que muestra la tarjeta bajo el
- * puntero, sobre el espacio. Al pasar a los terrenos vuelven a verse todos los cuerpos y, si la
- * cámara se quedó en un objeto de misión, vuela de vuelta al planeta.
+ * Elección del tipo de misión (paso 1 del panel): se ven el planeta y, en órbita a su alrededor,
+ * el rover, la antena y el panel solar; el resto de cuerpos se ocultan. Al pasar a los terrenos
+ * vuelven a verse todos y, si la cámara se quedó en un objeto de misión, vuela de vuelta al planeta.
  */
-const missionObjects = { rover: rover.group, solarPanel: solarPanel.group, antenna: antenna.group };
+const missionObjects = { rover, antenna, solarPanel };
+const missionObjectGroups = Object.values(missionObjects).map((object) => object.group);
+// Posición y tamaño en su órbita terrestre, para devolverlos al volver al menú
+const missionObjectHomes = Object.values(missionObjects).map(({ model }) => ({
+  model,
+  position: model.position.clone(),
+  scale: model.scale.x
+}));
+let missionObjectScale = 1; // tamaño respecto al terrestre (ver MISSION_PREVIEW.objectScale)
 let choosingBody = null; // planeta cuyas misiones se eligen ('moon' | 'mars'); null = fuera del paso 1
 let previewed = null; // lo último mostrado por una tarjeta
 
@@ -261,8 +273,9 @@ function setChoosingMission(choosing) {
   previewed = null;
   if (choosing) {
     choosingBody = cameraNavigator.currentFocus;
-    sceneBodies.forEach((body) => (body.visible = false));
-    placeMissionObjectsNear(missionBodies[choosingBody]);
+    const planet = missionBodies[choosingBody].group;
+    sceneBodies.forEach((body) => (body.visible = body === planet || missionObjectGroups.includes(body)));
+    placeMissionObjectsAround(choosingBody);
     return;
   }
   sceneBodies.forEach((body) => (body.visible = true));
@@ -272,32 +285,57 @@ function setChoosingMission(choosing) {
 }
 
 /**
- * Lleva el rover, el panel y la antena (juntos) justo encima del planeta, fuera de su encuadre: el viaje de
- * la cámara entre el planeta y ellos es corto. Ahí se quedan hasta la siguiente elección.
+ * Pone el rover, la antena y el panel en órbita baja alrededor del planeta, en el lado que ve la
+ * cámara (ver MISSION_PREVIEW): el viaje entre el planeta y cada objeto es corto y el planeta queda
+ * de fondo al enfocarlos. Ahí se quedan hasta la siguiente elección.
  */
-const pairCenter = new THREE.Vector3();
-const pairOutward = new THREE.Vector3();
-function placeMissionObjectsNear(mission) {
-  mission.mesh.getWorldPosition(pairCenter);
-  pairOutward.copy(pairCenter).setY(0).normalize(); // alejándose de la Tierra: horizontal en pantalla
-  pairCenter.y += mission.config.radius * MISSION_PREVIEW.lift;
-  rover.placeAt(pairCenter);
-  solarPanel.placeAt(pairCenter.addScaledVector(pairOutward, MISSION_PREVIEW.pairGap));
-  antenna.placeAt(pairCenter.addScaledVector(pairOutward, -2 * MISSION_PREVIEW.pairGap));
+const orbitPlanetCenter = new THREE.Vector3();
+const orbitToCamera = new THREE.Vector3();
+const orbitRight = new THREE.Vector3();
+const orbitForward = new THREE.Vector3();
+const orbitPoint = new THREE.Vector3();
+const WORLD_UP = new THREE.Vector3(0, 1, 0);
+function placeMissionObjectsAround(name) {
+  const mission = missionBodies[name];
+  mission.mesh.getWorldPosition(orbitPlanetCenter);
+  // Plano de la órbita: casi el de la pantalla vista desde la cámara del planeta (derecha y
+  // arriba), inclinado un poco hacia ella para que se lea como una órbita alrededor del planeta
+  orbitToCamera.subVectors(cameraNavigator.viewPosition(name), orbitPlanetCenter).normalize();
+  orbitRight.crossVectors(orbitToCamera, WORLD_UP).normalize().negate();
+  orbitForward.crossVectors(orbitToCamera, orbitRight).normalize(); // arriba en pantalla
+  orbitForward.multiplyScalar(Math.cos(MISSION_PREVIEW.orbitTilt)).addScaledVector(orbitToCamera, Math.sin(MISSION_PREVIEW.orbitTilt));
+  const radius = mission.config.radius * MISSION_PREVIEW.orbitRadius;
+  missionObjectScale = MISSION_PREVIEW.objectScale[name];
+  missionObjectHomes.forEach(({ model, scale }) => model.scale.setScalar(scale * missionObjectScale));
+  Object.entries(missionObjects).forEach(([key, object]) => {
+    const angle = MISSION_PREVIEW.orbitAngles[key];
+    orbitPoint.copy(orbitPlanetCenter).addScaledVector(orbitRight, radius * Math.cos(angle)).addScaledVector(orbitForward, radius * Math.sin(angle));
+    object.placeAt(orbitPoint);
+  });
+  missionOrbitMesh = mission.mesh;
+}
+
+/** Devuelve el rover, la antena y el panel a su órbita terrestre (recorrido del menú) */
+function sendMissionObjectsHome() {
+  if (!missionOrbitMesh) return;
+  missionObjectHomes.forEach(({ model, position, scale }) => {
+    model.position.copy(position);
+    model.scale.setScalar(scale);
+  });
+  missionObjectScale = 1;
+  missionOrbitMesh = null;
 }
 
 /**
- * Tarjeta de misión bajo el puntero: la cámara viaja (como entre planetas) hasta lo que muestra:
- * 'body' (misión libre) = el planeta elegido; 'rover' | 'antenna' | 'solarPanel' = ese objeto.
- * Al salir de la lista (`null`) se queda donde está.
+ * Tarjeta de misión bajo el puntero: la cámara viaja hasta lo que muestra, con el planeta y los
+ * objetos en órbita a la vista: 'body' (misión libre) = el planeta elegido; 'rover' | 'antenna' |
+ * 'solarPanel' = ese objeto, con el planeta de fondo. Al salir de la lista (`null`) se queda donde está.
  */
 function previewMission(name) {
   if (!choosingBody || !name || name === previewed) return;
   previewed = name;
   const isBody = name === 'body';
-  const target = isBody ? missionBodies[choosingBody].group : missionObjects[name];
-  sceneBodies.forEach((body) => (body.visible = body === target));
-  cameraNavigator.focus(isBody ? choosingBody : name, false, isBody ? 1 : MISSION_PREVIEW.objectDistanceScale);
+  cameraNavigator.focus(isBody ? choosingBody : name, false, isBody ? 1 : MISSION_PREVIEW.objectDistanceScale * missionObjectScale);
 }
 
 /** Sale de la vista de misión (cualquier cambio de enfoque la cierra) */
@@ -347,7 +385,10 @@ const mainMenu = setupMainMenu({
     // En el menú la escena es solo fondo: sin arrastre ni zoom
     controls.enabled = !isOpen;
     viewShift.setTarget(isOpen ? shiftIfWide(MENU.viewShift) : 0, 0);
-    if (isOpen) menuTour.reset();
+    if (isOpen) {
+      sendMissionObjectsHome();
+      menuTour.reset();
+    }
     updateTerrainAreas(cameraNavigator.currentFocus, isOpen);
   }
 });

@@ -267,13 +267,19 @@ export const MISSION_FILTERS = [
 
 /**
  * Al pasar por una tarjeta de misión la cámara vuela hasta su objeto; `objectDistanceScale` escala
- * la distancia de su vista normal (< 1 = más cerca, el objeto se ve más grande).
- * Para que el viaje sea corto, al elegir misión el rover, el panel y la antena se acercan al
- * planeta: quedan sobre él, a `lift` radios de su centro (fuera del encuadre del planeta), en fila
- * y separados `pairGap` (el rover en medio).
+ * la distancia de su vista normal (> 1 = más lejos: se ve el objeto con el planeta de fondo).
+ * Para que el viaje sea corto, al elegir misión el rover, la antena y el panel pasan a orbitar el
+ * planeta elegido, como el satélite y Orión con la Tierra: en una órbita circular a `orbitRadius`
+ * radios de su centro, casi de frente a la cámara (inclinada `orbitTilt` hacia ella) y repartidos
+ * en `orbitAngles` (rad; 0 = a la derecha del planeta en pantalla, π/2 = arriba, -π/2 = abajo),
+ * del lado contrario a la lista de tarjetas. `objectScale` encoge los objetos según el planeta
+ * (en la Tierra miden 1) y la vista se acerca en la misma proporción. Al volver al menú
+ * regresan a su órbita terrestre.
  */
 export const MISSION_PREVIEW = {
-  objectDistanceScale: 0.9,
-  lift: 2.8,
-  pairGap: 0.4
+  objectDistanceScale: 1.7,
+  orbitRadius: 1.75,
+  orbitTilt: deg(25),
+  orbitAngles: { rover: deg(38), solarPanel: deg(0), antenna: deg(-38) },
+  objectScale: { moon: 0.55, mars: 0.8 }
 };

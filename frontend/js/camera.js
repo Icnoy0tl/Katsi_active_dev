@@ -18,13 +18,16 @@ function sideView(elevation, distance) {
   };
 }
 
+const orbitCenter = new THREE.Vector3();
+
 /**
- * Vista de una nave en órbita baja: desde fuera de la órbita (`outwardDistance` alejándose de la
- * Tierra, `sideDistance` de costado y `lift` hacia arriba), con la Tierra de fondo
+ * Vista de una nave en órbita baja: desde fuera de la órbita (`outwardDistance` alejándose del
+ * cuerpo que orbita, `sideDistance` de costado y `lift` hacia arriba), con ese cuerpo de fondo.
+ * `centerOf(out)` da el centro del cuerpo orbitado (la Tierra, en el origen, si no se indica).
  */
-function orbitView(outwardDistance, sideDistance, lift) {
+function orbitView(outwardDistance, sideDistance, lift, centerOf) {
   return (target, out) => {
-    outward.copy(target).normalize();
+    outward.copy(target).sub(centerOf ? centerOf(orbitCenter) : orbitCenter.set(0, 0, 0)).normalize();
     side.set(-outward.z, 0, outward.x).normalize();
     out.copy(target).addScaledVector(outward, outwardDistance).addScaledVector(side, sideDistance);
     out.y += lift;
@@ -36,7 +39,7 @@ function orbitView(outwardDistance, sideDistance, lift) {
  * Destinos de cámara. `zoom` limita el acercamiento/alejamiento (nunca lo suficiente para ver
  * todo el sistema) y `near` es el plano cercano de la cámara.
  */
-function createFocusViews(bodies) {
+function createFocusViews(bodies, orbitCenterOf) {
   return {
     earth: {
       object: bodies.earth,
@@ -70,19 +73,19 @@ function createFocusViews(bodies) {
     },
     rover: {
       object: bodies.rover,
-      cameraPosition: orbitView(0.3, 0.22, 0.1),
+      cameraPosition: orbitView(0.3, 0.22, 0.1, (out) => orbitCenterOf(out)),
       zoom: [0.08, 3.0],
       near: 0.005
     },
     antenna: {
       object: bodies.antenna,
-      cameraPosition: orbitView(0.45, 0.25, 0.12),
+      cameraPosition: orbitView(0.45, 0.25, 0.12, (out) => orbitCenterOf(out)),
       zoom: [0.12, 3.0],
       near: 0.01
     },
     solarPanel: {
       object: bodies.solarPanel,
-      cameraPosition: orbitView(0.45, -0.3, 0.15),
+      cameraPosition: orbitView(0.45, -0.3, 0.15, (out) => orbitCenterOf(out)),
       zoom: [0.12, 3.0],
       near: 0.01
     }
@@ -95,9 +98,11 @@ function createFocusViews(bodies) {
  *
  * @param bodies    objetos a enfocar: { earth, moon, mars, satellite, orion }
  * @param obstacles esferas que el vuelo no atraviesa: [{ object, safeRadius }]
+ * @param missionOrbitCenter(out) centro del cuerpo que orbitan el rover, la antena y el panel
+ *        (por defecto la Tierra, en el origen)
  */
-export function createCameraNavigator({ camera, controls, bodies, obstacles }) {
-  const views = createFocusViews(bodies);
+export function createCameraNavigator({ camera, controls, bodies, obstacles, missionOrbitCenter = (out) => out.set(0, 0, 0) }) {
+  const views = createFocusViews(bodies, missionOrbitCenter);
   const flight = {
     active: false,
     t: 0,
