@@ -15,36 +15,38 @@ type Coordinates struct {
 	Longitude float64 `json:"longitude"`
 }
 
-//TODO every field passed to be float64: for convenience. All use cases so far didnt used the full capacity of an int and floats made overall calculations easier. Further testing is needed
+// Every variable is *float64: JSON null (or a missing key) means "no data" and stays nil,
+// instead of silently becoming 0. knn turns nil into NaN and treats it as missing (coverage).
 type CoreVariables struct {
-	Slope                  float64 `json:"slope"`
-	RadarRoughness         float64 `json:"radar_roughness"`
-	ApparentThermalInertia float64 `json:"apparent_thermal_inertia"`
-	SoilMoisture           float64 `json:"soil_moisture"`
-	VisualTexture          float64 `json:"visual_texture"`
-	LowSunShadows          float64 `json:"low_sun_shadows"`
-	LineOfSight            float64 `json:"line_of_sight"`
-	DiurnalThermalRange    float64 `json:"diurnal_thermal_range"`
-	DustAerosols           float64 `json:"dust_aerosols"`
-	Insolation             float64 `json:"insolation"`
+	Slope                  *float64 `json:"slope"`
+	RadarRoughness         *float64 `json:"radar_roughness"`
+	ApparentThermalInertia *float64 `json:"apparent_thermal_inertia"`
+	SoilMoisture           *float64 `json:"soil_moisture"`
+	VisualTexture          *float64 `json:"visual_texture"`
+	LowSunShadows          *float64 `json:"low_sun_shadows"`
+	LineOfSight            *float64 `json:"line_of_sight"`
+	DiurnalThermalRange    *float64 `json:"diurnal_thermal_range"`
+	DustAerosols           *float64 `json:"dust_aerosols"`
+	Insolation             *float64 `json:"insolation"`
 }
 
 type AuditVariables struct {
-	RockAbundancePct   float64 `json:"rock_abundance_pct"`
-	GrainSizeUm        float64 `json:"grain_size_um"`
-	AngleOfReposeDeg   float64 `json:"angle_of_repose_deg"`
-	DepthToBedrockMinM float64 `json:"depth_to_bedrock_min_m"`
-	DepthToBedrockMaxM float64 `json:"depth_to_bedrock_max_m"`
-	VrmMicrorelief     float64 `json:"vrm_microrelief"`
-	DielectricConstant float64 `json:"dielectric_constant"`
-	SalinityWtPct      float64 `json:"salinity_wt_pct"`
-	DiffuseRatio       float64 `json:"diffuse_ratio"`
-	Albedo             float64 `json:"albedo"`
-	VegetationNdvi     float64 `json:"vegetation_ndvi"`
-	SurfacePressureKpa float64 `json:"surface_pressure_kpa"`
-	WindTypicalMs      float64 `json:"wind_typical_ms"`
-	WindGustMs         float64 `json:"wind_gust_ms"`
-	AbrasiveMohs       float64 `json:"abrasive_mohs"`
+	RockAbundancePct   *float64 `json:"rock_abundance_pct"`
+	GrainSizeUm        *float64 `json:"grain_size_um"`
+	AngleOfReposeDeg   *float64 `json:"angle_of_repose_deg"`
+	DepthToBedrockMinM *float64 `json:"depth_to_bedrock_min_m"`
+	DepthToBedrockMaxM *float64 `json:"depth_to_bedrock_max_m"`
+	VrmMicrorelief     *float64 `json:"vrm_microrelief"`
+	DielectricConstant *float64 `json:"dielectric_constant"`
+	SalinityWtPct      *float64 `json:"salinity_wt_pct"`
+	DiffuseRatio       *float64 `json:"diffuse_ratio"`
+	Albedo             *float64 `json:"albedo"`
+	VegetationNdvi     *float64 `json:"vegetation_ndvi"`
+	SurfacePressureKpa *float64 `json:"surface_pressure_kpa"`
+	WindTypicalMs      *float64 `json:"wind_typical_ms"`
+	WindGustMs         *float64 `json:"wind_gust_ms"`
+	AbrasiveMohs       *float64 `json:"abrasive_mohs"`
+	GroundIceIndex     *float64 `json:"ground_ice_index"` // 1 low, 2 medium, 3 high; null = no data
 }
 
 type Region struct {
@@ -53,9 +55,12 @@ type Region struct {
 	Coords         Coordinates    `json:"coordinates"`
 	CoreVariables  CoreVariables  `json:"coreVariables"`
 	AuditVariables AuditVariables `json:"auditVariables"`
+
+	// CustomVariables: values of user-defined variables (--own-regions), by name.
+	CustomVariables map[string]*float64 `json:"customVariables,omitempty"`
 }
 
-type PlanetInformation struct { 
+type PlanetInformation struct {
 	Planet  string   `json:"planet"`
 	Regions []Region `json:"regions"`
 }
@@ -103,7 +108,7 @@ type Parser struct {
 	dataDir string
 }
 
-//constructor of the parser, checks for the data directory
+// constructor of the parser, checks for the data directory
 func New(dataDir string) (*Parser, error) {
 	abs, err := filepath.Abs(dataDir)
 	if err != nil {
@@ -116,7 +121,7 @@ func New(dataDir string) (*Parser, error) {
 	return &Parser{dataDir: abs}, nil
 }
 
-// Sanitization function, filename can only come from constants in here, never accept arbitrary filenames from userr 
+// Sanitization function, filename can only come from constants in here, never accept arbitrary filenames from userr
 func (p *Parser) readFile(filename string) ([]Region, error) {
 	path := filepath.Join(p.dataDir, filename)
 
@@ -156,8 +161,20 @@ func (p *Parser) GetRegion(planet, regionID string) (PlanetInformation, error) {
 	return PlanetInformation{}, ErrRegionNotFound
 }
 
-// GetEarthRegions returns the whole planet region pool to procces using knn
-//TODO maybe if needed we can just make this one a generic function to get the information of a whole planet 
+// GetRegions returns every built-in region of a body: "moon", "mars" or "earth".
+func (p *Parser) GetRegions(planet string) ([]Region, error) {
+	planet = strings.ToLower(strings.TrimSpace(planet))
+	if planet == "earth" {
+		return p.readFile(earthFile)
+	}
+	planet, err := SanitizePlanet(planet)
+	if err != nil {
+		return nil, err
+	}
+	return p.readFile(planetFiles[planet])
+}
+
+// GetEarthRegions returns the whole Earth region pool to process using knn
 func (p *Parser) GetEarthRegions() ([]Region, error) {
 	regions, err := p.readFile(earthFile)
 	if err != nil {
