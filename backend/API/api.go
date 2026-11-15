@@ -48,7 +48,7 @@ func WriteError(w http.ResponseWriter, StatusCode int, Message string) {
 func Status(w http.ResponseWriter, r *http.Request) {
 	Response := map[string]string{
 		"status": "Status: 200 ok",
-		"image":  "PASTE_IMAGE_URL_OR_BASE64_HERE",
+		"image":  "backend/data/status.png",
 	}
 	WriteJSON(w, http.StatusOK, Response)
 }
