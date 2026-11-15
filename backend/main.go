@@ -7,6 +7,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -112,9 +113,25 @@ func analogHandler(parser *jsonParser.Parser) http.HandlerFunc {
 	}
 }
 
+// isLocalOrigin: el front servido desde localhost/127.0.0.1 en cualquier puerto (desarrollo)
+func isLocalOrigin(origin string) bool {
+	u, err := url.Parse(origin)
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") {
+		return false
+	}
+	host := u.Hostname()
+	return host == "localhost" || host == "127.0.0.1"
+}
+
+// cors: con ALLOWED_ORIGIN vacío se acepta cualquier origen local (desarrollo); si se define,
+// solo ese origen (producción en otro dominio).
 func cors(allowedOrigin string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+		origin := r.Header.Get("Origin")
+		if origin != "" && (origin == allowedOrigin || (allowedOrigin == "" && isLocalOrigin(origin))) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+		}
 		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		if r.Method == http.MethodOptions {
@@ -128,7 +145,7 @@ func cors(allowedOrigin string, next http.Handler) http.Handler {
 func main() {
 	dataDir := envOr("DATA_DIR", "data") // relativo a donde corres el binario
 	addr := envOr("ADDR", ":8080")
-	origin := envOr("ALLOWED_ORIGIN", "http://localhost:5173")
+	origin := os.Getenv("ALLOWED_ORIGIN") // vacío = cualquier localhost
 
 	parser, err := jsonParser.New(dataDir)
 	if err != nil {
