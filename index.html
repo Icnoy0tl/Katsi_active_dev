@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Planeta Tierra 3D Interactivo - Tierra, Luna y Marte</title>
+  <title>HailMary</title>
   <!-- Tailwind CSS para la interfaz flotante -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Fuente Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
   <style>
     * {
@@ -93,6 +93,803 @@
       background: rgba(255, 255, 255, 0.2);
       border-radius: 999px;
     }
+
+    /* ---------- Menú principal ---------- */
+    .is-hidden {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    /* Oculto por la vista de misión (independiente de .is-hidden, que gestiona el menú) */
+    .is-replaced {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    #main-menu {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 clamp(16px, 6vw, 96px);
+      /* Oscurece solo el lado izquierdo para que el texto se lea sobre la escena */
+      background: linear-gradient(90deg, rgba(3, 5, 10, 0.72) 0%, rgba(3, 5, 10, 0.35) 38%, rgba(3, 5, 10, 0) 60%);
+      transition: opacity 0.6s ease;
+    }
+
+    .menu-title {
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: clamp(2.6rem, 6.4vw, 5.4rem);
+      letter-spacing: 0.01em;
+      line-height: 1.05;
+      margin: 0;
+      color: #eef2f8;
+      /* Destello: degradado recortado al texto que se desplaza (ver menu-shine) */
+      background: linear-gradient(110deg, #eef2f8 0%, #eef2f8 42%, #ffffff 48%, #9fd0ff 50%, #ffffff 52%, #eef2f8 58%, #eef2f8 100%) 100% 0 / 300% 100% no-repeat;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      /* text-shadow se pintaría a través del relleno transparente: usamos drop-shadow */
+      filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.12)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+    }
+
+    .menu-description {
+      max-width: min(42rem, 100%);
+      margin: 1.4rem 0 0;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: clamp(0.78rem, 1.15vw, 0.95rem);
+      letter-spacing: 0.2em;
+      line-height: 1.75;
+      text-transform: uppercase;
+      color: rgba(203, 213, 225, 0.72);
+      background: linear-gradient(110deg, rgba(203, 213, 225, 0.72) 0%, rgba(203, 213, 225, 0.72) 42%, rgba(255, 255, 255, 0.95) 50%, rgba(203, 213, 225, 0.72) 58%, rgba(203, 213, 225, 0.72) 100%) 100% 0 / 300% 100% no-repeat;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+    }
+
+    /* Línea de acento: tramo azul que continúa en una línea tenue que se desvanece */
+    .menu-accent {
+      width: min(15rem, 60vw);
+      height: 3px;
+      margin: 1.6rem 0 clamp(2rem, 6vh, 3.5rem);
+      border-radius: 2px;
+      background:
+        linear-gradient(90deg, #3b82f6 0, #60a5fa 25%, transparent 25%),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.28) 25%, rgba(148, 163, 184, 0) 100%);
+      box-shadow: -10px 0 14px -6px rgba(59, 130, 246, 0.7);
+    }
+
+    .menu-options {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    /* Opción: icono | divisor | etiqueta → flecha. El marco luminoso se dibuja con ::before/::after */
+    .menu-tag {
+      --chamfer: 16px;
+      --frame: polygon(var(--chamfer) 0, calc(100% - var(--chamfer)) 0, 100% 36%, 100% 64%, calc(100% - var(--chamfer)) 100%, var(--chamfer) 100%, 0 64%, 0 36%);
+      position: relative;
+      isolation: isolate;
+      display: flex;
+      align-items: center;
+      width: min(28rem, calc(100vw - 32px));
+      height: clamp(3.6rem, 8vh, 4.4rem);
+      will-change: width;
+      padding: 0 1.6rem 0 0;
+      border: 0;
+      background: none;
+      text-align: left;
+      cursor: pointer;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: clamp(0.85rem, 1.3vw, 1rem);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(203, 213, 225, 0.65);
+      transition: color 0.3s ease, filter 0.3s ease, width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Borde (degradado azul) y relleno del marco: ocultos hasta que la opción se resalta */
+    .menu-tag::before,
+    .menu-tag::after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      clip-path: var(--frame);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .menu-tag::before {
+      inset: 0;
+      background: linear-gradient(90deg, #3b82f6 0%, #93c5fd 45%, #60a5fa 75%, #2563eb 100%);
+    }
+    .menu-tag::after {
+      inset: 1.5px;
+      background:
+        radial-gradient(120% 140% at 100% 100%, rgba(59, 130, 246, 0.22) 0%, transparent 45%),
+        linear-gradient(180deg, rgba(14, 24, 48, 0.92) 0%, rgba(6, 11, 26, 0.92) 100%);
+    }
+
+    .menu-icon-box {
+      width: 4.6rem;
+      display: flex;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .menu-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      color: rgba(203, 213, 225, 0.6);
+      transition: color 0.3s ease;
+    }
+
+    .menu-divider {
+      width: 1px;
+      height: 45%;
+      background: rgba(203, 213, 225, 0.25);
+      flex-shrink: 0;
+    }
+
+    .menu-label {
+      flex: 1;
+      padding-left: 1.6rem;
+    }
+
+    .menu-arrow {
+      width: 1.4rem;
+      height: 1.4rem;
+      flex-shrink: 0;
+      color: rgba(148, 163, 184, 0.7);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    /* Opción resaltada al pasar el mouse (o con foco de teclado) */
+    .menu-tag:hover,
+    .menu-tag:focus-visible {
+      outline: none;
+      color: #f1f5f9;
+      filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.55));
+    }
+    .menu-tag:hover::before,
+    .menu-tag:hover::after,
+    .menu-tag:focus-visible::before,
+    .menu-tag:focus-visible::after {
+      opacity: 1;
+    }
+    .menu-tag:hover .menu-icon,
+    .menu-tag:focus-visible .menu-icon {
+      color: #60a5fa;
+    }
+    .menu-tag:hover .menu-arrow,
+    .menu-tag:focus-visible .menu-arrow {
+      opacity: 1;
+    }
+    .menu-tag:hover .menu-arrow {
+      transform: translateX(4px);
+    }
+
+    /* Al pasar el mouse la tarjeta se alarga hacia la derecha */
+    .menu-tag:hover,
+    .menu-tag:focus-visible {
+      width: min(32rem, calc(100vw - 32px));
+    }
+
+    /* Entrada escalonada al abrir el menú (se repite cada vez que vuelve a mostrarse) */
+    @keyframes menu-enter {
+      from {
+        opacity: 0;
+        transform: translateX(-28px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @keyframes menu-accent-grow {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    #main-menu:not(.is-hidden) .menu-enter {
+      animation: menu-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(0.15s + var(--i, 0) * 0.1s);
+    }
+
+    /* Destello que barre el título y la descripción de izquierda a derecha, con pausa entre pasadas */
+    @keyframes menu-shine {
+      0% {
+        background-position: 100% 0;
+      }
+      45%,
+      100% {
+        background-position: 0% 0;
+      }
+    }
+
+    #main-menu:not(.is-hidden) .menu-title,
+    #main-menu:not(.is-hidden) .menu-description {
+      animation:
+        menu-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) calc(0.15s + var(--i, 0) * 0.1s) both,
+        menu-shine 4.5s ease-in-out calc(1s + var(--i, 0) * 0.35s) infinite;
+    }
+
+    #main-menu:not(.is-hidden) .menu-accent {
+      transform-origin: left center;
+      animation: menu-accent-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: 0.4s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #main-menu:not(.is-hidden) .menu-enter,
+      #main-menu:not(.is-hidden) .menu-accent {
+        animation: none;
+      }
+      .menu-tag {
+        transition: none;
+      }
+    }
+
+    /* Etiqueta de los puntos de terreno */
+    .terrain-tooltip {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      border-radius: 6px;
+      background: rgba(6, 11, 26, 0.88);
+      font-size: 0.75rem;
+      pointer-events: none;
+      white-space: nowrap;
+      transition: opacity 0.15s ease;
+    }
+    .terrain-tooltip strong {
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+    .terrain-tooltip span {
+      color: rgba(148, 163, 184, 0.9);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---------- Viñeta de la vista de misión ----------
+       Oscurece los bordes (sobre todo arriba y a los lados, donde están los botones) y deja
+       el centro despejado para el área. Solo opacidad: el navegador la compone sin repintar. */
+    #mission-vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 10; /* sobre la escena (1), bajo los paneles (20) y botones (30) */
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 75% 70% at 50% 55%, rgba(3, 5, 10, 0) 45%, rgba(3, 5, 10, 0.55) 80%, rgba(3, 5, 10, 0.85) 100%),
+        linear-gradient(180deg, rgba(3, 5, 10, 0.55) 0%, rgba(3, 5, 10, 0) 18%, rgba(3, 5, 10, 0) 82%, rgba(3, 5, 10, 0.45) 100%);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    #mission-vignette.is-visible {
+      opacity: 1;
+    }
+
+    /* ---------- Panel de misiones (izquierda, mismo lenguaje visual que el menú) ---------- */
+    #missions-panel {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #missions-panel.is-hidden {
+      transform: translateX(-12px);
+    }
+    /* Oscurece el lado izquierdo para leer el panel sobre la escena, como el menú */
+    #missions-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 15;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(3, 5, 10, 0.65) 0%, rgba(3, 5, 10, 0.3) 32%, rgba(3, 5, 10, 0) 50%);
+      transition: opacity 0.3s ease;
+    }
+    .missions-title {
+      margin: 0;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(226, 232, 240, 0.85);
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+    }
+    .missions-title b {
+      font-weight: 500;
+      color: #60a5fa;
+    }
+    .missions-accent {
+      width: min(14rem, 60vw);
+      margin: 1.1rem 0 1.8rem;
+    }
+    /* Variante compacta de .menu-tag con dos líneas de texto */
+    .menu-tag--mission {
+      --chamfer: 16px;
+      width: 100%;
+      height: auto;
+      min-height: 5rem;
+      padding: 0.85rem 1.4rem 0.85rem 0;
+      font-size: clamp(0.85rem, 1.15vw, 0.95rem);
+      letter-spacing: 0.14em;
+    }
+    .menu-tag--mission .menu-icon-box {
+      width: 4.2rem;
+    }
+    .menu-tag--mission .menu-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+    .menu-tag--mission .menu-divider {
+      height: 60%;
+      align-self: center;
+    }
+    .menu-tag--mission .menu-label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      padding-left: 1.4rem;
+      line-height: 1.3;
+    }
+    .menu-tag--mission .menu-arrow {
+      width: 1.4rem;
+      height: 1.4rem;
+    }
+    .mission-meta {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: rgba(148, 163, 184, 0.75);
+      font-variant-numeric: tabular-nums;
+      transition: color 0.3s ease;
+    }
+    /* En lugar de alargarse (como en el menú) se desplaza un poco: el panel tiene ancho fijo */
+    .menu-tag--mission:hover,
+    .menu-tag--mission:focus-visible {
+      width: 100%;
+      transform: translateX(6px);
+    }
+    .menu-tag--mission {
+      transition: color 0.3s ease, filter 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    /* Entrada escalonada cada vez que aparece el panel */
+    #missions-panel:not(.is-hidden) .menu-enter {
+      animation: menu-enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(0.05s + var(--i, 0) * 0.08s);
+    }
+    #missions-panel:not(.is-hidden) .missions-accent {
+      transform-origin: left center;
+      animation: menu-accent-grow 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #missions-panel:not(.is-hidden) .menu-enter,
+      #missions-panel:not(.is-hidden) .missions-accent {
+        animation: none;
+      }
+    }
+
+    /* ---------- Información del terreno seleccionado (izquierda) ---------- */
+    #mission-info {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #mission-info.is-hidden {
+      transform: translateX(-12px);
+    }
+    #mission-info:not(.is-hidden) .menu-enter {
+      animation: menu-enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(0.05s + var(--i, 0) * 0.08s);
+    }
+    #mission-info:not(.is-hidden) .missions-accent {
+      transform-origin: left center;
+      animation: menu-accent-grow 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+    }
+    .info-id {
+      margin: 0 0 0.3rem;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: #60a5fa;
+    }
+    .info-name {
+      margin: 0;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: clamp(1.3rem, 2vw, 1.7rem);
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #eef2f8;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+    }
+    .info-coords {
+      margin: 0.5rem 0 0;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      color: rgba(203, 213, 225, 0.75);
+      font-variant-numeric: tabular-nums;
+    }
+    .info-analog {
+      margin: 0 0 0.3rem;
+      font-size: 0.9rem;
+      color: #a5f3fc;
+    }
+    .info-section {
+      margin: 0 0 0.5rem;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(147, 197, 253, 0.9);
+    }
+    #mission-info section + section {
+      margin-top: 1.4rem;
+    }
+    #mission-info dl {
+      margin: 0;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.42rem 0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      font-size: 0.8rem;
+    }
+    .info-row dt {
+      color: rgba(203, 213, 225, 0.75);
+    }
+    .info-row dd {
+      margin: 0;
+      color: #f1f5f9;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    /* ---------- Holograma del terreno (derecha de la Luna) ---------- */
+    .hologram-beam {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 11;
+      pointer-events: none;
+      overflow: visible;
+      transition: opacity 0.5s ease;
+    }
+    .hologram-beam.is-occluded {
+      opacity: 0;
+    }
+    .hologram-beam-shape {
+      animation: holo-flicker 3.2s steps(1) infinite;
+    }
+    .hologram-beam-edges {
+      fill: none;
+      stroke: rgba(103, 232, 249, 0.55);
+      stroke-width: 1;
+    }
+    .hologram {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 12;
+      /* Dos hologramas apilados (Luna y Tierra): cada uno cabe en menos de la mitad del alto */
+      width: min(clamp(200px, 19vw, 280px), 38vh);
+      aspect-ratio: 1;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      will-change: transform;
+    }
+    /* La posición la fija JS con transform en .hologram; la animación de apertura va en el interior */
+    .holo-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border: 1px solid rgba(103, 232, 249, 0.35);
+      border-radius: 4px;
+      background: radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.14) 0%, rgba(8, 47, 73, 0.28) 70%);
+      box-shadow: 0 0 32px rgba(34, 211, 238, 0.2), inset 0 0 40px rgba(34, 211, 238, 0.12);
+      transform-origin: left center;
+    }
+    .hologram:not(.is-hidden) .holo-inner {
+      animation: holo-open 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both, holo-flicker 4s steps(1) 1.2s infinite;
+    }
+    .holo-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .holo-shape {
+      fill: rgba(103, 232, 249, 0.2);
+      stroke: #67e8f9;
+      stroke-width: 0.018;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 6px rgba(103, 232, 249, 0.7));
+    }
+    .holo-badge-ring {
+      fill: none;
+      stroke: #a5f3fc;
+      stroke-width: 0.018;
+    }
+    .holo-badge {
+      fill: rgba(165, 243, 252, 0.35);
+      stroke: #a5f3fc;
+      stroke-width: 0.012;
+    }
+    .holo-scale line {
+      stroke: #a5f3fc;
+      stroke-width: 0.014;
+    }
+    .holo-scale text {
+      fill: rgba(165, 243, 252, 0.9);
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-size: 0.085px;
+      letter-spacing: 0.01px;
+    }
+    .holo-header,
+    .holo-name {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      margin: 0;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      text-transform: uppercase;
+      color: rgba(165, 243, 252, 0.88);
+      text-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
+    }
+    .holo-header {
+      top: 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.6rem;
+      font-size: 0.58rem;
+      letter-spacing: 0.16em;
+      white-space: nowrap;
+    }
+    /* El texto largo se recorta con "…"; la etiqueta derecha (ID o similitud) siempre completa */
+    .holo-kicker {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .holo-tag {
+      flex-shrink: 0;
+      color: #e0fbff;
+    }
+    .holo-name {
+      bottom: 8px;
+      font-size: 0.66rem;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    /* Líneas de barrido y franja que recorre el holograma */
+    .holo-scan {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, rgba(103, 232, 249, 0.07) 0 1px, transparent 1px 3px);
+    }
+    .holo-scan::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 18%;
+      background: linear-gradient(180deg, transparent, rgba(103, 232, 249, 0.12), transparent);
+      animation: holo-sweep 3.5s linear infinite;
+    }
+    @keyframes holo-open {
+      from {
+        opacity: 0;
+        transform: scaleX(0.03);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    @keyframes holo-sweep {
+      from {
+        transform: translateY(-100%);
+      }
+      to {
+        transform: translateY(560%);
+      }
+    }
+    /* Parpadeo breve e irregular */
+    @keyframes holo-flicker {
+      0%, 46%, 49%, 100% {
+        opacity: 1;
+      }
+      47% {
+        opacity: 0.72;
+      }
+      48% {
+        opacity: 0.9;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hologram:not(.is-hidden) .holo-inner,
+      .hologram-beam-shape,
+      .holo-scan::after,
+      #mission-info:not(.is-hidden) .menu-enter,
+      #mission-info:not(.is-hidden) .missions-accent {
+        animation: none;
+      }
+    }
+
+    #control-panel {
+      transition-property: opacity, transform;
+    }
+
+    /* ---------- Botones de la escena (mismo lenguaje visual que .menu-tag) ---------- */
+    .hud-btn {
+      --chamfer: 9px;
+      --frame: polygon(var(--chamfer) 0, calc(100% - var(--chamfer)) 0, 100% 36%, 100% 64%, calc(100% - var(--chamfer)) 100%, var(--chamfer) 100%, 0 64%, 0 36%);
+      --edge: linear-gradient(90deg, #3b82f6 0%, #93c5fd 45%, #60a5fa 75%, #2563eb 100%);
+      --tint: rgba(59, 130, 246, 0.22);
+      --glow: rgba(59, 130, 246, 0.55);
+      --accent: #60a5fa;
+      position: relative;
+      isolation: isolate;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      min-height: 2.5rem;
+      padding: 0 1.1rem;
+      border: 0;
+      background: none;
+      cursor: pointer;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      color: rgba(203, 213, 225, 0.7);
+      transition: color 0.3s ease, filter 0.3s ease, opacity 0.4s ease, transform 0.15s ease;
+    }
+
+    /* Marco: borde (::before) y relleno (::after). En reposo se ve un marco tenue */
+    .hud-btn::before,
+    .hud-btn::after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      clip-path: var(--frame);
+      transition: opacity 0.3s ease;
+    }
+    .hud-btn::before {
+      inset: 0;
+      background: rgba(148, 163, 184, 0.28);
+    }
+    .hud-btn::after {
+      inset: 1px;
+      background: linear-gradient(180deg, rgba(14, 24, 48, 0.88) 0%, rgba(6, 11, 26, 0.88) 100%);
+    }
+
+    /* Capa luminosa (borde degradado + relleno teñido) que aparece al resaltar */
+    .hud-btn > .hud-frame {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      clip-path: var(--frame);
+      background: var(--edge);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .hud-btn > .hud-frame::after {
+      content: '';
+      position: absolute;
+      inset: 1.5px;
+      clip-path: var(--frame);
+      background:
+        radial-gradient(120% 140% at 100% 100%, var(--tint) 0%, transparent 45%),
+        linear-gradient(180deg, rgba(14, 24, 48, 0.94) 0%, rgba(6, 11, 26, 0.94) 100%);
+    }
+
+    .hud-icon {
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+      color: rgba(203, 213, 225, 0.6);
+      transition: color 0.3s ease;
+    }
+
+    .hud-divider {
+      width: 1px;
+      height: 1rem;
+      background: rgba(203, 213, 225, 0.25);
+      flex-shrink: 0;
+    }
+
+    .hud-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #475569;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .hud-btn:hover,
+    .hud-btn:focus-visible,
+    .hud-btn.is-active {
+      outline: none;
+      color: #f1f5f9;
+      filter: drop-shadow(0 0 8px var(--glow));
+    }
+    .hud-btn:hover > .hud-frame,
+    .hud-btn:focus-visible > .hud-frame,
+    .hud-btn.is-active > .hud-frame {
+      opacity: 1;
+    }
+    .hud-btn:hover .hud-icon,
+    .hud-btn:focus-visible .hud-icon,
+    .hud-btn.is-active .hud-icon {
+      color: var(--accent);
+    }
+    .hud-btn.is-active .hud-dot {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .hud-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* Variante fantasma: sin marco en reposo, como las opciones del menú */
+    .hud-btn--ghost::before,
+    .hud-btn--ghost::after {
+      opacity: 0;
+    }
+
+    /* Variante compacta para grupos estrechos (selector "Ir a") */
+    .hud-btn--sm {
+      --chamfer: 6px;
+      min-height: 2rem;
+      padding: 0 0.15rem;
+      font-size: 0.56rem;
+      letter-spacing: 0.06em;
+    }
+
+    /* Acento naranja (Marte) */
+    .hud-btn--mars {
+      --edge: linear-gradient(90deg, #f97316 0%, #fdba74 45%, #fb923c 75%, #ea580c 100%);
+      --tint: rgba(249, 115, 22, 0.22);
+      --glow: rgba(249, 115, 22, 0.5);
+      --accent: #fb923c;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hud-btn,
+      .hud-btn > .hud-frame {
+        transition: none;
+      }
+    }
   </style>
 
   <!-- Import Map oficial de Three.js r164 -->
@@ -109,13 +906,95 @@
   <!-- Contenedor WebGL de pantalla completa -->
   <div id="canvas-container"></div>
 
+  <!-- Menú principal (Orión de fondo) -->
+  <nav id="main-menu" aria-label="Menú principal">
+    <h1 class="menu-title menu-enter" style="--i: 0">HailMary</h1>
+    <p class="menu-description menu-enter" style="--i: 1">Identify Earth Locations that Analog<br />the Permanent Moon Base Locations and Mars</p>
+    <div class="menu-accent" aria-hidden="true"></div>
+    <ul class="menu-options">
+      <li class="menu-enter" style="--i: 3">
+        <button class="menu-tag" data-action="moon">
+          <span class="menu-icon-box">
+            <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg>
+          </span>
+          <span class="menu-divider"></span>
+          <span class="menu-label">Misiones en Luna</span>
+          <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="m14 6 6 6-6 6"/></svg>
+        </button>
+      </li>
+      <li class="menu-enter" style="--i: 4">
+        <button class="menu-tag" data-action="mars">
+          <span class="menu-icon-box">
+            <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M6 9.5c2 1 4 .5 5.5-.5M10 16c1.5-1 3.5-1 5 .5M14.5 7.5l1.5 1"/></svg>
+          </span>
+          <span class="menu-divider"></span>
+          <span class="menu-label">Misiones en Marte</span>
+          <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="m14 6 6 6-6 6"/></svg>
+        </button>
+      </li>
+      <li class="menu-enter" style="--i: 5">
+        <button class="menu-tag" data-action="docs">
+          <span class="menu-icon-box">
+            <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5Z"/><path d="M14 3v4.5h4.5M9 12.5h6M9 16h6"/></svg>
+          </span>
+          <span class="menu-divider"></span>
+          <span class="menu-label">Documentación</span>
+          <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="m14 6 6 6-6 6"/></svg>
+        </button>
+      </li>
+      <li class="menu-enter" style="--i: 6">
+        <button class="menu-tag" data-action="test">
+          <span class="menu-icon-box">
+            <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3h5M10 3v6l-5 9a1.5 1.5 0 0 0 1.3 2.2h11.4A1.5 1.5 0 0 0 19 18l-5-9V3"/><path d="M7.5 14.5h9"/></svg>
+          </span>
+          <span class="menu-divider"></span>
+          <span class="menu-label">Prueba</span>
+          <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="m14 6 6 6-6 6"/></svg>
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Volver al menú principal -->
+  <button
+    id="open-menu-btn"
+    data-scene-ui
+    aria-label="Volver al menú principal"
+    class="hud-btn fixed top-4 left-4 sm:top-6 sm:left-6 z-30"
+  >
+    <span class="hud-frame" aria-hidden="true"></span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="hud-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 12H4"></path>
+      <path d="m10 6-6 6 6 6"></path>
+    </svg>
+    <span class="hud-divider hidden sm:block"></span>
+    <span class="hidden sm:inline">Volver al menú</span>
+  </button>
+
+  <!-- Volver a la lista de misiones: sustituye al botón del menú mientras hay una misión abierta -->
+  <button
+    id="back-to-missions-btn"
+    aria-label="Volver a misiones"
+    class="hud-btn is-hidden fixed top-4 left-4 sm:top-6 sm:left-6 z-30"
+  >
+    <span class="hud-frame" aria-hidden="true"></span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="hud-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 12H4"></path>
+      <path d="m10 6-6 6 6 6"></path>
+    </svg>
+    <span class="hud-divider hidden sm:block"></span>
+    <span class="hidden sm:inline">Volver a misiones</span>
+  </button>
+
   <!-- Botón flotante para mostrar/ocultar el panel de controles -->
   <button
     id="toggle-panel-btn"
+    data-scene-ui
     aria-label="Mostrar u ocultar controles"
-    class="fixed top-4 right-4 sm:top-6 sm:right-6 z-30 glass-panel hover:bg-neutral-800/90 active:scale-95 text-slate-100 p-3 rounded-xl transition-all flex items-center gap-2 text-xs font-medium cursor-pointer"
+    class="hud-btn fixed top-4 right-4 sm:top-6 sm:right-6 z-30"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <span class="hud-frame" aria-hidden="true"></span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="hud-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
       <line x1="4" y1="21" x2="4" y2="14"></line>
       <line x1="4" y1="10" x2="4" y2="3"></line>
       <line x1="12" y1="21" x2="12" y2="12"></line>
@@ -126,22 +1005,53 @@
       <line x1="9" y1="8" x2="15" y2="8"></line>
       <line x1="17" y1="16" x2="23" y2="16"></line>
     </svg>
+    <span class="hud-divider hidden sm:block"></span>
     <span class="hidden sm:inline">Controles</span>
   </button>
+
+  <!-- Viñeta: solo con una misión seleccionada, para que se lean los botones -->
+  <div id="mission-vignette" aria-hidden="true"></div>
+
+  <!-- Panel de misiones disponibles (se muestra al enfocar la Luna o Marte) -->
+  <div data-scene-ui>
+    <div id="missions-backdrop" class="is-hidden" aria-hidden="true"></div>
+    <aside
+      id="missions-panel"
+      aria-label="Misiones disponibles"
+      aria-hidden="true"
+      class="is-hidden fixed top-20 left-4 sm:top-24 sm:left-6 z-20 w-[min(26rem,calc(100vw-2rem))] max-h-[calc(100vh-8rem)] overflow-y-auto overflow-x-hidden custom-scroll pl-1 pr-3 py-1"
+    >
+      <h2 class="missions-title menu-enter" style="--i: 0">Misiones disponibles · <b id="missions-count"></b></h2>
+      <div class="menu-accent missions-accent" aria-hidden="true"></div>
+      <ul id="missions-list" class="menu-options"></ul>
+    </aside>
+
+    <!-- Información del terreno seleccionado (sustituye a la lista de misiones) -->
+    <aside
+      id="mission-info"
+      aria-label="Información del terreno"
+      aria-hidden="true"
+      class="is-hidden fixed top-20 left-4 sm:top-24 sm:left-6 z-20 w-[min(24rem,calc(100vw-2rem))] max-h-[calc(100vh-8rem)] overflow-y-auto overflow-x-hidden custom-scroll pl-1 pr-3 py-1"
+    >
+      <div id="mission-info-body"></div>
+    </aside>
+
+    <!-- Hologramas de terreno (Luna o Marte, y Tierra): los construye js/hologram.js -->
+    <div id="holograms"></div>
+  </div>
 
   <!-- Panel lateral flotante de controles -->
   <aside
     id="control-panel"
+    data-scene-ui
     class="fixed top-16 right-4 sm:top-20 sm:right-6 z-20 glass-panel rounded-2xl p-4 sm:p-5 w-[calc(100vw-2rem)] max-w-xs sm:w-80 max-h-[calc(100vh-11rem)] overflow-y-auto custom-scroll transition-all duration-300"
   >
     <div class="flex items-center justify-between pb-3 mb-3.5 border-b border-white/10">
       <span class="text-xs font-semibold uppercase tracking-wider text-slate-200">
         Panel de Control
       </span>
-      <button
-        id="reset-camera-btn"
-        class="text-[11px] text-sky-400 hover:text-sky-300 font-medium transition-colors cursor-pointer"
-      >
+      <button id="reset-camera-btn" class="hud-btn hud-btn--ghost hud-btn--sm !px-3">
+        <span class="hud-frame" aria-hidden="true"></span>
         Centrar vista
       </button>
     </div>
@@ -150,48 +1060,28 @@
       <!-- 1. Selector de Enfoque de Cámara -->
       <div class="space-y-1.5">
         <span class="text-xs text-slate-300 block">Ir a</span>
-        <div class="grid grid-cols-4 gap-1 bg-black/50 p-1 rounded-xl border border-white/10">
-          <button
-            id="focus-earth-btn"
-            class="py-1.5 px-1 rounded-lg text-[11px] font-medium bg-sky-500/25 text-sky-200 border border-sky-400/40 transition-all cursor-pointer"
-          >
-            Tierra
-          </button>
-          <button
-            id="focus-moon-btn"
-            class="py-1.5 px-1 rounded-lg text-[11px] font-medium text-slate-400 hover:text-white border border-transparent transition-all cursor-pointer"
-          >
-            Luna
-          </button>
-          <button
-            id="focus-mars-btn"
-            class="py-1.5 px-1 rounded-lg text-[11px] font-medium text-slate-400 hover:text-white border border-transparent transition-all cursor-pointer"
-          >
-            Marte
-          </button>
-          <button
-            id="focus-satellite-btn"
-            class="py-1.5 px-1 rounded-lg text-[11px] font-medium text-slate-400 hover:text-white border border-transparent transition-all cursor-pointer"
-          >
-            Satélite
-          </button>
+        <div class="grid grid-cols-5 gap-1 bg-black/50 p-1 rounded-xl border border-white/10">
+          <button id="focus-earth-btn" class="hud-btn hud-btn--ghost hud-btn--sm"><span class="hud-frame" aria-hidden="true"></span>Tierra</button>
+          <button id="focus-moon-btn" class="hud-btn hud-btn--ghost hud-btn--sm"><span class="hud-frame" aria-hidden="true"></span>Luna</button>
+          <button id="focus-mars-btn" class="hud-btn hud-btn--ghost hud-btn--sm hud-btn--mars"><span class="hud-frame" aria-hidden="true"></span>Marte</button>
+          <button id="focus-satellite-btn" class="hud-btn hud-btn--ghost hud-btn--sm"><span class="hud-frame" aria-hidden="true"></span>Satélite</button>
+          <button id="focus-orion-btn" class="hud-btn hud-btn--ghost hud-btn--sm is-active"><span class="hud-frame" aria-hidden="true"></span>Orión</button>
         </div>
       </div>
 
       <!-- 2. Botón Pausar / Reanudar -->
       <div class="flex items-center justify-between">
         <span class="text-xs text-slate-300">Rotación de los planetas</span>
-        <button
-          id="toggle-rotation-btn"
-          class="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/40 text-sky-200 text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer"
-        >
-          <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+        <button id="toggle-rotation-btn" class="hud-btn">
+          <span class="hud-frame" aria-hidden="true"></span>
+          <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" class="hud-icon !w-3.5 !h-3.5" viewBox="0 0 24 24" fill="currentColor">
             <rect x="6" y="4" width="4" height="16" rx="1"></rect>
             <rect x="14" y="4" width="4" height="16" rx="1"></rect>
           </svg>
-          <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 hidden" viewBox="0 0 24 24" fill="currentColor">
+          <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="hud-icon !w-3.5 !h-3.5 hidden" viewBox="0 0 24 24" fill="currentColor">
             <polygon points="5 3 19 12 5 21 5 3"></polygon>
           </svg>
+          <span class="hud-divider"></span>
           <span id="rotation-btn-label">Pausar</span>
         </button>
       </div>
@@ -200,7 +1090,7 @@
       <div class="space-y-1.5">
         <div class="flex justify-between text-xs">
           <label for="speed-slider" class="text-slate-300">Velocidad de rotación</label>
-          <span id="speed-value" class="text-sky-300 font-mono font-medium">1.0x</span>
+          <span id="speed-value" class="text-sky-300 font-mono font-medium">0.5x</span>
         </div>
         <input
           id="speed-slider"
@@ -208,33 +1098,29 @@
           min="0"
           max="4"
           step="0.1"
-          value="1.0"
+          value="0.5"
         />
       </div>
 
       <!-- 4. Interruptores (Nubes y Atmósfera) -->
       <div class="pt-2.5 border-t border-white/10 grid grid-cols-2 gap-2">
         <!-- Nubes -->
-        <button
-          id="toggle-clouds-btn"
-          class="p-2.5 rounded-xl border border-sky-400/40 bg-sky-500/20 text-white text-xs font-medium flex items-center justify-between transition-all cursor-pointer"
-        >
-          <span class="flex items-center gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-sky-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button id="toggle-clouds-btn" class="hud-btn is-active !justify-between !px-3.5" aria-pressed="true">
+          <span class="hud-frame" aria-hidden="true"></span>
+          <span class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="hud-icon !w-3.5 !h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
             </svg>
             Nubes
           </span>
-          <span id="clouds-status" class="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
+          <span class="hud-dot"></span>
         </button>
 
         <!-- Atmósfera -->
-        <button
-          id="toggle-atmosphere-btn"
-          class="p-2.5 rounded-xl border border-sky-400/40 bg-sky-500/20 text-white text-xs font-medium flex items-center justify-between transition-all cursor-pointer"
-        >
-          <span class="flex items-center gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-sky-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button id="toggle-atmosphere-btn" class="hud-btn is-active !justify-between !px-3.5" aria-pressed="true">
+          <span class="hud-frame" aria-hidden="true"></span>
+          <span class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="hud-icon !w-3.5 !h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="4"></circle>
               <path d="M12 2v2"></path>
               <path d="M12 20v2"></path>
@@ -243,7 +1129,7 @@
             </svg>
             Atmósfera
           </span>
-          <span id="atmosphere-status" class="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
+          <span class="hud-dot"></span>
         </button>
       </div>
     </div>

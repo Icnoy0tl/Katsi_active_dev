@@ -3,5 +3,5 @@
  */
 export const state = {
   isRotating: true,
-  rotationSpeed: 1.0
+  rotationSpeed: 0.5
 };

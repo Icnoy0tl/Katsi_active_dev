@@ -2,18 +2,8 @@ import { state } from './state.js';
 
 const $ = (id) => document.getElementById(id);
 
-// Estilos del botón de destino activo (Marte usa acento naranja)
-const ACTIVE_FOCUS_CLASSES = {
-  default: ['bg-sky-500/25', 'text-sky-200', 'border-sky-400/40'],
-  mars: ['bg-orange-500/25', 'text-orange-200', 'border-orange-400/40']
-};
-const INACTIVE_FOCUS_CLASSES = ['text-slate-400', 'border-transparent'];
-
-// Estilos de los interruptores (botón + punto de estado)
-const TOGGLE_ON = ['border-sky-400/40', 'bg-sky-500/20', 'text-white'];
-const TOGGLE_OFF = ['border-white/10', 'bg-white/5', 'text-slate-400'];
-const DOT_ON = ['bg-sky-400', 'shadow-[0_0_8px_#38bdf8]'];
-const DOT_OFF = ['bg-slate-600'];
+// Estado resaltado de los botones .hud-btn (el acento de Marte lo define .hud-btn--mars)
+const ACTIVE_CLASS = 'is-active';
 
 /**
  * Conecta el panel de control con la escena.
@@ -21,13 +11,17 @@ const DOT_OFF = ['bg-slate-600'];
  * @param cameraNavigator  navegador de cámara (focus, currentFocus)
  * @param onToggleClouds(visible)     muestra u oculta las nubes
  * @param onToggleAtmosphere(visible) muestra u oculta las atmósferas
+ * @param onFocus(name)               se llama cada vez que se enfoca un cuerpo
+ * @returns { focus(name), setRotating(on) } — enfoca un cuerpo manteniendo sincronizados los
+ *          botones "Ir a"; pausa o reanuda la rotación manteniendo sincronizado su botón
  */
-export function setupControlPanel({ cameraNavigator, onToggleClouds, onToggleAtmosphere }) {
+export function setupControlPanel({ cameraNavigator, onToggleClouds, onToggleAtmosphere, onFocus }) {
   setupPanelVisibility();
-  setupFocusButtons(cameraNavigator);
-  setupRotationControls();
-  bindToggle('toggle-clouds-btn', 'clouds-status', onToggleClouds);
-  bindToggle('toggle-atmosphere-btn', 'atmosphere-status', onToggleAtmosphere);
+  const focus = setupFocusButtons(cameraNavigator, onFocus);
+  const setRotating = setupRotationControls();
+  bindToggle('toggle-clouds-btn', onToggleClouds);
+  bindToggle('toggle-atmosphere-btn', onToggleAtmosphere);
+  return { focus, setRotating };
 }
 
 /** Mostrar / ocultar el panel */
@@ -43,29 +37,26 @@ function setupPanelVisibility() {
 }
 
 /** Botones "Ir a" y "Centrar vista" */
-function setupFocusButtons(cameraNavigator) {
+function setupFocusButtons(cameraNavigator, onFocus) {
   const buttons = {
     earth: $('focus-earth-btn'),
     moon: $('focus-moon-btn'),
     mars: $('focus-mars-btn'),
-    satellite: $('focus-satellite-btn')
+    satellite: $('focus-satellite-btn'),
+    orion: $('focus-orion-btn')
   };
-  const allActiveClasses = [...ACTIVE_FOCUS_CLASSES.default, ...ACTIVE_FOCUS_CLASSES.mars];
 
-  const select = (name) => {
+  const select = (name, distanceScale) => {
     Object.entries(buttons).forEach(([key, button]) => {
-      button.classList.remove(...allActiveClasses, ...INACTIVE_FOCUS_CLASSES);
-      if (key === name) {
-        button.classList.add(...(ACTIVE_FOCUS_CLASSES[key] || ACTIVE_FOCUS_CLASSES.default));
-      } else {
-        button.classList.add(...INACTIVE_FOCUS_CLASSES);
-      }
+      button.classList.toggle(ACTIVE_CLASS, key === name);
     });
-    cameraNavigator.focus(name);
+    cameraNavigator.focus(name, false, distanceScale);
+    onFocus?.(name);
   };
 
   Object.entries(buttons).forEach(([name, button]) => button.addEventListener('click', () => select(name)));
   $('reset-camera-btn').addEventListener('click', () => select(cameraNavigator.currentFocus));
+  return select;
 }
 
 /** Pausar / reanudar la rotación y ajustar su velocidad */
@@ -74,32 +65,31 @@ function setupRotationControls() {
   const playIcon = $('play-icon');
   const label = $('rotation-btn-label');
 
-  $('toggle-rotation-btn').addEventListener('click', () => {
-    state.isRotating = !state.isRotating;
-    pauseIcon.classList.toggle('hidden', !state.isRotating);
-    playIcon.classList.toggle('hidden', state.isRotating);
-    label.textContent = state.isRotating ? 'Pausar' : 'Reanudar';
-  });
+  const setRotating = (on) => {
+    state.isRotating = on;
+    pauseIcon.classList.toggle('hidden', !on);
+    playIcon.classList.toggle('hidden', on);
+    label.textContent = on ? 'Pausar' : 'Reanudar';
+  };
+  $('toggle-rotation-btn').addEventListener('click', () => setRotating(!state.isRotating));
 
   const speedValue = $('speed-value');
   $('speed-slider').addEventListener('input', (event) => {
     state.rotationSpeed = parseFloat(event.target.value);
     speedValue.textContent = `${state.rotationSpeed.toFixed(1)}x`;
   });
+  return setRotating;
 }
 
 /** Interruptor encendido/apagado (empieza encendido) */
-function bindToggle(buttonId, dotId, onChange) {
+function bindToggle(buttonId, onChange) {
   const button = $(buttonId);
-  const dot = $(dotId);
   let isOn = true;
 
   button.addEventListener('click', () => {
     isOn = !isOn;
-    button.classList.remove(...(isOn ? TOGGLE_OFF : TOGGLE_ON));
-    button.classList.add(...(isOn ? TOGGLE_ON : TOGGLE_OFF));
-    dot.classList.remove(...(isOn ? DOT_OFF : DOT_ON));
-    dot.classList.add(...(isOn ? DOT_ON : DOT_OFF));
+    button.classList.toggle(ACTIVE_CLASS, isOn);
+    button.setAttribute('aria-pressed', String(isOn));
     onChange(isOn);
   });
 }

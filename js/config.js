@@ -8,6 +8,7 @@ const deg = THREE.MathUtils.degToRad;
  */
 export const EARTH = {
   radius: 2.0,
+  realRadiusKm: 6371, // para la escala de los hologramas
   cloudsRadius: 2.028,
   atmosphereRadius: 2.16,
   axialTilt: deg(23.44),
@@ -17,11 +18,26 @@ export const EARTH = {
 const MOON_RADIUS = EARTH.radius * 0.273;
 export const MOON = {
   radius: MOON_RADIUS,
+  realRadiusKm: 1737.4, // para convertir km de superficie a unidades de escena
   distance: 7.6,
   angle: 0.65,
   orbitInclination: deg(5.14),
   axialTilt: deg(6.68),
-  flightSafeRadius: MOON_RADIUS * 1.5
+  flightSafeRadius: MOON_RADIUS * 1.5,
+  /**
+   * Vista de una misión: Luna más pequeña (cámara a `distance` del centro), desplazada a la
+   * izquierda y hacia arriba (`viewShift` [x, y], fracciones del ancho/alto) para dejar sitio
+   * a los hologramas y a la Tierra debajo. `faceCamera` gira el área hacia la cámara
+   * (0 = de perfil en el borde derecho, mayor = más de frente).
+   * `earth`: Tierra en miniatura (no a escala) bajo la Luna; `drop` es la separación vertical
+   * entre centros como fracción de `distance` (así se mantiene la composición).
+   */
+  missionView: {
+    distance: 4.6,
+    viewShift: [-0.07, 0.2],
+    faceCamera: 0.55,
+    earth: { radius: 0.62, drop: 0.37 }
+  }
 };
 
 const MARS_RADIUS = EARTH.radius * 0.532;
@@ -35,15 +51,62 @@ export const MARS = {
   orbitInclination: deg(1.85),
   orbitTiltX: deg(-1.4),
   axialTilt: deg(25.19),
-  flightSafeRadius: MARS_RADIUS * 1.4
+  flightSafeRadius: MARS_RADIUS * 1.4,
+  realRadiusKm: 3389.5,
+  /**
+   * Misma composición que la vista de misión de la Luna (ver MOON.missionView), con las
+   * distancias escaladas al radio de Marte para que ocupe lo mismo en pantalla
+   */
+  missionView: {
+    distance: 4.6 * (MARS_RADIUS / MOON_RADIUS),
+    viewShift: [-0.07, 0.2],
+    faceCamera: 0.55,
+    earth: { radius: 0.62 * (MARS_RADIUS / MOON_RADIUS), drop: 0.37 }
+  }
 };
 
 export const SATELLITE = {
+  distance: 3.2,
+  angle: -0.9,
+  orbitInclination: deg(28.5),
+  scale: 0.034, // el modelo se construye en unidades locales (~12.5 de envergadura)
+  flightSafeRadius: 0.3
+};
+
+/**
+ * Cápsula tipo Orión en órbita baja terrestre (inclinación 51.6°, la de la ISS).
+ * `pose` inclina la nave respecto a la cámara (rad).
+ */
+export const ORION = {
   distance: 2.95,
   angle: 1.1,
   orbitInclination: deg(51.6),
-  scale: 0.034, // el modelo se construye en unidades locales (~12.5 de envergadura)
-  flightSafeRadius: 0.3
+  scale: 0.017, // el modelo se construye en ~metros (~19 de envergadura)
+  pose: { pitch: -0.12, roll: -0.18 },
+  flightSafeRadius: 0.22
+};
+
+/**
+ * Menú principal: la vista se desplaza horizontalmente (fracción del ancho) para dejar
+ * Orión a la derecha y el menú a la izquierda. En pantallas estrechas no se desplaza.
+ */
+export const MENU = {
+  viewShift: 0.22,
+  minWidthForShift: 700, // px
+  shiftSpeed: 4, // velocidad de la transición del desplazamiento
+  /**
+   * Recorrido automático de fondo: en cada parada la cámara gira muy despacio, siempre
+   * hacia la derecha, durante `hold` segundos y luego vuela a la siguiente.
+   * `distanceScale` < 1 acerca la cámara respecto a la vista normal del cuerpo.
+   */
+  tour: {
+    stops: [
+      { body: 'orion', hold: 5 },
+      { body: 'moon', hold: 5, distanceScale: 0.8 },
+      { body: 'mars', hold: 5, distanceScale: 0.8 }
+    ],
+    driftSpeed: 0.012 // rad/s (≈ 0.7°/s) de giro alrededor del cuerpo
+  }
 };
 
 /** Rotación sobre su propio eje (rad/s a velocidad 1x) */

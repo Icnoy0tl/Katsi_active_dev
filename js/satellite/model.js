@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { getEnvironmentMap } from '../utils/environment.js';
 import { createSatelliteTextures } from './textures.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
@@ -187,9 +187,7 @@ export function buildSatelliteModel({ renderer, anisotropy }) {
  * (solo afecta al satélite).
  */
 function createMaterials(renderer, textures) {
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  const envMap = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  pmrem.dispose();
+  const envMap = getEnvironmentMap(renderer);
 
   const standard = (params) => new THREE.MeshStandardMaterial({ envMap, ...params });
 
@@ -209,7 +207,7 @@ function createMaterials(renderer, textures) {
 /**
  * Tobera tipo campana (abre hacia +Y local)
  */
-function createBellGeometry(scale) {
+export function createBellGeometry(scale) {
   const profile = [[0.06, 0], [0.075, 0.04], [0.1, 0.1], [0.15, 0.2], [0.21, 0.32]];
   return new THREE.LatheGeometry(profile.map(([r, y]) => new THREE.Vector2(r * scale, y * scale)), 32);
 }

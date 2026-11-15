@@ -3,6 +3,8 @@ import { FLIGHT } from './config.js';
 
 const outward = new THREE.Vector3();
 const side = new THREE.Vector3();
+// Componente vertical máxima de la vista sobre un punto de superficie (evita mirar justo desde el polo)
+const MAX_POLAR_Y = 0.995;
 
 /**
  * Vista lateral de un cuerpo: la cámara se coloca de costado respecto a la línea Tierra-cuerpo,
@@ -52,6 +54,19 @@ function createFocusViews(bodies) {
       },
       zoom: [0.18, 3.0],
       near: 0.01 // reducido para no recortar el modelo al acercarse
+    },
+    orion: {
+      object: bodies.orion,
+      // Desde fuera de la órbita, con la Tierra de fondo
+      cameraPosition: (target, out) => {
+        outward.copy(target).normalize();
+        side.set(-outward.z, 0, outward.x).normalize();
+        out.copy(target).addScaledVector(outward, 0.6).addScaledVector(side, -0.2);
+        out.y += 0.12;
+        return out;
+      },
+      zoom: [0.16, 3.0],
+      near: 0.01
     }
   };
 }
@@ -60,7 +75,7 @@ function createFocusViews(bodies) {
  * Lleva la cámara de un cuerpo a otro con un vuelo corto (aceleración y frenado suaves y un
  * arco leve), empujándola fuera de cualquier obstáculo que se cruce en el camino.
  *
- * @param bodies    objetos a enfocar: { earth, moon, mars, satellite }
+ * @param bodies    objetos a enfocar: { earth, moon, mars, satellite, orion }
  * @param obstacles esferas que el vuelo no atraviesa: [{ object, safeRadius }]
  */
 export function createCameraNavigator({ camera, controls, bodies, obstacles }) {
@@ -79,6 +94,7 @@ export function createCameraNavigator({ camera, controls, bodies, obstacles }) {
   const obstacleCenter = new THREE.Vector3();
   const obstacleOffset = new THREE.Vector3();
   let currentFocus = null;
+  const surfaceDirection = new THREE.Vector3();
 
   const applyZoomLimits = ([min, max]) => {
     controls.minDistance = min;
@@ -95,8 +111,18 @@ export function createCameraNavigator({ camera, controls, bodies, obstacles }) {
     if (flight.active) endFlight();
   });
 
-  /** Enfoca un cuerpo ("earth" | "moon" | "mars" | "satellite"); `instant` evita el vuelo */
-  function focus(name, instant = false) {
+  /** Posición de cámara predefinida para un destino (sin moverla) */
+  function viewPosition(name, out = new THREE.Vector3()) {
+    const view = views[name];
+    view.object.getWorldPosition(obstacleCenter);
+    return view.cameraPosition(obstacleCenter, out);
+  }
+
+  /**
+   * Enfoca un cuerpo ("earth" | "moon" | "mars" | "satellite" | "orion"); `instant` evita el vuelo.
+   * `distanceScale` < 1 acerca la cámara respecto a la vista predefinida.
+   */
+  function focus(name, instant = false, distanceScale = 1) {
     const view = views[name];
     currentFocus = name;
 
@@ -105,6 +131,9 @@ export function createCameraNavigator({ camera, controls, bodies, obstacles }) {
 
     view.object.getWorldPosition(flight.toTarget);
     view.cameraPosition(flight.toTarget, flight.toCamera);
+    if (distanceScale !== 1) {
+      flight.toCamera.sub(flight.toTarget).multiplyScalar(distanceScale).add(flight.toTarget);
+    }
     flight.zoom = view.zoom;
 
     if (instant) {
@@ -128,6 +157,25 @@ export function createCameraNavigator({ camera, controls, bodies, obstacles }) {
 
     // Sin límites de zoom durante el vuelo para que OrbitControls no lo frene
     applyZoomLimits([0, Infinity]);
+  }
+
+  /**
+   * Vuela hasta ver un cuerpo desde `direction` (unitaria, en coordenadas de mundo) a
+   * `distance` de su centro; la cámara sigue orbitando alrededor del cuerpo.
+   */
+  function focusFrom(name, direction, distance) {
+    const view = views[name];
+    focus(name);
+    // Cerca de los polos se separa un poco del eje vertical para que OrbitControls no se bloquee
+    surfaceDirection.copy(direction);
+    if (Math.abs(direction.y) > MAX_POLAR_Y) {
+      surfaceDirection.y = 0;
+      if (surfaceDirection.lengthSq() < 1e-6) surfaceDirection.set(1, 0, 0);
+      surfaceDirection.setLength(Math.sqrt(1 - MAX_POLAR_Y * MAX_POLAR_Y));
+      surfaceDirection.y = Math.sign(direction.y) * MAX_POLAR_Y;
+    }
+    view.object.getWorldPosition(flight.toTarget);
+    flight.toCamera.copy(flight.toTarget).addScaledVector(surfaceDirection.normalize(), distance);
   }
 
   /** Avanza el vuelo (smootherstep) evitando atravesar obstáculos */
@@ -155,7 +203,12 @@ export function createCameraNavigator({ camera, controls, bodies, obstacles }) {
 
   return {
     focus,
+    focusFrom,
     update,
+    get isFlying() {
+      return flight.active;
+    },
+    viewPosition,
     get currentFocus() {
       return currentFocus;
     }
