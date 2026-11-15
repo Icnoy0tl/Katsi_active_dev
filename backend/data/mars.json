@@ -1,0 +1,559 @@
+{
+  "regions": [
+    {
+      "regionId": "MARS-001",
+      "name": "Jezero Crater (Perseverance)",
+      "coordinates": {
+        "latitude": 18.44,
+        "longitude": 77.45
+      },
+      "coreVariables": {
+        "slope": 4.0,
+        "radar_roughness": 0.5,
+        "apparent_thermal_inertia": 380,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.55,
+        "low_sun_shadows": 20,
+        "line_of_sight": 55,
+        "diurnal_thermal_range": 90,
+        "dust_aerosols": 0.5,
+        "insolation": 125
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 12,
+        "grain_size_um": 200,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 3,
+        "vrm_microrelief": 0.02,
+        "dielectric_constant": 6.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.15,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.806,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 20,
+        "abrasive_mohs": 6.5
+      }
+    },
+    {
+      "regionId": "MARS-002",
+      "name": "Gale Crater - Aeolis Mons base (Curiosity)",
+      "coordinates": {
+        "latitude": -4.59,
+        "longitude": 137.44
+      },
+      "coreVariables": {
+        "slope": 4.0,
+        "radar_roughness": 0.55,
+        "apparent_thermal_inertia": 340,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.6,
+        "low_sun_shadows": 25,
+        "line_of_sight": 45,
+        "diurnal_thermal_range": 80,
+        "dust_aerosols": 0.5,
+        "insolation": 140
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 10,
+        "grain_size_um": 150,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 2,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 5.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.16,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.958,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 15,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MARS-003",
+      "name": "Arcadia Planitia",
+      "coordinates": {
+        "latitude": 47.0,
+        "longitude": -176.0
+      },
+      "coreVariables": {
+        "slope": 1.5,
+        "radar_roughness": 0.3,
+        "apparent_thermal_inertia": 250,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.25,
+        "low_sun_shadows": 6,
+        "line_of_sight": 85,
+        "diurnal_thermal_range": 70,
+        "dust_aerosols": 0.4,
+        "insolation": 85
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 5,
+        "grain_size_um": 10,
+        "angle_of_repose_deg": 30,
+        "depth_to_bedrock_min_m": null,
+        "depth_to_bedrock_max_m": null,
+        "vrm_microrelief": 0.003,
+        "dielectric_constant": 3.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.27,
+        "albedo": 0.26,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.874,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 15,
+        "abrasive_mohs": 5.5
+      }
+    },
+    {
+      "regionId": "MARS-004",
+      "name": "Gusev Crater (Spirit)",
+      "coordinates": {
+        "latitude": -14.57,
+        "longitude": 175.47
+      },
+      "coreVariables": {
+        "slope": 3.0,
+        "radar_roughness": 0.45,
+        "apparent_thermal_inertia": 280,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.45,
+        "low_sun_shadows": 12,
+        "line_of_sight": 70,
+        "diurnal_thermal_range": 85,
+        "dust_aerosols": 0.5,
+        "insolation": 150
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 15,
+        "grain_size_um": 100,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 3,
+        "vrm_microrelief": 0.02,
+        "dielectric_constant": 5.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.2,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.756,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 18,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MARS-005",
+      "name": "Meridiani Planum (Opportunity)",
+      "coordinates": {
+        "latitude": -1.95,
+        "longitude": -5.53
+      },
+      "coreVariables": {
+        "slope": 1.0,
+        "radar_roughness": 0.25,
+        "apparent_thermal_inertia": 200,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.3,
+        "low_sun_shadows": 5,
+        "line_of_sight": 85,
+        "diurnal_thermal_range": 85,
+        "dust_aerosols": 0.5,
+        "insolation": 160
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 5,
+        "grain_size_um": 100,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 3,
+        "vrm_microrelief": 0.005,
+        "dielectric_constant": 5.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.17,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.722,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 20,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MARS-006",
+      "name": "Hellas Planitia floor",
+      "coordinates": {
+        "latitude": -42.4,
+        "longitude": 70.5
+      },
+      "coreVariables": {
+        "slope": 1.0,
+        "radar_roughness": 0.3,
+        "apparent_thermal_inertia": 230,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.25,
+        "low_sun_shadows": 6,
+        "line_of_sight": 85,
+        "diurnal_thermal_range": 75,
+        "dust_aerosols": 0.6,
+        "insolation": 105
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 5,
+        "grain_size_um": 50,
+        "angle_of_repose_deg": 32,
+        "depth_to_bedrock_min_m": null,
+        "depth_to_bedrock_max_m": null,
+        "vrm_microrelief": 0.003,
+        "dielectric_constant": 4.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.22,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 1.219,
+        "wind_typical_ms": 6,
+        "wind_gust_ms": 20,
+        "abrasive_mohs": 5.5
+      }
+    },
+    {
+      "regionId": "MARS-007",
+      "name": "Coprates Chasma (Valles Marineris)",
+      "coordinates": {
+        "latitude": -13.5,
+        "longitude": -59.0
+      },
+      "coreVariables": {
+        "slope": 15.0,
+        "radar_roughness": 0.7,
+        "apparent_thermal_inertia": 280,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.6,
+        "low_sun_shadows": 45,
+        "line_of_sight": 30,
+        "diurnal_thermal_range": 85,
+        "dust_aerosols": 0.5,
+        "insolation": 130
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 20,
+        "grain_size_um": 100,
+        "angle_of_repose_deg": 34,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 5,
+        "vrm_microrelief": 0.05,
+        "dielectric_constant": 5.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.18,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.916,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 15,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MARS-008",
+      "name": "Olympus Mons summit caldera",
+      "coordinates": {
+        "latitude": 18.65,
+        "longitude": -133.8
+      },
+      "coreVariables": {
+        "slope": 8.0,
+        "radar_roughness": 0.55,
+        "apparent_thermal_inertia": 150,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.3,
+        "low_sun_shadows": 15,
+        "line_of_sight": 65,
+        "diurnal_thermal_range": 60,
+        "dust_aerosols": 0.2,
+        "insolation": 150
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 8,
+        "grain_size_um": 50,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 5,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 4.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.25,
+        "albedo": 0.22,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.094,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 15,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MARS-009",
+      "name": "Arsia Mons",
+      "coordinates": {
+        "latitude": -8.3,
+        "longitude": -121.1
+      },
+      "coreVariables": {
+        "slope": 7.0,
+        "radar_roughness": 0.55,
+        "apparent_thermal_inertia": 150,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 15,
+        "line_of_sight": 65,
+        "diurnal_thermal_range": 65,
+        "dust_aerosols": 0.2,
+        "insolation": 155
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 8,
+        "grain_size_um": 50,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 5,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 4.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.25,
+        "albedo": 0.2,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.126,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 15,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MARS-010",
+      "name": "Medusae Fossae Formation",
+      "coordinates": {
+        "latitude": -5.0,
+        "longitude": -147.0
+      },
+      "coreVariables": {
+        "slope": 3.0,
+        "radar_roughness": 0.4,
+        "apparent_thermal_inertia": 120,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 10,
+        "line_of_sight": 70,
+        "diurnal_thermal_range": 85,
+        "dust_aerosols": 0.5,
+        "insolation": 150
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 3,
+        "grain_size_um": 30,
+        "angle_of_repose_deg": 30,
+        "depth_to_bedrock_min_m": null,
+        "depth_to_bedrock_max_m": null,
+        "vrm_microrelief": 0.01,
+        "dielectric_constant": 3.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.2,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.665,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 18,
+        "abrasive_mohs": 5.0
+      }
+    },
+    {
+      "regionId": "MARS-011",
+      "name": "Syrtis Major Planum",
+      "coordinates": {
+        "latitude": 8.4,
+        "longitude": 69.5
+      },
+      "coreVariables": {
+        "slope": 3.0,
+        "radar_roughness": 0.4,
+        "apparent_thermal_inertia": 220,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 10,
+        "line_of_sight": 75,
+        "diurnal_thermal_range": 90,
+        "dust_aerosols": 0.5,
+        "insolation": 150
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 8,
+        "grain_size_um": 100,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 4,
+        "vrm_microrelief": 0.02,
+        "dielectric_constant": 5.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.14,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.581,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 18,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MARS-012",
+      "name": "Nili Fossae",
+      "coordinates": {
+        "latitude": 22.56,
+        "longitude": 76.8
+      },
+      "coreVariables": {
+        "slope": 5.0,
+        "radar_roughness": 0.5,
+        "apparent_thermal_inertia": 300,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.55,
+        "low_sun_shadows": 18,
+        "line_of_sight": 55,
+        "diurnal_thermal_range": 90,
+        "dust_aerosols": 0.5,
+        "insolation": 130
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 12,
+        "grain_size_um": 150,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 3,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 5.5,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.15,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.654,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 18,
+        "abrasive_mohs": 6.5
+      }
+    },
+    {
+      "regionId": "MARS-013",
+      "name": "Mawrth Vallis",
+      "coordinates": {
+        "latitude": 22.36,
+        "longitude": -16.5
+      },
+      "coreVariables": {
+        "slope": 3.0,
+        "radar_roughness": 0.35,
+        "apparent_thermal_inertia": 220,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 8,
+        "line_of_sight": 75,
+        "diurnal_thermal_range": 85,
+        "dust_aerosols": 0.5,
+        "insolation": 130
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 5,
+        "grain_size_um": 100,
+        "angle_of_repose_deg": 32,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 5,
+        "vrm_microrelief": 0.02,
+        "dielectric_constant": 4.5,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.22,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.836,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 15,
+        "abrasive_mohs": 5.5
+      }
+    },
+    {
+      "regionId": "MARS-014",
+      "name": "Utopia Planitia (Zhurong)",
+      "coordinates": {
+        "latitude": 25.07,
+        "longitude": 109.9
+      },
+      "coreVariables": {
+        "slope": 1.5,
+        "radar_roughness": 0.3,
+        "apparent_thermal_inertia": 240,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.25,
+        "low_sun_shadows": 5,
+        "line_of_sight": 85,
+        "diurnal_thermal_range": 80,
+        "dust_aerosols": 0.4,
+        "insolation": 125
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 8,
+        "grain_size_um": 100,
+        "angle_of_repose_deg": 32,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 5,
+        "vrm_microrelief": 0.005,
+        "dielectric_constant": 4.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.28,
+        "albedo": 0.2,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.924,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 15,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MARS-015",
+      "name": "Elysium Planitia (InSight)",
+      "coordinates": {
+        "latitude": 4.5,
+        "longitude": 135.6
+      },
+      "coreVariables": {
+        "slope": 1.0,
+        "radar_roughness": 0.25,
+        "apparent_thermal_inertia": 180,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.2,
+        "low_sun_shadows": 4,
+        "line_of_sight": 85,
+        "diurnal_thermal_range": 85,
+        "dust_aerosols": 0.5,
+        "insolation": 150
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 4,
+        "grain_size_um": 100,
+        "angle_of_repose_deg": 33,
+        "depth_to_bedrock_min_m": 0,
+        "depth_to_bedrock_max_m": 5,
+        "vrm_microrelief": 0.005,
+        "dielectric_constant": 4.0,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.2,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.807,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 18,
+        "abrasive_mohs": 6.0
+      }
+    }
+  ]
+}

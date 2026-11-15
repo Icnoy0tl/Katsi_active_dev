@@ -1,0 +1,559 @@
+{
+  "regions": [
+    {
+      "regionId": "MOON-001",
+      "name": "Shackleton Crater rim",
+      "coordinates": {
+        "latitude": -89.9,
+        "longitude": 129.78
+      },
+      "coreVariables": {
+        "slope": 14.0,
+        "radar_roughness": 0.55,
+        "apparent_thermal_inertia": 60,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 55,
+        "line_of_sight": 30,
+        "diurnal_thermal_range": 130,
+        "dust_aerosols": 0.0,
+        "insolation": 28
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 1.5,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 5,
+        "depth_to_bedrock_max_m": 15,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 2.7,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.15,
+        "albedo": 0.15,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MOON-002",
+      "name": "Mare Tranquillitatis",
+      "coordinates": {
+        "latitude": 8.5,
+        "longitude": 31.4
+      },
+      "coreVariables": {
+        "slope": 2.5,
+        "radar_roughness": 0.3,
+        "apparent_thermal_inertia": 55,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.2,
+        "low_sun_shadows": 10,
+        "line_of_sight": 80,
+        "diurnal_thermal_range": 290,
+        "dust_aerosols": 0.0,
+        "insolation": 425
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 0.7,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 3,
+        "depth_to_bedrock_max_m": 6,
+        "vrm_microrelief": 0.005,
+        "dielectric_constant": 3.0,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.08,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 5.5
+      }
+    },
+    {
+      "regionId": "MOON-003",
+      "name": "Aristarchus Plateau",
+      "coordinates": {
+        "latitude": 24.5,
+        "longitude": -49.0
+      },
+      "coreVariables": {
+        "slope": 7.0,
+        "radar_roughness": 0.75,
+        "apparent_thermal_inertia": 90,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.7,
+        "low_sun_shadows": 35,
+        "line_of_sight": 50,
+        "diurnal_thermal_range": 270,
+        "dust_aerosols": 0.0,
+        "insolation": 395
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 4.0,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 2,
+        "depth_to_bedrock_max_m": 8,
+        "vrm_microrelief": 0.04,
+        "dielectric_constant": 2.8,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.18,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MOON-004",
+      "name": "Malapert Massif",
+      "coordinates": {
+        "latitude": -86.0,
+        "longitude": 0.1
+      },
+      "coreVariables": {
+        "slope": 10.0,
+        "radar_roughness": 0.45,
+        "apparent_thermal_inertia": 60,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.4,
+        "low_sun_shadows": 45,
+        "line_of_sight": 55,
+        "diurnal_thermal_range": 150,
+        "dust_aerosols": 0.0,
+        "insolation": 60
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 1.5,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 5,
+        "depth_to_bedrock_max_m": 15,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 2.7,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.15,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MOON-005",
+      "name": "Connecting Ridge (Shackleton - de Gerlache)",
+      "coordinates": {
+        "latitude": -89.45,
+        "longitude": -137.3
+      },
+      "coreVariables": {
+        "slope": 8.0,
+        "radar_roughness": 0.5,
+        "apparent_thermal_inertia": 60,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 50,
+        "line_of_sight": 40,
+        "diurnal_thermal_range": 120,
+        "dust_aerosols": 0.0,
+        "insolation": 40
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 1.5,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 5,
+        "depth_to_bedrock_max_m": 15,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 2.7,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.15,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MOON-006",
+      "name": "Cabeus Crater rim",
+      "coordinates": {
+        "latitude": -84.9,
+        "longitude": -35.5
+      },
+      "coreVariables": {
+        "slope": 12.0,
+        "radar_roughness": 0.5,
+        "apparent_thermal_inertia": 60,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 60,
+        "line_of_sight": 35,
+        "diurnal_thermal_range": 100,
+        "dust_aerosols": 0.0,
+        "insolation": 20
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 2.0,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 5,
+        "depth_to_bedrock_max_m": 15,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 2.7,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.12,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MOON-007",
+      "name": "Nobile Crater rim",
+      "coordinates": {
+        "latitude": -85.2,
+        "longitude": 53.5
+      },
+      "coreVariables": {
+        "slope": 12.0,
+        "radar_roughness": 0.5,
+        "apparent_thermal_inertia": 60,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 55,
+        "line_of_sight": 35,
+        "diurnal_thermal_range": 110,
+        "dust_aerosols": 0.0,
+        "insolation": 30
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 2.0,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 5,
+        "depth_to_bedrock_max_m": 15,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 2.7,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.13,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MOON-008",
+      "name": "Taurus-Littrow Valley (Apollo 17)",
+      "coordinates": {
+        "latitude": 20.19,
+        "longitude": 30.77
+      },
+      "coreVariables": {
+        "slope": 6.0,
+        "radar_roughness": 0.45,
+        "apparent_thermal_inertia": 65,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.45,
+        "low_sun_shadows": 25,
+        "line_of_sight": 40,
+        "diurnal_thermal_range": 285,
+        "dust_aerosols": 0.0,
+        "insolation": 405
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 2.5,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 8,
+        "depth_to_bedrock_max_m": 15,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 2.9,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.12,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 5.5
+      }
+    },
+    {
+      "regionId": "MOON-009",
+      "name": "Marius Hills volcanic field",
+      "coordinates": {
+        "latitude": 14.0,
+        "longitude": -56.0
+      },
+      "coreVariables": {
+        "slope": 5.0,
+        "radar_roughness": 0.6,
+        "apparent_thermal_inertia": 70,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.55,
+        "low_sun_shadows": 20,
+        "line_of_sight": 60,
+        "diurnal_thermal_range": 285,
+        "dust_aerosols": 0.0,
+        "insolation": 415
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 3.0,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 4,
+        "depth_to_bedrock_max_m": 10,
+        "vrm_microrelief": 0.04,
+        "dielectric_constant": 3.0,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.08,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 5.5
+      }
+    },
+    {
+      "regionId": "MOON-010",
+      "name": "Reiner Gamma",
+      "coordinates": {
+        "latitude": 7.5,
+        "longitude": -59.0
+      },
+      "coreVariables": {
+        "slope": 2.5,
+        "radar_roughness": 0.3,
+        "apparent_thermal_inertia": 55,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.25,
+        "low_sun_shadows": 10,
+        "line_of_sight": 80,
+        "diurnal_thermal_range": 290,
+        "dust_aerosols": 0.0,
+        "insolation": 430
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 1.0,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 4,
+        "depth_to_bedrock_max_m": 6,
+        "vrm_microrelief": 0.005,
+        "dielectric_constant": 3.0,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.15,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 5.5
+      }
+    },
+    {
+      "regionId": "MOON-011",
+      "name": "Mons Rumker",
+      "coordinates": {
+        "latitude": 40.8,
+        "longitude": -58.1
+      },
+      "coreVariables": {
+        "slope": 6.0,
+        "radar_roughness": 0.5,
+        "apparent_thermal_inertia": 65,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.4,
+        "low_sun_shadows": 20,
+        "line_of_sight": 60,
+        "diurnal_thermal_range": 250,
+        "dust_aerosols": 0.0,
+        "insolation": 328
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 1.5,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 4,
+        "depth_to_bedrock_max_m": 8,
+        "vrm_microrelief": 0.02,
+        "dielectric_constant": 3.0,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.09,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 5.5
+      }
+    },
+    {
+      "regionId": "MOON-012",
+      "name": "Tycho Crater",
+      "coordinates": {
+        "latitude": -43.3,
+        "longitude": -11.2
+      },
+      "coreVariables": {
+        "slope": 12.0,
+        "radar_roughness": 0.8,
+        "apparent_thermal_inertia": 100,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.75,
+        "low_sun_shadows": 40,
+        "line_of_sight": 40,
+        "diurnal_thermal_range": 260,
+        "dust_aerosols": 0.0,
+        "insolation": 315
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 6.0,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 1,
+        "depth_to_bedrock_max_m": 5,
+        "vrm_microrelief": 0.05,
+        "dielectric_constant": 2.8,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.2,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MOON-013",
+      "name": "Lacus Mortis pit",
+      "coordinates": {
+        "latitude": 44.96,
+        "longitude": 25.61
+      },
+      "coreVariables": {
+        "slope": 4.0,
+        "radar_roughness": 0.45,
+        "apparent_thermal_inertia": 65,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 15,
+        "line_of_sight": 70,
+        "diurnal_thermal_range": 240,
+        "dust_aerosols": 0.0,
+        "insolation": 305
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 1.5,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 4,
+        "depth_to_bedrock_max_m": 6,
+        "vrm_microrelief": 0.02,
+        "dielectric_constant": 3.0,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.1,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 5.5
+      }
+    },
+    {
+      "regionId": "MOON-014",
+      "name": "Schrodinger Basin floor",
+      "coordinates": {
+        "latitude": -75.0,
+        "longitude": 132.4
+      },
+      "coreVariables": {
+        "slope": 7.0,
+        "radar_roughness": 0.55,
+        "apparent_thermal_inertia": 65,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.45,
+        "low_sun_shadows": 40,
+        "line_of_sight": 45,
+        "diurnal_thermal_range": 170,
+        "dust_aerosols": 0.0,
+        "insolation": 110
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 3.0,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 2,
+        "depth_to_bedrock_max_m": 8,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 2.8,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.14,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 6.0
+      }
+    },
+    {
+      "regionId": "MOON-015",
+      "name": "Mare Orientale",
+      "coordinates": {
+        "latitude": -19.4,
+        "longitude": -92.8
+      },
+      "coreVariables": {
+        "slope": 4.5,
+        "radar_roughness": 0.45,
+        "apparent_thermal_inertia": 65,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.4,
+        "low_sun_shadows": 15,
+        "line_of_sight": 65,
+        "diurnal_thermal_range": 285,
+        "dust_aerosols": 0.0,
+        "insolation": 410
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 3.0,
+        "grain_size_um": 70,
+        "angle_of_repose_deg": 35,
+        "depth_to_bedrock_min_m": 3,
+        "depth_to_bedrock_max_m": 10,
+        "vrm_microrelief": 0.03,
+        "dielectric_constant": 2.8,
+        "salinity_wt_pct": 0.0,
+        "diffuse_ratio": 0.0,
+        "albedo": 0.16,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.0,
+        "wind_typical_ms": 0,
+        "wind_gust_ms": 0,
+        "abrasive_mohs": 6.0
+      }
+    }
+  ]
+}
