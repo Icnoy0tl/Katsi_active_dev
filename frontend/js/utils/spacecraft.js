@@ -57,3 +57,22 @@ export function turnTowardsLight(array, localLight, follow) {
   const diff = Math.atan2(-localLight.y, localLight.z) - array.rotation.x;
   array.rotation.x += Math.atan2(Math.sin(diff), Math.cos(diff)) * follow;
 }
+
+/** Barras entre pares de puntos `[a, b]` como una única malla instanciada */
+export function createInstancedStruts(segments, radius, material) {
+  const mesh = new THREE.InstancedMesh(new THREE.CylinderGeometry(radius, radius, 1, 8), material, segments.length);
+  const matrix = new THREE.Matrix4();
+  const quaternion = new THREE.Quaternion();
+  const scale = new THREE.Vector3();
+  const middle = new THREE.Vector3();
+  const dir = new THREE.Vector3();
+  segments.forEach(([a, b], i) => {
+    dir.subVectors(b, a);
+    scale.set(1, dir.length(), 1);
+    middle.copy(a).addScaledVector(dir, 0.5);
+    quaternion.setFromUnitVectors(UP, dir.normalize());
+    mesh.setMatrixAt(i, matrix.compose(middle, quaternion, scale));
+  });
+  mesh.instanceMatrix.needsUpdate = true;
+  return mesh;
+}

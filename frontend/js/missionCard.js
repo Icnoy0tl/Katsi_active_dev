@@ -26,3 +26,19 @@ export function missionCardContent({ icon, title, meta, trailing }) {
         </span>
         ${trailing}`;
 }
+
+/** Iconos de las tarjetas de misión (paso previo a los terrenos) */
+export const MISSION_ICONS = {
+  // Movilidad: rover de seis ruedas
+  mobility:
+    '<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13h14l-1.5-4h-11Z"/><path d="M9 9V5.5h2.5"/><circle cx="6" cy="17.5" r="2"/><circle cx="12" cy="17.5" r="2"/><circle cx="18" cy="17.5" r="2"/></svg>',
+  // Percepción: antena parabólica
+  perception:
+    '<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5a9 9 0 0 0 12.7 12.7Z"/><path d="m11.3 11.8 4.2-4.2"/><circle cx="16.3" cy="6.8" r="1.2"/><path d="M9 15.5 7 21h7l-2.2-4"/></svg>',
+  // Supervivencia: panel solar
+  environmental_survival:
+    '<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16l-2 8H6Z"/><path d="M9.5 9 9 17M14.5 9l.5 8M5 13h14M12 17v3.5M9 20.5h6"/><path d="M12 2.5V5M6.5 4.5 8 6M17.5 4.5 16 6"/></svg>',
+  // Misión libre: brújula
+  '':
+    '<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8Z"/></svg>'
+};

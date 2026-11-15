@@ -67,6 +67,24 @@ function createFocusViews(bodies) {
       cameraPosition: orbitView(0.6, -0.2, 0.12),
       zoom: [0.16, 3.0],
       near: 0.01
+    },
+    rover: {
+      object: bodies.rover,
+      cameraPosition: orbitView(0.3, 0.22, 0.1),
+      zoom: [0.08, 3.0],
+      near: 0.005
+    },
+    antenna: {
+      object: bodies.antenna,
+      cameraPosition: orbitView(0.45, 0.25, 0.12),
+      zoom: [0.12, 3.0],
+      near: 0.01
+    },
+    solarPanel: {
+      object: bodies.solarPanel,
+      cameraPosition: orbitView(0.45, -0.3, 0.15),
+      zoom: [0.12, 3.0],
+      near: 0.01
     }
   };
 }
@@ -119,7 +137,7 @@ export function createCameraNavigator({ camera, controls, bodies, obstacles }) {
   }
 
   /**
-   * Enfoca un cuerpo ("earth" | "moon" | "mars" | "satellite" | "orion"); `instant` evita el vuelo.
+   * Enfoca un cuerpo ("earth" | "moon" | "mars" | "satellite" | "orion" | "rover" | "antenna" | "solarPanel"); `instant` evita el vuelo.
    * `distanceScale` < 1 acerca la cámara respecto a la vista predefinida.
    */
   function focus(name, instant = false, distanceScale = 1) {

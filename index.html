@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HailMary · Earth analogs for Moon and Mars base sites</title>
+  <title>Katsí · Earth analogs for Moon and Mars base sites</title>
   <meta name="description" content="Explore Earth, the Moon and Mars in 3D and find the places on Earth that most resemble the proposed sites for permanent bases on the Moon and Mars." />
   <meta name="theme-color" content="#05070c" />
   <meta name="color-scheme" content="dark" />
@@ -14,12 +14,12 @@
 
   <!-- Vista previa al compartir (Open Graph / Twitter) -->
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="HailMary" />
+  <meta property="og:site_name" content="Katsí" />
   <meta property="og:locale" content="en_US" />
-  <meta property="og:title" content="HailMary · Earth analogs for Moon and Mars base sites" />
+  <meta property="og:title" content="Katsí · Earth analogs for Moon and Mars base sites" />
   <meta property="og:description" content="Explore Earth, the Moon and Mars in 3D and find the places on Earth that most resemble the proposed sites for permanent bases." />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="HailMary · Earth analogs for Moon and Mars base sites" />
+  <meta name="twitter:title" content="Katsí · Earth analogs for Moon and Mars base sites" />
   <meta name="twitter:description" content="Explore Earth, the Moon and Mars in 3D and find the places on Earth that most resemble the proposed sites for permanent bases." />
   <!-- Pendiente hasta tener dominio (deben ser URLs absolutas):
   <link rel="canonical" href="https://DOMINIO/" />
@@ -787,6 +787,14 @@
     #missions-filter {
       width: 100%;
       margin-bottom: 1.6rem;
+    }
+    /* Paso 1 (eligiendo misión): sin la misión elegida encima de la lista */
+    #missions-filter[hidden] {
+      display: none;
+    }
+    /* Paso 2: la misión elegida, que lleva de vuelta a las tarjetas de misión */
+    #missions-filter [data-change] {
+      flex: 0 0 auto;
     }
     .mission-filter-option {
       flex: 1 1 auto;
@@ -1592,7 +1600,7 @@
 
   <!-- Menú principal (Orión de fondo) -->
   <nav id="main-menu" aria-label="Main menu">
-    <h1 class="menu-title menu-enter" style="--i: 0">HailMary</h1>
+    <h1 class="menu-title menu-enter" style="--i: 0">Katsí</h1>
     <p class="menu-description menu-enter" style="--i: 1">Identify Earth Locations that Analog<br />the Permanent Moon Base Locations and Mars</p>
     <div class="menu-accent" aria-hidden="true"></div>
     <ul class="menu-options">
@@ -1674,9 +1682,9 @@
       aria-hidden="true"
       class="is-hidden fixed top-20 left-4 sm:top-24 sm:left-6 z-20 w-[min(26rem,calc(100vw-2rem))] max-h-[calc(100vh-8rem)] overflow-y-auto overflow-x-hidden scroll-fade pl-1 pr-3 py-1"
     >
-      <h2 class="missions-title menu-enter" style="--i: 0">Available missions · <b id="missions-count"></b></h2>
+      <h2 class="missions-title menu-enter" style="--i: 0"><span id="missions-heading">Choose a mission</span> · <b id="missions-count"></b></h2>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
-      <div id="missions-filter" class="mission-filter menu-enter" style="--i: 1" role="group" aria-label="Filter terrains by mission"></div>
+      <div id="missions-filter" class="mission-filter menu-enter" style="--i: 1" role="group" aria-label="Chosen mission" hidden></div>
       <p id="missions-status" class="sr-only" role="status"></p>
       <ul id="missions-list" class="menu-options" aria-label="Terrains: pick one to see its Earth analogs"></ul>
     </aside>

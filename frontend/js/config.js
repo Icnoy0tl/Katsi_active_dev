@@ -89,6 +89,54 @@ export const ORION = {
 };
 
 /**
+ * Rover, panel solar y antena flotando juntos en la misma órbita baja terrestre: solo los separa
+ * `angle` (≈ 0.4 unidades de escena entre cada uno), para poder usarlos juntos más adelante.
+ */
+const SPACE_PAIR = { distance: 3.1, angle: -2.2, orbitInclination: deg(20) };
+
+/**
+ * Rover de seis ruedas a la deriva (el modelo se construye en ~metros, ~2.4 de envergadura).
+ * Gira despacio sobre sí mismo (`spin`, rad/s por eje) y el cabezal del mástil barre a los lados.
+ */
+export const ROVER = {
+  distance: SPACE_PAIR.distance,
+  angle: SPACE_PAIR.angle,
+  orbitInclination: SPACE_PAIR.orbitInclination,
+  scale: 0.07,
+  spin: { x: 0.012, y: 0.025 },
+  mastPanSpeed: 0.35, // rad/s del barrido del cabezal
+  mastPanAngle: 0.6, // amplitud del barrido (rad)
+  flightSafeRadius: 0.16
+};
+
+/**
+ * Antena de espacio profundo (misión de percepción), al otro lado del rover: reflector de ~10 m
+ * que barre muy despacio (`scanSpeed`, rad/s) alrededor de `elevation`
+ */
+export const ANTENNA = {
+  distance: SPACE_PAIR.distance,
+  angle: SPACE_PAIR.angle + 0.13,
+  orbitInclination: SPACE_PAIR.orbitInclination,
+  scale: 0.026,
+  elevation: deg(40),
+  scanSpeed: 0.08,
+  azimuthSweep: 0.5,
+  elevationSweep: 0.12,
+  flightSafeRadius: 0.22
+};
+
+/**
+ * Panel solar suelto: mástil de celosía con dos mantas de celdas (~10 × 9 m) que siguen la luz
+ */
+export const SOLAR_PANEL = {
+  distance: SPACE_PAIR.distance,
+  angle: SPACE_PAIR.angle - 0.13,
+  orbitInclination: SPACE_PAIR.orbitInclination,
+  scale: 0.03,
+  flightSafeRadius: 0.2
+};
+
+/**
  * Campo de visión vertical (grados). En la vista de misión se estrecha y la cámara se aleja en
  * la misma proporción: los cuerpos ocupan lo mismo en pantalla, pero los que quedan lejos del
  * centro (Tierra en miniatura abajo a la izquierda) ya no se ven ovalados por la perspectiva.
@@ -122,7 +170,10 @@ export const MENU = {
     stops: [
       { body: 'orion', hold: 5 },
       { body: 'moon', hold: 5, distanceScale: 0.8 },
-      { body: 'mars', hold: 5, distanceScale: 0.8 }
+      { body: 'mars', hold: 5, distanceScale: 0.8 },
+      { body: 'rover', hold: 5 },
+      { body: 'antenna', hold: 5 },
+      { body: 'solarPanel', hold: 5 }
     ],
     driftSpeed: 0.012 // rad/s (≈ 0.7°/s) de giro alrededor del cuerpo
   }
@@ -201,13 +252,28 @@ export const CUSTOM_ANALOGS_API = {
 };
 
 /**
- * Filtros de misión del panel de terrenos: `id` es el `filter` de `GET /api/regions` y de
- * `GET /api/analog` (perfiles de backend/knn/mission.go); '' = sin filtro, todos los terrenos y
- * todas las variables pesan igual.
+ * Misiones del panel de terrenos: `id` es el `filter` de `GET /api/regions` y de `GET /api/analog`
+ * (perfiles de backend/knn/mission.go); '' = misión libre: todos los terrenos y todas las variables
+ * pesan igual. Primero se elige la misión con una tarjeta (`card`, en este orden) y luego se ven
+ * sus terrenos. `showcase` es lo que se ve al pasar por su tarjeta: 'body' = el planeta enfocado,
+ * 'rover' | 'antenna' | 'solarPanel' = ese objeto solo sobre el espacio; null = nada.
  */
 export const MISSION_FILTERS = [
-  { id: '', label: 'All', title: 'All variables weigh the same' },
-  { id: 'mobility', label: 'Mobility', title: 'Slope, rocks and soil mechanics: traversing the terrain' },
-  { id: 'perception', label: 'Perception', title: 'Line of sight, texture, shadows and illumination: navigation' },
-  { id: 'environmental_survival', label: 'Survival', title: 'Thermal cycle, energy, pressure and wind: environmental survival' }
+  { id: '', label: 'All', card: 'Free mission', title: 'All terrains: every variable weighs the same', showcase: 'body' },
+  { id: 'mobility', label: 'Mobility', card: 'Mobility mission', title: 'Slope, rocks and soil mechanics: traversing the terrain', showcase: 'rover' },
+  { id: 'perception', label: 'Perception', card: 'Perception mission', title: 'Line of sight, texture, shadows and illumination: navigation', showcase: 'antenna' },
+  { id: 'environmental_survival', label: 'Survival', card: 'Survival mission', title: 'Thermal cycle, energy, pressure and wind: environmental survival', showcase: 'solarPanel' },
 ];
+
+/**
+ * Al pasar por una tarjeta de misión la cámara vuela hasta su objeto; `objectDistanceScale` escala
+ * la distancia de su vista normal (< 1 = más cerca, el objeto se ve más grande).
+ * Para que el viaje sea corto, al elegir misión el rover, el panel y la antena se acercan al
+ * planeta: quedan sobre él, a `lift` radios de su centro (fuera del encuadre del planeta), en fila
+ * y separados `pairGap` (el rover en medio).
+ */
+export const MISSION_PREVIEW = {
+  objectDistanceScale: 0.9,
+  lift: 2.8,
+  pairGap: 0.4
+};

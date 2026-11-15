@@ -8,7 +8,7 @@
 - [x] **Open Graph / Twitter Card**: título y descripción listos.
 - [ ] **`og:image`** de 1200×630: hacer una captura real de la escena, guardarla en `frontend/icons/og-image.jpg` y descomentar las líneas en `index.html` (necesita URL absoluta, o sea, el dominio).
 - [x] **Favicon**: `frontend/icons/favicon.svg` + `apple-touch-icon.png` de 180×180.
-- [x] `<title>` descriptivo: "HailMary · Earth analogs for Moon and Mars base sites".
+- [x] `<title>` descriptivo: "Katsí · Earth analogs for Moon and Mars base sites".
 
 
 - [ ] **Quitar `cdn.tailwindcss.com`**: es el Play CDN, que compila en el navegador y no está pensado para producción (bloquea el render y pesa ~300 KB de JS). Generar un CSS estático con el CLI de Tailwind.
