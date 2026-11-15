@@ -28,11 +28,12 @@ const AREA = {
   badgeSize: 0.075,
   gap: 0.008, // separación mínima entre áreas vecinas (fracción del radio)
   maxSegment: 0.02, // longitud máxima de un lado tras recortar (el borde sigue la curvatura)
-  fillOpacity: 0.5,
-  // Color de cada área: tonos repartidos con el ángulo áureo (dos misiones seguidas nunca se parecen)
+  fillOpacity: 0.58,
+  // Color de cada área: tonos repartidos con el ángulo áureo (dos misiones seguidas nunca se parecen).
+  // Saturación alta y luminosidad media: colores vivos que no se lavan sobre el gris de la Luna
   hueStep: 0.618034,
-  fill: { saturation: 0.65, lightness: 0.6 },
-  outline: { saturation: 0.85, lightness: 0.8 }
+  fill: { saturation: 0.95, lightness: 0.55 },
+  outline: { saturation: 1, lightness: 0.72 }
 };
 
 /** Materiales de relleno y borde con un tono propio para el área número `index` */
