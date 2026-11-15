@@ -106,7 +106,6 @@ func analogHandler(parser *jsonParser.Parser) http.HandlerFunc {
 		weights, err := knn.WeightsFor(filter, knn.FeatureNames())
 		if err != nil {
 			writeError(w, http.StatusBadRequest, "filter debe ser "+strings.Join(knn.MissionNames(), ", ")+" o vacío")
-			writeError(w, http.StatusBadRequest, "filter debe ser vacío o uno de: "+strings.Join(knn.MissionNames(), ", "))
 			return
 		}
 		matches, err := knn.FindMostSimilar(target, pool, weights, topK)
