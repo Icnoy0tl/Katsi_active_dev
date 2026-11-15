@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"spaceapps/API"
 	"spaceapps/jsonParser"
 	"spaceapps/knn"
 )
@@ -18,11 +19,7 @@ func newTestServer(t *testing.T) *httptest.Server {
 	if err != nil {
 		t.Fatal(err)
 	}
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /api/analog", analogHandler(p))
-	mux.HandleFunc("GET /api/filters", filtersHandler)
-	mux.HandleFunc("GET /api/health", healthHandler)
-	srv := httptest.NewServer(cors(parseOrigins(defaultAllowedOrigins), mux))
+	srv := httptest.NewServer(newHandler(p, false, parseOrigins(defaultAllowedOrigins)))
 	t.Cleanup(srv.Close)
 	return srv
 }
@@ -83,8 +80,8 @@ func TestAnalogResponseShape(t *testing.T) {
 		t.Fatal(err)
 	}
 	matches, _ := body["matches"].([]any)
-	if len(matches) != topK {
-		t.Fatalf("expected %d matches, got %d", topK, len(matches))
+	if len(matches) != API.TopK {
+		t.Fatalf("expected %d matches, got %d", API.TopK, len(matches))
 	}
 	for _, m := range matches {
 		mm := m.(map[string]any)
@@ -127,7 +124,6 @@ func TestPreflightAndFilters(t *testing.T) {
 		t.Fatalf("/api/filters: %v, %d missions", err, len(reps))
 	}
 }
-
 func TestCORS(t *testing.T) {
 	srv := newTestServer(t)
 	do := func(method, origin string) *http.Response {

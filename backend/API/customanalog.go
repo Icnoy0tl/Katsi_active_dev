@@ -1,4 +1,4 @@
-package main
+package API
 
 // Endpoints for user-supplied data (the API view of the frontend):
 //
@@ -234,103 +234,107 @@ func parseMission(raw json.RawMessage) (knn.Vector, knn.WeightReport, error) {
 }
 
 // POST /api/analog/custom
-func customAnalogHandler(parser *jsonParser.Parser) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, maxCustomBody))
-		if err != nil {
-			var tooBig *http.MaxBytesError
-			if errors.As(err, &tooBig) {
-				writeError(w, http.StatusRequestEntityTooLarge, "request larger than 1 MB")
-			} else {
-				writeError(w, http.StatusBadRequest, "could not read the request body")
-			}
-			return
+// CustomAnalog: POST /api/analog/custom.
+func (s *Server) CustomAnalog(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, maxCustomBody))
+	if err != nil {
+		var tooBig *http.MaxBytesError
+		if errors.As(err, &tooBig) {
+			WriteError(w, http.StatusRequestEntityTooLarge, "request larger than 1 MB")
+		} else {
+			WriteError(w, http.StatusBadRequest, "could not read the request body")
 		}
-		var req customRequest
-		if err := decodeStrict(body, &req); err != nil {
-			writeError(w, http.StatusBadRequest, "body must be { \"characteristics\": {...}, \"mission\": {...} }: "+err.Error())
-			return
-		}
-
-		regions, err := parseRegions(req.Characteristics)
-		if err != nil {
-			writeError(w, http.StatusBadRequest, err.Error())
-			return
-		}
-		weights, report, err := parseMission(req.Mission)
-		if err != nil {
-			var bad badRequest
-			if errors.As(err, &bad) {
-				writeError(w, http.StatusBadRequest, err.Error())
-			} else {
-				log.Printf("custom mission weights: %v", err)
-				writeError(w, http.StatusInternalServerError, "internal error")
-			}
-			return
-		}
-
-		earth, err := parser.GetEarthRegions()
-		if err != nil {
-			log.Printf("reading earth.json: %v", err)
-			writeError(w, http.StatusInternalServerError, "internal error")
-			return
-		}
-		byID := make(map[string]jsonParser.Region, len(earth))
-		for _, e := range earth {
-			byID[e.RegionId] = e
-		}
-
-		resp := customResponse{Mission: report, Results: make([]customResult, 0, len(regions))}
-		for _, region := range regions {
-			target, pool, stats, err := knn.PrepareWithStats(region, earth)
-			if err != nil {
-				writeError(w, http.StatusUnprocessableEntity, err.Error())
-				return
-			}
-			coverage := dataCoverage(target, weights)
-			if coverage == 0 {
-				writeError(w, http.StatusUnprocessableEntity, fmt.Sprintf(
-					"%s: none of its variables count for mission %q — add variables the mission weights", region.RegionId, report.Mission))
-				return
-			}
-			matches, err := knn.FindMostSimilar(target, pool, weights, topK)
-			if err != nil {
-				log.Printf("custom knn: %v", err)
-				writeError(w, http.StatusInternalServerError, "internal error")
-				return
-			}
-			extrap, err := knn.CheckExtrapolation(region, earth, weights)
-			if err != nil {
-				log.Printf("custom extrapolation: %v", err)
-				writeError(w, http.StatusInternalServerError, "internal error")
-				return
-			}
-			candByID := make(map[string]knn.Candidate, len(pool))
-			for _, c := range pool {
-				candByID[c.ID] = c
-			}
-			result := customResult{SelectedRegion: region, Extrapolation: extrap, DataCoverage: coverage}
-			for _, m := range matches {
-				// Desglose por variable, como en GET /api/analog (columna Match de la comparativa)
-				features, err := knn.CompareFeatures(region, byID[m.RegionID], target, candByID[m.RegionID], stats, weights)
-				if err != nil {
-					log.Printf("custom breakdown %s: %v", m.RegionID, err)
-					writeError(w, http.StatusInternalServerError, "internal error")
-					return
-				}
-				result.Matches = append(result.Matches, MatchResponse{Match: m, Region: byID[m.RegionID], Features: features})
-			}
-			resp.Results = append(resp.Results, result)
-		}
-		writeJSON(w, http.StatusOK, resp)
+		return
 	}
+	var req customRequest
+	if err := decodeStrict(body, &req); err != nil {
+		WriteError(w, http.StatusBadRequest, "body must be { \"characteristics\": {...}, \"mission\": {...} }: "+err.Error())
+		return
+	}
+
+	regions, err := parseRegions(req.Characteristics)
+	if err != nil {
+		WriteError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	weights, report, err := parseMission(req.Mission)
+	if err != nil {
+		var bad badRequest
+		if errors.As(err, &bad) {
+			WriteError(w, http.StatusBadRequest, err.Error())
+		} else {
+			log.Printf("custom mission weights: %v", err)
+			WriteError(w, http.StatusInternalServerError, "internal error")
+		}
+		return
+	}
+
+	earth, err := s.Parser.GetEarthRegions()
+	if err != nil {
+		log.Printf("reading earth.json: %v", err)
+		WriteError(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+	byID := make(map[string]jsonParser.Region, len(earth))
+	for _, e := range earth {
+		byID[e.RegionId] = e
+	}
+
+	resp := customResponse{Mission: report, Results: make([]customResult, 0, len(regions))}
+	for _, region := range regions {
+		target, pool, stats, err := knn.PrepareWithStats(region, earth)
+		if err != nil {
+			WriteError(w, http.StatusUnprocessableEntity, err.Error())
+			return
+		}
+		coverage := dataCoverage(target, weights)
+		if coverage == 0 {
+			WriteError(w, http.StatusUnprocessableEntity, fmt.Sprintf(
+				"%s: none of its variables count for mission %q — add variables the mission weights", region.RegionId, report.Mission))
+			return
+		}
+		matches, err := knn.FindMostSimilar(target, pool, weights, TopK)
+		if err != nil {
+			log.Printf("custom knn: %v", err)
+			WriteError(w, http.StatusInternalServerError, "internal error")
+			return
+		}
+		extrap, err := knn.CheckExtrapolation(region, earth, weights)
+		if err != nil {
+			log.Printf("custom extrapolation: %v", err)
+			WriteError(w, http.StatusInternalServerError, "internal error")
+			return
+		}
+		candByID := make(map[string]knn.Candidate, len(pool))
+		for _, c := range pool {
+			candByID[c.ID] = c
+		}
+		result := customResult{SelectedRegion: region, Extrapolation: extrap, DataCoverage: coverage}
+		for _, m := range matches {
+			// Desglose por variable, como en GET /api/analog (columna Match de la comparativa)
+			features, err := knn.CompareFeatures(region, byID[m.RegionID], target, candByID[m.RegionID], stats, weights)
+			if err != nil {
+				log.Printf("custom breakdown %s: %v", m.RegionID, err)
+				WriteError(w, http.StatusInternalServerError, "internal error")
+				return
+			}
+			result.Matches = append(result.Matches, MatchResponse{Match: m, Region: RegionView{byID[m.RegionID], "builtin"}, Features: features})
+		}
+		resp.Results = append(resp.Results, result)
+	}
+	WriteJSON(w, http.StatusOK, resp)
 }
 
-// GET /api/missions
-func missionsHandler(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, http.StatusOK, map[string]any{
+// Missions: GET /api/missions.
+func Missions(w http.ResponseWriter, r *http.Request) {
+	WriteJSON(w, http.StatusOK, map[string]any{
 		"categories": knn.Categories,
 		"missions":   knn.MissionReports(),
 		"variables":  knn.FeatureNames(),
 	})
+}
+
+// Filters: GET /api/filters → weights of each mission (F1 affinity, F2′ weight, N_ef, angle).
+func Filters(w http.ResponseWriter, _ *http.Request) {
+	WriteJSON(w, http.StatusOK, knn.MissionReports())
 }

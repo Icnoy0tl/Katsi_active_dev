@@ -1,0 +1,82 @@
+{
+  "planet": "mars",
+  "variables": [
+    {
+      "name": "magnetic_susceptibility",
+      "label": "Susceptibilidad magnética (ejemplo)",
+      "unit": "1e-3 SI",
+      "memberships": { "VOL": 0.7, "MEC": 0.3 }
+    }
+  ],
+  "regions": [
+    {
+      "regionId": "UNI-MARS-01",
+      "name": "Ejemplo: sitio de prueba de la sonda (valores ilustrativos)",
+      "coordinates": { "latitude": 15.0, "longitude": -160.0 },
+      "coreVariables": {
+        "slope": 2.0,
+        "radar_roughness": 0.35,
+        "apparent_thermal_inertia": 220,
+        "soil_moisture": 0.0,
+        "visual_texture": 0.3,
+        "low_sun_shadows": 8,
+        "line_of_sight": 80,
+        "diurnal_thermal_range": 75,
+        "dust_aerosols": 0.45,
+        "insolation": 120
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 6,
+        "grain_size_um": 80,
+        "angle_of_repose_deg": 31,
+        "depth_to_bedrock_min_m": null,
+        "depth_to_bedrock_max_m": null,
+        "vrm_microrelief": 0.008,
+        "dielectric_constant": 3.5,
+        "salinity_wt_pct": null,
+        "diffuse_ratio": 0.3,
+        "albedo": 0.22,
+        "vegetation_ndvi": 0.0,
+        "surface_pressure_kpa": 0.85,
+        "wind_typical_ms": 4,
+        "wind_gust_ms": 18,
+        "abrasive_mohs": 5.5
+      },
+      "customVariables": { "magnetic_susceptibility": 4.2 }
+    },
+    {
+      "planet": "earth",
+      "regionId": "UNI-EARTH-01",
+      "name": "Ejemplo: campo de pruebas universitario (valores ilustrativos)",
+      "coordinates": { "latitude": 31.9, "longitude": -113.9 },
+      "coreVariables": {
+        "slope": 3.0,
+        "radar_roughness": 0.4,
+        "apparent_thermal_inertia": 300,
+        "soil_moisture": 0.02,
+        "visual_texture": 0.35,
+        "low_sun_shadows": 10,
+        "line_of_sight": 75,
+        "diurnal_thermal_range": 30,
+        "dust_aerosols": 0.1,
+        "insolation": 250
+      },
+      "auditVariables": {
+        "rock_abundance_pct": 8,
+        "grain_size_um": 150,
+        "angle_of_repose_deg": 33,
+        "vrm_microrelief": 0.01,
+        "dielectric_constant": 4.0,
+        "salinity_wt_pct": 0.3,
+        "diffuse_ratio": 0.2,
+        "albedo": 0.25,
+        "vegetation_ndvi": 0.08,
+        "surface_pressure_kpa": 100.5,
+        "wind_typical_ms": 5,
+        "wind_gust_ms": 20,
+        "abrasive_mohs": 6.0
+      },
+      "customVariables": { "magnetic_susceptibility": 3.1 }
+    }
+  ]
+}

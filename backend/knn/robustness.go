@@ -34,12 +34,13 @@ func perturbMap(m map[string]float64, eps float64, r *rand.Rand) map[string]floa
 	return out
 }
 
-// weightSampler returns a func that generates perturbed weights for the filter
-func weightSampler(filter string, eps float64) (string, func(*rand.Rand) (Vector, error), error) {
-	names := FeatureNames()
-	if filter == "" {
+// weightSampler returns a func that generates perturbed weights for a demand
+// profile (nil = no mission: the uniform per-variable weights are perturbed).
+func (m *Model) weightSampler(profile map[string]float64, eps float64) (string, func(*rand.Rand) (Vector, error)) {
+	names := m.FeatureNames()
+	if profile == nil {
 		return "uniform_weights", func(r *rand.Rand) (Vector, error) {
-			p := perturbMap(Default.uniformPerVar(), eps, r)
+			p := perturbMap(m.uniformPerVar(), eps, r)
 			s := 0.0
 			for _, x := range p {
 				s += x
@@ -47,38 +48,46 @@ func weightSampler(filter string, eps float64) (string, func(*rand.Rand) (Vector
 			for k := range p {
 				p[k] /= s
 			}
-			return Default.expand(p, names)
-		}, nil
-	}
-	profile, ok := Missions[filter]
-	if !ok {
-		return "", nil, ErrUnknownFilter
+			return m.expand(p, names)
+		}
 	}
 	return "mission_profile", func(r *rand.Rand) (Vector, error) {
-		rep, err := ComputeWeights(perturbMap(profile, eps, r), Mu, Categories)
+		rep, err := ComputeWeights(perturbMap(profile, eps, r), m.mu, m.categories)
 		if err != nil {
 			return nil, err
 		}
-		return Default.expand(reportPerVar(rep), names)
-	}, nil
+		return m.expand(reportPerVar(rep), names)
+	}
 }
 
-// AnalyzeRobustness deterministic given a seed (Results can be reproduced)
+// AnalyzeRobustness on the built-in model with a built-in filter ("" = no
+// mission). Deterministic given a seed (results can be reproduced).
 func AnalyzeRobustness(target Candidate, pool []Candidate, filter string, k int, eps float64, trials int, seed uint64) (Robustness, error) {
+	var profile map[string]float64
+	if filter != "" {
+		p, ok := Missions[filter]
+		if !ok {
+			return Robustness{}, ErrUnknownFilter
+		}
+		profile = p
+	}
+	return Default.AnalyzeRobustness(target, pool, profile, k, eps, trials, seed)
+}
+
+// AnalyzeRobustness for any demand profile of this model (nil = no mission),
+// so custom variables and missions get the same sensitivity analysis.
+func (m *Model) AnalyzeRobustness(target Candidate, pool []Candidate, profile map[string]float64, k int, eps float64, trials int, seed uint64) (Robustness, error) {
 	if eps < 0 || eps >= 1 {
 		return Robustness{}, errors.New("epsilon must be in [0, 1)")
 	}
 	if trials <= 0 {
-		return Robustness{}, errors.New("Trials must be > 0")
+		return Robustness{}, errors.New("trials must be > 0")
 	}
-	w, err := WeightsFor(filter, FeatureNames())
+	w, err := m.Weights(profile)
 	if err != nil {
 		return Robustness{}, err
 	}
-	what, sample, err := weightSampler(filter, eps)
-	if err != nil {
-		return Robustness{}, err
-	}
+	what, sample := m.weightSampler(profile, eps)
 	base, err := FindMostSimilar(target, pool, w, k)
 	if err != nil {
 		return Robustness{}, err
@@ -88,9 +97,9 @@ func AnalyzeRobustness(target Candidate, pool []Candidate, filter string, k int,
 		return res, nil
 	}
 	baseSet := map[string]bool{}
-	for _, m := range base {
-		baseSet[m.RegionID] = true
-		res.InclusionRate[m.RegionID] = 0
+	for _, b := range base {
+		baseSet[b.RegionID] = true
+		res.InclusionRate[b.RegionID] = 0
 	}
 
 	r := rand.New(rand.NewPCG(seed, seed^0x9e3779b97f4a7c15))
@@ -104,14 +113,14 @@ func AnalyzeRobustness(target Candidate, pool []Candidate, filter string, k int,
 		if err != nil {
 			return Robustness{}, err
 		}
-		if got[0].RegionID == base[0].RegionID {
+		if len(got) > 0 && got[0].RegionID == base[0].RegionID {
 			top1++
 		}
 		inter := 0
-		for _, m := range got {
-			if baseSet[m.RegionID] {
+		for _, g := range got {
+			if baseSet[g.RegionID] {
 				inter++
-				res.InclusionRate[m.RegionID]++
+				res.InclusionRate[g.RegionID]++
 			}
 		}
 		jaccard += float64(inter) / float64(len(base)+len(got)-inter)
