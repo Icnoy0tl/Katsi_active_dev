@@ -2,46 +2,132 @@ package API
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
+	"errors"
 	"log"
 	"net/http"
 
-	"backend/jsonParser"
+	"spaceapps/jsonParser"
+	"spaceapps/knn"
 )
 
-func API() {
-	http.HandleFunc("/api/Planets", GetPlanetsHandler)
+const TopK = 3
 
-	fmt.Println("Server running at http://localhost:8080/api/Planets")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+type MatchResponse struct {
+	knn.Match
+	Region jsonParser.Region `json:"region"`
 }
 
-func GetPlanetsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+type AnalogResponse struct {
+	Planet         string            `json:"planet"`
+	Filter         string            `json:"filter"`
+	SelectedRegion jsonParser.Region `json:"selectedRegion"`
+	Matches        []MatchResponse   `json:"matches"`
+}
+
+type AnalogRequest struct {
+	Missions struct {
+		Filter string `json:"filter"`
+	} `json:"misiones"`
+	Characteristics struct {
+		Planet   string `json:"planet"`
+		RegionID string `json:"regionId"`
+	} `json:"caracteristicas"`
+}
+
+func WriteJSON(w http.ResponseWriter, StatusCode int, Payload any) {
 	w.Header().Set("Content-Type", "application/json")
-
-	NasaURL := "https://caltech.edu"
-
-	Resp, err := http.Get(NasaURL)
-	if err != nil {
-		http.Error(w, "Error connecting to NASA", http.StatusBadGateway)
-		return
-	}
-	defer Resp.Body.Close()
-
-	RawData, err := io.ReadAll(Resp.Body)
-	if err != nil {
-		http.Error(w, "Error reading response", http.StatusInternalServerError)
-		return
-	}
-
-	CleanData, err := jsonParser.Parser(RawData)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	json.NewEncoder(w).Encode(CleanData)
+	w.WriteHeader(StatusCode)
+	_ = json.NewEncoder(w).Encode(Payload)
 }
 
+func WriteError(w http.ResponseWriter, StatusCode int, Message string) {
+	WriteJSON(w, StatusCode, map[string]string{"error": Message})
+}
+
+// Endpoint 1: Status -> Returns "Status: 200 ok" and an image
+func Status(w http.ResponseWriter, r *http.Request) {
+	Response := map[string]string{
+		"status": "Status: 200 ok",
+		"image":  "backend/data/status.png",
+	}
+	WriteJSON(w, http.StatusOK, Response)
+}
+
+// Endpoint 2: Calculate -> Parsers both jsons, normalize data, and runs KNN
+func Analog(ParserInstance *jsonParser.Parser) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var Req AnalogRequest
+		if err := json.NewDecoder(r.Body).Decode(&Req); err != nil {
+			WriteError(w, http.StatusBadRequest, "Invalid JSON payload: "+err.Error())
+			return
+		}
+
+		// 1. Parse target region from Moon or Mars
+		PlanetInfo, err := ParserInstance.GetRegion(Req.Characteristics.Planet, Req.Characteristics.RegionID)
+		switch {
+		case errors.Is(err, jsonParser.ErrInvalidPlanet):
+			WriteError(w, http.StatusBadRequest, "Planet must be 'moon' or 'mars'")
+			return
+		case errors.Is(err, jsonParser.ErrInvalidRegionID):
+			WriteError(w, http.StatusBadRequest, "Invalid regionId")
+			return
+		case errors.Is(err, jsonParser.ErrRegionNotFound):
+			WriteError(w, http.StatusNotFound, "Region not found")
+			return
+		case err != nil:
+			log.Printf("Error reading planet data: %v", err)
+			WriteError(w, http.StatusInternalServerError, "Internal server error")
+			return
+		}
+		Selected := PlanetInfo.Regions[0]
+
+		// 2. Parse all Earth regions
+		EarthRegions, err := ParserInstance.GetEarthRegions()
+		if err != nil {
+			log.Printf("Error reading earth.json: %v", err)
+			WriteError(w, http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		// 3. Normalize data (Target vs Earth pool)
+		Target, Pool, err := knn.Prepare(Selected, EarthRegions)
+		if err != nil {
+			log.Printf("Error normalizing data: %v", err)
+			WriteError(w, http.StatusUnprocessableEntity, "Invalid region data")
+			return
+		}
+
+		// 4. Get mission weights and calculate Top 3 matches via KNN
+		Weights, err := knn.WeightsFor(Req.Missions.Filter, knn.FeatureNames())
+		if err != nil {
+			WriteError(w, http.StatusBadRequest, "Filter must be rover, ice_and_volatiles, thermal_cycles, or empty")
+			return
+		}
+		Matches, err := knn.FindMostSimilar(Target, Pool, Weights, TopK)
+		if err != nil {
+			log.Printf("Error running KNN: %v", err)
+			WriteError(w, http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		// 5. Build final JSON response
+		ByID := make(map[string]jsonParser.Region, len(EarthRegions))
+		for _, E := range EarthRegions {
+			ByID[E.RegionId] = E
+		}
+
+		Resp := AnalogResponse{
+			Planet:         PlanetInfo.Planet,
+			Filter:         Req.Missions.Filter,
+			SelectedRegion: Selected,
+		}
+		for _, M := range Matches {
+			Resp.Matches = append(Resp.Matches, MatchResponse{
+				Match:  M,
+				Region: ByID[M.RegionID],
+			})
+		}
+
+		WriteJSON(w, http.StatusOK, Resp)
+	}
+}
