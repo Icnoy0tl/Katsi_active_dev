@@ -184,6 +184,23 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
   const updateScrollEnd = setupScrollFade(panel);
   const setVignette = (visible) => vignette.classList.toggle('is-visible', visible);
 
+  // Botón «siguiente análogo» (borde derecho, circular): solo dentro de una comparación
+  const switcher = $('analog-switcher');
+  function updateSwitcher() {
+    const visible = shown !== -1 && analogs?.length > 1;
+    switcher.classList.toggle('is-hidden', !visible);
+    switcher.setAttribute('aria-hidden', String(!visible));
+    switcher.querySelectorAll('button').forEach((button) => (button.tabIndex = visible ? 0 : -1));
+    if (!visible) return;
+    $('analog-switcher-current').textContent = shown + 1;
+    $('analog-switcher-total').textContent = analogs.length;
+  }
+  switcher.addEventListener('click', (event) => {
+    const step = event.target.closest('button[data-step]');
+    if (!step || shown === -1) return;
+    openAnalog((shown + Number(step.dataset.step) + analogs.length) % analogs.length);
+  });
+
   // Zona con scroll de la comparación (se recrea en cada render): difuminado inferior propio
   let cmpScroll = null;
   const updateCmpFade = () => {
@@ -255,6 +272,11 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
             ${comparisonGroup('Audit variables', region.auditVariables ?? {}, AUDIT_VARIABLES, analog)}
           </table>
         </div>
+        <button type="button" class="cmp-more" data-more tabindex="-1" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 7l6 5 6-5" /><path d="M6 13l6 5 6-5" />
+          </svg>
+        </button>
       </section>`);
     setComparisonLayout(true);
   }
@@ -277,13 +299,49 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
       onRetry?.();
       return;
     }
+    // Flechas «hay más filas»: bajan casi una pantalla de la tabla
+    if (event.target.closest('button[data-more]') && cmpScroll) {
+      cmpScroll.scrollBy({ top: cmpScroll.clientHeight * 0.8, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+      return;
+    }
     const card = event.target.closest('button[data-index]');
-    if (!card) return;
-    const index = Number(card.dataset.index);
+    if (card) openAnalog(Number(card.dataset.index));
+  });
+
+  // Cambio entre análogos dentro de la comparativa, como un carrusel: el contenido actual sale
+  // hacia la izquierda (escalonado) y el nuevo entra desde la derecha. `switchToken` descarta
+  // los cambios pisados por otro clic. `is-entering` se queda puesta hasta el siguiente cambio:
+  // si se quitase al acabar, volvería a aplicarse la entrada normal y la tabla se animaría dos veces
+  const SWITCH_OUT_MS = 320;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let switchToken = 0;
+
+  function openAnalog(index) {
+    const switching = shown !== -1;
+    const token = ++switchToken;
     shown = index;
     onAnalogChange?.(analogs[index]);
-    renderComparison(index);
-  });
+    updateSwitcher();
+    body.classList.remove('is-entering');
+    if (!switching || reducedMotion.matches) {
+      body.classList.remove('is-leaving');
+      renderComparison(index);
+      return;
+    }
+    body.classList.add('is-leaving');
+    setTimeout(() => {
+      if (token !== switchToken) return;
+      body.classList.remove('is-leaving');
+      body.classList.add('is-entering');
+      renderComparison(index);
+    }, SWITCH_OUT_MS);
+  }
+
+  /** Cancela una salida en curso (al volver a la lista o al cerrar) */
+  function cancelSwitch() {
+    switchToken++;
+    body.classList.remove('is-leaving', 'is-entering');
+  }
 
   return {
     /** true mientras se ve la comparación de un análogo */
@@ -295,7 +353,9 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
       if (shown === -1) return;
       const from = shown;
       shown = -1;
+      cancelSwitch();
       onAnalogChange?.(null);
+      updateSwitcher();
       renderList();
       body.querySelector(`[data-index="${from}"]`)?.focus({ preventScroll: true });
     },
@@ -305,6 +365,8 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
       analogs = foundAnalogs?.slice(0, ANALOG_SLOTS) ?? null;
       analogsFailed = false;
       shown = -1;
+      cancelSwitch();
+      updateSwitcher();
       renderList();
       panel.classList.remove('is-hidden');
       panel.setAttribute('aria-hidden', 'false');
@@ -328,6 +390,8 @@ export function setupMissionInfo({ onAnalogChange, onRetry } = {}) {
       analogs = null;
       analogsFailed = false;
       shown = -1;
+      cancelSwitch();
+      updateSwitcher();
       setVignette(false);
       setComparisonLayout(false);
       panel.classList.add('is-hidden');

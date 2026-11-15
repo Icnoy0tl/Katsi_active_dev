@@ -249,6 +249,30 @@ const EARTH_APPEAR_SPEED = 3; // 1/s (≈ 0.33 s)
 let earthAppear = 0;
 
 /**
+ * Cambio de análogo con la Tierra ya a la vista: el globo gira sobre su eje (interpolando
+ * longitud y latitud del punto que queda en su borde derecho) hasta llevar el nuevo área allí.
+ * El haz del holograma sigue a ese punto, así que el área nueva «llega» bajo él.
+ */
+const EARTH_SWITCH_SECONDS = 1.1;
+const earthSwitch = { t: 1, fromLon: 0, fromLat: 0, dLon: 0, dLat: 0 };
+const switchFrame = { normal: new THREE.Vector3(), east: new THREE.Vector3(), north: new THREE.Vector3() };
+const POLE = new THREE.Vector3(0, 1, 0);
+const switchPoint = new THREE.Vector3();
+const lonOf = (n) => Math.atan2(n.x, n.z);
+const latOf = (n) => Math.asin(THREE.MathUtils.clamp(n.y, -1, 1));
+
+/** Base del punto en (lon, lat) con el norte hacia el polo, como surfaceFrame de terrainMarkers */
+function setSwitchFrame(lon, lat) {
+  const { normal, east, north } = switchFrame;
+  normal.set(Math.cos(lat) * Math.sin(lon), Math.sin(lat), Math.cos(lat) * Math.cos(lon));
+  east.crossVectors(POLE, normal);
+  if (east.lengthSq() < 1e-10) east.set(1, 0, 0);
+  east.normalize();
+  north.crossVectors(normal, east);
+}
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+/**
  * Distancia de la cámara en la vista de misión, como factor de `missionView.distance`:
  * más cerca en la lista de análogos (cuerpo más grande) y la normal dentro de un análogo
  */
@@ -268,6 +292,7 @@ function showAnalog(analog) {
   const view = mission.config.missionView;
   if (!analog) {
     analogRegionId = null;
+    earthSwitch.t = 1;
     earthHologram.hide();
     earthMini.group.visible = false;
     viewShift.setTarget(...view.soloViewShift);
@@ -276,9 +301,20 @@ function showAnalog(analog) {
   }
   missionZoom.target = 1;
   const changed = analogRegionId !== analog.region.regionId;
+  const nextFrame = earthMarkers.localFrame(analog.region.regionId);
   if (!analogRegionId) earthAppear = 0; // solo crece si no estaba ya a la vista
+  else if (changed && !reducedMotion.matches) {
+    // Desde donde esté ahora el globo (también si estaba a mitad de otro giro)
+    const from = earthSwitch.t < 1 ? switchFrame.normal : analogFrame.normal;
+    earthSwitch.fromLon = lonOf(from);
+    earthSwitch.fromLat = latOf(from);
+    const dLon = lonOf(nextFrame.normal) - earthSwitch.fromLon;
+    earthSwitch.dLon = Math.atan2(Math.sin(dLon), Math.cos(dLon)); // por el camino más corto
+    earthSwitch.dLat = latOf(nextFrame.normal) - earthSwitch.fromLat;
+    earthSwitch.t = 0;
+  }
   analogRegionId = analog.region.regionId;
-  analogFrame = earthMarkers.localFrame(analogRegionId);
+  analogFrame = nextFrame;
   earthMarkers.showOnly(analogRegionId);
   earthMini.group.visible = true;
   viewShift.setTarget(...view.viewShift);
@@ -407,9 +443,22 @@ function updateMissionView(delta) {
     earthAppear = Math.min(1, earthAppear + EARTH_APPEAR_SPEED * delta);
     earthMini.setRadius(view.earth.radius * (1 - (1 - earthAppear) ** 3)); // ease-out cúbico
   }
+  let frame = analogFrame;
+  let eased = 1;
+  if (earthSwitch.t < 1) {
+    earthSwitch.t = Math.min(1, earthSwitch.t + delta / EARTH_SWITCH_SECONDS);
+    eased = (1 - Math.cos(Math.PI * earthSwitch.t)) / 2; // ease-in-out senoidal
+    setSwitchFrame(earthSwitch.fromLon + earthSwitch.dLon * eased, earthSwitch.fromLat + earthSwitch.dLat * eased);
+    frame = switchFrame;
+  }
   // Separación cuerpo → Tierra proporcional a la distancia de la vista (mantiene la composición)
-  earthMini.place(camera, bodyCenter, view.earth.drop * view.distance, analogFrame, view.faceCamera);
+  earthMini.place(camera, bodyCenter, view.earth.drop * view.distance, frame, view.faceCamera);
   earthMarkers.worldPosition(analogRegionId, analogArea);
+  if (frame === switchFrame) {
+    // Durante el giro el haz sale del punto del borde y acaba, sin salto, en el centro del área
+    earthMini.surface.localToWorld(switchPoint.copy(switchFrame.normal).multiplyScalar(earthMini.areaRadius));
+    analogArea.lerpVectors(switchPoint, analogArea, eased);
+  }
   earthHologram.update(camera, earthMini.group.position, earthMini.radius, analogArea);
 }
 

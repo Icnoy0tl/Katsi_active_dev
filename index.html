@@ -628,7 +628,118 @@
       }
     }
 
+    /* Siguiente análogo: botón redondo con flecha a la derecha, centrado en el borde derecho
+       entre los dos hologramas (solo en la comparativa; lo gestiona frontend/js/missionInfo.js) */
+    #analog-switcher {
+      position: fixed;
+      top: 50%;
+      right: 1rem;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.7rem;
+      transform: translateY(-50%);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    @media (min-width: 640px) {
+      #analog-switcher {
+        right: 2.5rem;
+      }
+    }
+    #analog-switcher.is-hidden {
+      transform: translate(8px, -50%);
+    }
+    .analog-next {
+      display: grid;
+      place-items: center;
+      width: 4.5rem;
+      height: 4.5rem;
+      padding: 0;
+      border: 1px solid rgba(103, 232, 249, 0.45);
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.14) 0%, rgba(8, 47, 73, 0.4) 70%);
+      color: #a5f3fc;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(34, 211, 238, 0.18);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    }
+    .analog-next svg {
+      width: 1.8rem;
+      height: 1.8rem;
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .analog-next:hover,
+    .analog-next:focus-visible {
+      outline: none;
+      border-color: rgba(165, 243, 252, 0.9);
+      box-shadow: 0 0 28px rgba(34, 211, 238, 0.4);
+    }
+    .analog-next:hover svg,
+    .analog-next:focus-visible svg {
+      transform: translateX(3px);
+    }
+    .analog-next:active {
+      transform: scale(0.95);
+    }
+    .analog-switcher-label {
+      margin: 0;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-align: center;
+      color: rgba(203, 213, 225, 0.7);
+      font-variant-numeric: tabular-nums;
+    }
+    .analog-switcher-label b {
+      display: block;
+      margin-top: 0.3rem;
+      font-weight: 600;
+      color: #a5f3fc;
+    }
+
+    /* Cambio de análogo (carrusel): lo actual sale hacia la izquierda, escalonado, y lo nuevo
+       entra desde la derecha. Dos ids para ganar a la entrada normal (#mission-info … .menu-enter) */
+    #mission-info #mission-info-body.is-leaving > * {
+      animation: cmp-leave 0.32s cubic-bezier(0.55, 0, 0.75, 0.2) both;
+    }
+    #mission-info #mission-info-body.is-leaving > :nth-child(2) {
+      animation-delay: 0.03s;
+    }
+    #mission-info #mission-info-body.is-leaving > :nth-child(n + 3) {
+      animation-delay: 0.06s;
+    }
+    #mission-info:not(.is-hidden) #mission-info-body.is-entering .menu-enter {
+      animation: cmp-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc((var(--i, 0) - 2) * 0.05s);
+    }
+    #mission-info:not(.is-hidden) #mission-info-body.is-entering .missions-accent {
+      animation: menu-accent-grow 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+    }
+    @keyframes cmp-leave {
+      to {
+        opacity: 0;
+        transform: translateX(-36px);
+        filter: blur(3px);
+      }
+    }
+    @keyframes cmp-enter {
+      from {
+        opacity: 0;
+        transform: translateX(36px);
+        filter: blur(3px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+        filter: none;
+      }
+    }
+
     .cmp-detail {
+      position: relative;
       display: flex;
       flex-direction: column;
       flex: 1 1 auto;
@@ -669,6 +780,45 @@
     }
     #cmp-vignette.is-visible {
       opacity: 1;
+    }
+
+    /* Flechas al pie de la tabla: avisan de que hay más filas y desaparecen al llegar al final */
+    .cmp-more {
+      position: absolute;
+      left: 50%;
+      bottom: 0.25rem;
+      display: grid;
+      place-items: center;
+      width: 2rem;
+      height: 2rem;
+      margin-left: -1rem;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: rgba(203, 213, 225, 0.7);
+      cursor: pointer;
+      transition: opacity 0.3s ease, color 0.2s ease;
+      animation: cmp-more-bob 1.6s ease-in-out infinite;
+    }
+    .cmp-more:hover {
+      color: #e2e8f0;
+    }
+    .cmp-more svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+    .cmp-scroll.is-scroll-end + .cmp-more {
+      opacity: 0;
+      pointer-events: none;
+    }
+    @keyframes cmp-more-bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cmp-more {
+        animation: none;
+      }
     }
 
     /* Tabla comparativa minimalista: variable | cuerpo | Tierra, sin fondos ni bordes duros */
@@ -938,6 +1088,51 @@
       background: linear-gradient(180deg, transparent, rgba(103, 232, 249, 0.12), transparent);
       animation: holo-sweep 3.5s linear infinite;
     }
+    /* Cambio de análogo con la tarjeta abierta: el contenido se apaga y vuelve a sintonizarse */
+    .hologram.is-switching .holo-svg,
+    .hologram.is-switching .holo-header,
+    .hologram.is-switching .holo-scale,
+    .hologram.is-switching .holo-name {
+      animation: holo-retune 0.9s cubic-bezier(0.45, 0, 0.25, 1) both;
+    }
+    .hologram.is-switching .holo-scan::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(165, 243, 252, 0.28), transparent);
+      animation: holo-wipe 0.9s cubic-bezier(0.45, 0, 0.25, 1) both;
+    }
+    @keyframes holo-retune {
+      0% {
+        opacity: 1;
+        filter: none;
+      }
+      35% {
+        opacity: 0.08;
+        filter: blur(3px);
+      }
+      100% {
+        opacity: 1;
+        filter: none;
+      }
+    }
+    @keyframes holo-wipe {
+      from {
+        transform: translateX(-100%);
+      }
+      to {
+        transform: translateX(100%);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hologram.is-switching .holo-svg,
+      .hologram.is-switching .holo-header,
+      .hologram.is-switching .holo-scale,
+      .hologram.is-switching .holo-name,
+      .hologram.is-switching .holo-scan::before {
+        animation: none;
+      }
+    }
     @keyframes holo-open {
       from {
         opacity: 0;
@@ -1199,6 +1394,14 @@
     >
       <div id="mission-info-body"></div>
     </aside>
+
+    <!-- Siguiente análogo de la comparativa (lo gestiona frontend/js/missionInfo.js) -->
+    <div id="analog-switcher" class="is-hidden" aria-hidden="true">
+      <button type="button" class="analog-next" data-step="1" tabindex="-1" aria-label="Next Earth analog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16"></path><path d="m14 6 6 6-6 6"></path></svg>
+      </button>
+      <p class="analog-switcher-label" aria-live="polite">Next analog<b><span id="analog-switcher-current">1</span> / <span id="analog-switcher-total">3</span></b></p>
+    </div>
 
     <!-- Hologramas de terreno (Luna o Marte, y Tierra): los construye frontend/js/hologram.js -->
     <div id="holograms"></div>

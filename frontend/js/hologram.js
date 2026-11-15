@@ -212,6 +212,12 @@ export function createHologram({ container, id }) {
       dom.tag.textContent = tag;
       dom.name.textContent = region.name;
 
+      // Cambio con la tarjeta ya abierta: parpadeo de «resintonizado» (se reinicia la animación)
+      if (visible) {
+        dom.card.classList.remove('is-switching');
+        void dom.card.offsetWidth;
+        dom.card.classList.add('is-switching');
+      }
       visible = true;
       dom.card.classList.remove('is-hidden');
       dom.beam.classList.remove('is-hidden');
@@ -221,6 +227,7 @@ export function createHologram({ container, id }) {
     hide() {
       stopMorph();
       visible = false;
+      dom.card.classList.remove('is-switching');
       dom.card.classList.add('is-hidden');
       dom.beam.classList.add('is-hidden');
     },
