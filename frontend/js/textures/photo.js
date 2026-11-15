@@ -2,8 +2,10 @@ import * as THREE from 'three';
 import { PHOTO_TEXTURES } from '../config.js';
 
 /**
- * Descarga en paralelo los mapas fotográficos y los sustituye cuerpo por cuerpo.
- * Si alguna textura falla, ese cuerpo conserva su versión procedural.
+ * Descarga los mapas fotográficos y los sustituye cuerpo por cuerpo, por prioridad:
+ * primero la Tierra (lo primero que se ve) y, cuando termina, nubes, Luna y Marte, para no
+ * competir por el ancho de banda en la carga inicial. Si alguna textura falla, ese cuerpo
+ * conserva su versión procedural.
  */
 export function loadPhotoTextures({ anisotropy, earth, moon, mars }) {
   const loader = new THREE.TextureLoader();
@@ -20,7 +22,7 @@ export function loadPhotoTextures({ anisotropy, earth, moon, mars }) {
     loadTexture(local, isColor).catch(() => loadTexture(fallback, isColor));
 
   // Tierra: color diurno, océanos especulares y relieve normal
-  Promise.all([
+  const earthReady = Promise.all([
     loadWithFallback(PHOTO_TEXTURES.earthDay, true),
     loadWithFallback(PHOTO_TEXTURES.earthSpecular, false),
     loadWithFallback(PHOTO_TEXTURES.earthNormal, false)
@@ -34,6 +36,11 @@ export function loadPhotoTextures({ anisotropy, earth, moon, mars }) {
     })
     .catch((err) => console.warn('Texturas de la Tierra no disponibles, usando procedurales.', err));
 
+  earthReady.then(() => loadSecondary(loadTexture, loadWithFallback, earth, moon, mars));
+}
+
+/** Nubes, Luna y Marte: se piden en paralelo una vez aplicada la Tierra */
+function loadSecondary(loadTexture, loadWithFallback, earth, moon, mars) {
   // Nubes: la local se usa como transparencia; el PNG de respaldo trae su propio alfa
   const clouds = PHOTO_TEXTURES.earthClouds;
   loadTexture(clouds.local, false)

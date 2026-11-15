@@ -169,13 +169,13 @@ const PLANETS_CDN = 'https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@ma
 const LOCAL = new URL('../textures/', import.meta.url).href;
 
 export const PHOTO_TEXTURES = {
-  earthDay: { local: LOCAL + 'earth_day_4k.jpg', fallback: THREE_CDN + 'earth_atmos_2048.jpg' },
-  earthSpecular: { local: LOCAL + 'earth_specular_2k.jpg', fallback: THREE_CDN + 'earth_specular_2048.jpg' },
-  earthNormal: { local: LOCAL + 'earth_normal_2k.jpg', fallback: THREE_CDN + 'earth_normal_2048.jpg' },
+  earthDay: { local: LOCAL + 'earth_day_4k.webp', fallback: THREE_CDN + 'earth_atmos_2048.jpg' },
+  earthSpecular: { local: LOCAL + 'earth_specular_2k.webp', fallback: THREE_CDN + 'earth_specular_2048.jpg' },
+  earthNormal: { local: LOCAL + 'earth_normal_2k.webp', fallback: THREE_CDN + 'earth_normal_2048.jpg' },
   // Local: escala de grises usada como transparencia; respaldo: PNG a color con alfa propio
-  earthClouds: { local: LOCAL + 'earth_clouds_4k.jpg', fallback: THREE_CDN + 'earth_clouds_1024.png' },
-  moonColor: { local: LOCAL + 'moon_4k.jpg', fallback: PLANETS_CDN + 'moonmap1k.jpg' },
-  moonBump: { local: LOCAL + 'moon_bump_2k.jpg', fallback: PLANETS_CDN + 'moonbump1k.jpg' },
-  marsColor: { local: LOCAL + 'mars_4k.jpg', fallback: PLANETS_CDN + 'marsmap1k.jpg' },
-  marsBump: { local: LOCAL + 'mars_bump_1k.jpg', fallback: PLANETS_CDN + 'marsbump1k.jpg' }
+  earthClouds: { local: LOCAL + 'earth_clouds_4k.webp', fallback: THREE_CDN + 'earth_clouds_1024.png' },
+  moonColor: { local: LOCAL + 'moon_4k.webp', fallback: PLANETS_CDN + 'moonmap1k.jpg' },
+  moonBump: { local: LOCAL + 'moon_bump_2k.webp', fallback: PLANETS_CDN + 'moonbump1k.jpg' },
+  marsColor: { local: LOCAL + 'mars_4k.webp', fallback: PLANETS_CDN + 'marsmap1k.jpg' },
+  marsBump: { local: LOCAL + 'mars_bump_1k.webp', fallback: PLANETS_CDN + 'marsbump1k.jpg' }
 };
