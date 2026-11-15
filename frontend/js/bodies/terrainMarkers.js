@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { createCanvas, createSeededRandom } from '../utils/canvas.js';
+import { formatLatLon } from '../utils/format.js';
 
 const deg = THREE.MathUtils.degToRad;
 
@@ -385,8 +386,6 @@ export function setupMarkerTooltip({ camera, domElement, markerSets, occluders, 
   let pending = false;
   let lastEvent = null;
 
-  const format = (value, pos, neg) => `${Math.abs(value).toFixed(2)}° ${value >= 0 ? pos : neg}`;
-
   /** Región bajo el puntero (solo cuenta el primer impacto: si es el cuerpo, el área está detrás) */
   function regionAt(event) {
     const rect = domElement.getBoundingClientRect();
@@ -409,8 +408,7 @@ export function setupMarkerTooltip({ camera, domElement, markerSets, occluders, 
       current = region;
       domElement.style.cursor = region ? 'pointer' : '';
       if (region) {
-        const { latitude, longitude } = region.coordinates;
-        tooltip.innerHTML = `<strong>${region.name}</strong><span>${region.regionId} · ${format(latitude, 'N', 'S')}, ${format(longitude, 'E', 'W')}</span>`;
+        tooltip.innerHTML = `<strong>${region.name}</strong><span>${region.regionId} · ${formatLatLon(region.coordinates)}</span>`;
       }
       tooltip.classList.toggle('is-hidden', !region);
     }

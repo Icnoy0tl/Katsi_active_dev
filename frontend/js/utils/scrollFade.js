@@ -5,11 +5,13 @@
  * @returns update() — llamarla tras cambiar el contenido del panel
  */
 export function setupScrollFade(panel) {
-  const update = () => {
-    const atEnd = panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 4;
-    panel.classList.toggle('is-scroll-end', atEnd);
-  };
+  const update = () => panel.classList.toggle('is-scroll-end', isScrolledToEnd(panel));
   panel.addEventListener('scroll', update, { passive: true });
   window.addEventListener('resize', update);
   return update;
+}
+
+/** true si no queda contenido por debajo (margen de 4 px por redondeos) */
+export function isScrolledToEnd(element) {
+  return element.scrollTop + element.clientHeight >= element.scrollHeight - 4;
 }

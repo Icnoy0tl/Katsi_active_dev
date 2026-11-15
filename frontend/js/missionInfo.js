@@ -1,4 +1,6 @@
-import { setupScrollFade } from './utils/scrollFade.js';
+import { isScrolledToEnd, setupScrollFade } from './utils/scrollFade.js';
+import { formatLatLon } from './utils/format.js';
+import { missionCardContent } from './missionCard.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -35,7 +37,6 @@ const AUDIT_VARIABLES = {
 
 const BODY_LABELS = { moon: 'Moon', mars: 'Mars' };
 
-const formatCoord = (value, pos, neg) => `${Math.abs(value).toFixed(2)}° ${value >= 0 ? pos : neg}`;
 const formatValue = (value) => (value === null || value === undefined ? '<span class="cmp-empty">—</span>' : value);
 
 /** Profundidad a roca madre: un solo rango en lugar de dos valores */
@@ -95,14 +96,12 @@ function analogCard(analog, index) {
   const { name, regionId, coordinates } = analog.region;
   const percent = Math.round(analog.similarity * 100);
   return `<li class="menu-enter" style="--i: ${index + 5}">
-      <button type="button" class="menu-tag menu-tag--mission" data-index="${index}">
-        <span class="menu-icon-box">${EARTH_ICON}</span>
-        <span class="menu-divider"></span>
-        <span class="menu-label">
-          <span>${name}</span>
-          <span class="mission-meta">${regionId} · ${formatCoord(coordinates.latitude, 'N', 'S')}, ${formatCoord(coordinates.longitude, 'E', 'W')}</span>
-        </span>
-        <span class="menu-score" style="--score: ${percent}" aria-label="${percent}% similarity"><b>${percent}%</b></span>
+      <button type="button" class="menu-tag menu-tag--mission" data-index="${index}">${missionCardContent({
+        icon: EARTH_ICON,
+        title: name,
+        meta: `${regionId} · ${formatLatLon(coordinates)}`,
+        trailing: `<span class="menu-score" style="--score: ${percent}" aria-label="${percent}% similarity"><b>${percent}%</b></span>`
+      })}
       </button>
     </li>`;
 }
@@ -110,14 +109,12 @@ function analogCard(analog, index) {
 /** Hueco reservado mientras no haya terrenos terrestres con los que comparar */
 function pendingCard(index) {
   return `<li class="menu-enter" style="--i: ${index + 5}">
-      <div class="menu-tag menu-tag--mission is-pending">
-        <span class="menu-icon-box">${EARTH_ICON}</span>
-        <span class="menu-divider"></span>
-        <span class="menu-label">
-          <span>Pending</span>
-          <span class="mission-meta">No Earth data yet</span>
-        </span>
-        <span class="menu-score" style="--score: 0"><b>—</b></span>
+      <div class="menu-tag menu-tag--mission is-pending">${missionCardContent({
+        icon: EARTH_ICON,
+        title: 'Pending',
+        meta: 'No Earth data yet',
+        trailing: '<span class="menu-score" style="--score: 0"><b>—</b></span>'
+      })}
       </div>
     </li>`;
 }
@@ -142,9 +139,7 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
   // Zona con scroll de la comparación (se recrea en cada render): difuminado inferior propio
   let cmpScroll = null;
   const updateCmpFade = () => {
-    if (!cmpScroll) return;
-    const atEnd = cmpScroll.scrollTop + cmpScroll.clientHeight >= cmpScroll.scrollHeight - 4;
-    cmpScroll.classList.toggle('is-scroll-end', atEnd);
+    if (cmpScroll) cmpScroll.classList.toggle('is-scroll-end', isScrolledToEnd(cmpScroll));
   };
   window.addEventListener('resize', updateCmpFade);
 
@@ -169,7 +164,6 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
   }
 
   function renderList() {
-    const { latitude, longitude } = region.coordinates;
     const cards = Array.from({ length: ANALOG_SLOTS }, (_, i) =>
       analogs[i] ? analogCard(analogs[i], i) : pendingCard(i)
     ).join('');
@@ -178,7 +172,7 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
     render(`
       <p class="info-section info-lead menu-enter" style="--i: 1">Closest Earth analogs to</p>
       <h2 class="info-name menu-enter" style="--i: 2">${region.name}</h2>
-      <p class="info-coords menu-enter" style="--i: 3">${region.regionId} · ${formatCoord(latitude, 'N', 'S')} · ${formatCoord(longitude, 'E', 'W')}</p>
+      <p class="info-coords menu-enter" style="--i: 3">${region.regionId} · ${formatLatLon(region.coordinates, ' · ')}</p>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
       <section class="cmp-analogs">
         <ol class="menu-options" aria-label="Earth analogs: pick one to see the comparison">${cards}</ol>
@@ -198,7 +192,7 @@ export function setupMissionInfo({ onAnalogChange } = {}) {
     setVignette(true);
     render(`
       <h2 class="info-name menu-enter" style="--i: 2">${name}</h2>
-      <p class="info-coords menu-enter" style="--i: 3">${regionId} · ${formatCoord(coordinates.latitude, 'N', 'S')} · ${formatCoord(coordinates.longitude, 'E', 'W')} · ${percent}% similarity</p>
+      <p class="info-coords menu-enter" style="--i: 3">${regionId} · ${formatLatLon(coordinates, ' · ')} · ${percent}% similarity</p>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
       <section class="cmp-detail menu-enter" style="--i: 4">
         <table class="cmp-table cmp-head" aria-hidden="true">
