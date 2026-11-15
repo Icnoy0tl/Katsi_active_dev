@@ -53,7 +53,7 @@ function errorCard(error) {
       <${tag} class="menu-tag menu-tag--mission api-result${canRetry ? '' : ' is-error'}">${missionCardContent({
         icon: canRetry ? RETRY_ICON : FILE_ICON,
         title: canRetry ? 'Earth analogs unavailable' : 'Data rejected',
-        meta: canRetry ? 'The analogs service did not respond · Retry' : escapeHtml(error.message),
+        meta: canRetry ? 'Free server may be waking up · Retry' : escapeHtml(error.message),
         trailing: ''
       })}</${tag.split(' ')[0]}>
     </li>`;

@@ -1,0 +1,10 @@
+# robots.txt — Katsí
+# Si el sitio se publica como deploy de prueba, cambiar "Allow: /" por "Disallow: /"
+# para que no se indexe.
+
+User-agent: *
+Allow: /
+# Los JSON de ejemplo de la API no son contenido para buscadores.
+Disallow: /frontend/examples/
+
+Sitemap: https://katsi.onrender.com/sitemap.xml

@@ -170,10 +170,7 @@ export const MENU = {
     stops: [
       { body: 'orion', hold: 5 },
       { body: 'moon', hold: 5, distanceScale: 0.8 },
-      { body: 'mars', hold: 5, distanceScale: 0.8 },
-      { body: 'rover', hold: 5 },
-      { body: 'antenna', hold: 5 },
-      { body: 'solarPanel', hold: 5 }
+      { body: 'mars', hold: 5, distanceScale: 0.8 }
     ],
     driftSpeed: 0.012 // rad/s (≈ 0.7°/s) de giro alrededor del cuerpo
   }
@@ -228,15 +225,26 @@ export const PHOTO_TEXTURES = {
 
 /**
  * Backend de análogos (`GET /api/analog`, en backend/main.go): es la única fuente de los análogos,
- * el front no los calcula. En local apunta al servidor de Go en el puerto 8080; en producción, a
- * `/api/analog` del mismo dominio (cambiar `url` si el backend se publica en otro).
+ * el front no los calcula. En local apunta al servidor de Go en el puerto 8080; en producción, al
+ * servicio de Render (otro dominio: su CORS solo acepta https://katsi.onrender.com y localhost).
  * Si la petición falla o tarda más de `timeoutMs`, el panel ofrece reintentar.
  */
 const IS_LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
-const API_BASE = IS_LOCAL ? 'http://localhost:8080' : '';
+const API_BASE = IS_LOCAL ? 'http://localhost:8080' : 'https://katsi-api.onrender.com';
 export const ANALOGS_API = {
   url: `${API_BASE}/api/analog`,
   timeoutMs: 8000
+};
+
+/**
+ * Despertar la API al cargar la página (`GET /api/health`, 204): en el plan gratuito de Render
+ * el servicio se apaga sin tráfico y tarda 30–50 s en arrancar. Las demás peticiones esperan a
+ * que termine (como mucho `timeoutMs`) antes de empezar a contar su propio timeout.
+ */
+export const API_WAKE = {
+  url: `${API_BASE}/api/health`,
+  timeoutMs: 60000,
+  slowMs: 4000 // a partir de aquí se avisa al usuario de que el servidor gratuito está arrancando
 };
 
 /** Terrenos de la Luna o Marte ordenados para una misión (`GET /api/regions`, en backend/regions.go) */
@@ -266,20 +274,34 @@ export const MISSION_FILTERS = [
 ];
 
 /**
- * Al pasar por una tarjeta de misión la cámara vuela hasta su objeto; `objectDistanceScale` escala
- * la distancia de su vista normal (> 1 = más lejos: se ve el objeto con el planeta de fondo).
- * Para que el viaje sea corto, al elegir misión el rover, la antena y el panel pasan a orbitar el
- * planeta elegido, como el satélite y Orión con la Tierra: en una órbita circular a `orbitRadius`
- * radios de su centro, casi de frente a la cámara (inclinada `orbitTilt` hacia ella) y repartidos
- * en `orbitAngles` (rad; 0 = a la derecha del planeta en pantalla, π/2 = arriba, -π/2 = abajo),
- * del lado contrario a la lista de tarjetas. `objectScale` encoge los objetos según el planeta
- * (en la Tierra miden 1) y la vista se acerca en la misma proporción. Al volver al menú
- * regresan a su órbita terrestre.
+ * Elección del tipo de misión: plano fijo calcado del de Orión con la Tierra en el menú (el
+ * planeta grande a la derecha y el objeto delante), en proporción al radio del planeta elegido.
+ * El objeto queda a `orbitRadius` radios del centro y la cámara, desde fuera de su órbita, a
+ * `cameraOffset` radios (hacia fuera, de costado y hacia arriba); los objetos se escalan para
+ * medir respecto al planeta lo mismo que Orión respecto a la Tierra. Al pasar por otra tarjeta
+ * solo cambia el objeto visible; la cámara no se mueve.
  */
 export const MISSION_PREVIEW = {
-  objectDistanceScale: 1.7,
-  orbitRadius: 1.75,
-  orbitTilt: deg(25),
-  orbitAngles: { rover: deg(38), solarPanel: deg(0), antenna: deg(-38) },
-  objectScale: { moon: 0.55, mars: 0.8 }
+  orbitRadius: ORION.distance / EARTH.radius,
+  cameraOffset: { outward: 0.3, side: -0.1, lift: 0.06 }, // vista de Orión (0.6, -0.2, 0.12) / radio de la Tierra
+  zoom: [0.5, 2.5], // límites de zoom, en múltiplos de la distancia del plano
+  near: 0.004,
+  // Entrada del objeto al pasar por su tarjeta: gira `turns` vueltas sobre el eje vertical y crece
+  // desde `fromScale` de su tamaño, frenando hasta quedar de frente en `duration` segundos
+  entrance: { duration: 0.8, turns: 1, fromScale: 0.15 },
+  /**
+   * Pose final de cada objeto: de frente a la cámara (su +Z local hacia ella), con un ligero giro
+   * (rad) para que no se vea plano: `yaw` sobre la vertical, `pitch` acerca su parte de arriba a
+   * la cámara y `roll` lo ladea en pantalla. En la antena el reflector ya apunta 40° hacia arriba:
+   * el `pitch` lo baja hacia la cámara.
+   */
+  front: {
+    rover: { yaw: 0.35, pitch: 0.3, roll: 0 },
+    antenna: { yaw: 0.3, pitch: 0.45, roll: 0 },
+    solarPanel: { yaw: -0.25, pitch: 0.15, roll: 0.3 }
+  },
+  // Giro lento de la cámara hacia la derecha alrededor del objeto, como en el recorrido del menú
+  // (`speed`, rad/s, la de MENU.tour.driftSpeed); frena poco a poco hasta pararse a `maxAngle`
+  // para que el planeta no salga del encuadre
+  drift: { speed: 0.012, maxAngle: deg(25) }
 };

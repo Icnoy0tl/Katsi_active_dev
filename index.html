@@ -21,15 +21,19 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Katsí · Earth analogs for Moon and Mars base sites" />
   <meta name="twitter:description" content="Explore Earth, the Moon and Mars in 3D and find the places on Earth that most resemble the proposed sites for permanent bases." />
-  <!-- Pendiente hasta tener dominio (deben ser URLs absolutas):
-  <link rel="canonical" href="https://DOMINIO/" />
-  <meta property="og:url" content="https://DOMINIO/" />
-  <meta property="og:image" content="https://DOMINIO/frontend/icons/og-image.jpg" />
-  <meta name="twitter:image" content="https://DOMINIO/frontend/icons/og-image.jpg" />
-  -->
-  <!-- Tailwind CSS para la interfaz flotante -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Imagen de vista previa: frontend/icons/og-image.jpg (1200×630) -->
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Katsí main menu: the Orion capsule orbiting Earth next to the Moon missions, Mars missions and API options." />
+  <meta name="twitter:image:alt" content="Katsí main menu: the Orion capsule orbiting Earth next to the Moon missions, Mars missions and API options." />
+  <link rel="canonical" href="https://katsi.onrender.com/" />
+  <meta property="og:url" content="https://katsi.onrender.com/" />
+  <meta property="og:image" content="https://katsi.onrender.com/frontend/icons/og-image.jpg" />
+  <meta name="twitter:image" content="https://katsi.onrender.com/frontend/icons/og-image.jpg" />
   <!-- Fuente Inter -->
+  <!-- API en otro dominio: abrir la conexión antes del primer fetch -->
+  <link rel="preconnect" href="https://katsi-api.onrender.com" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -776,55 +780,6 @@
     }
     .cmp-analogs .menu-options {
       gap: 1.6rem;
-    }
-    /* Filtro de misión: segmentos en fila sobre los análogos; el activo, con el azul del acento */
-    .mission-filter {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      width: min(28rem, calc(100vw - 32px));
-    }
-    #missions-filter {
-      width: 100%;
-      margin-bottom: 1.6rem;
-    }
-    /* Paso 1 (eligiendo misión): sin la misión elegida encima de la lista */
-    #missions-filter[hidden] {
-      display: none;
-    }
-    /* Paso 2: la misión elegida, que lleva de vuelta a las tarjetas de misión */
-    #missions-filter [data-change] {
-      flex: 0 0 auto;
-    }
-    .mission-filter-option {
-      flex: 1 1 auto;
-      padding: 0.55rem 0.8rem;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      border-radius: 2px;
-      background: rgba(15, 23, 42, 0.35);
-      font-family: 'Montserrat', 'Inter', sans-serif;
-      font-weight: 500;
-      font-size: 0.66rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: rgba(203, 213, 225, 0.65);
-      cursor: pointer;
-      transition: color 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
-    }
-    .mission-filter-option:hover,
-    .mission-filter-option:focus-visible {
-      color: #eef2f8;
-      border-color: rgba(96, 165, 250, 0.6);
-    }
-    .mission-filter-option:focus-visible {
-      outline: 2px solid #60a5fa;
-      outline-offset: 2px;
-    }
-    .mission-filter-option[aria-pressed='true'] {
-      color: #eef2f8;
-      border-color: #60a5fa;
-      background: rgba(59, 130, 246, 0.22);
-      box-shadow: 0 0 12px -4px rgba(59, 130, 246, 0.8);
     }
     /* Coordenadas bajo el nombre del terreno: más tenues que el título */
     #mission-info-body > .info-coords {
@@ -1582,7 +1537,97 @@
         transition: none;
       }
     }
+    /* Aviso de la API dormida (frontend/js/apiNotice.js): abajo al centro, sobre todo lo demás */
+    .api-notice {
+      position: fixed;
+      left: 50%;
+      bottom: max(1.25rem, env(safe-area-inset-bottom));
+      z-index: 60;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      width: min(30rem, calc(100vw - 32px));
+      padding: 0.9rem 0.9rem 0.9rem 1.1rem;
+      border: 1px solid rgba(96, 165, 250, 0.45);
+      border-radius: 8px;
+      background: rgba(6, 11, 26, 0.94);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      font-family: 'Inter', sans-serif;
+      color: rgba(226, 232, 240, 0.92);
+      transform: translateX(-50%);
+      animation: api-notice-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .api-notice[hidden] {
+      display: none;
+    }
+    .api-notice[data-state='failed'] {
+      border-color: rgba(251, 191, 36, 0.55);
+    }
+    .api-notice-dot {
+      flex-shrink: 0;
+      width: 0.6rem;
+      height: 0.6rem;
+      margin-top: 0.35rem;
+      border-radius: 50%;
+      background: #60a5fa;
+      animation: api-notice-pulse 1.2s ease-in-out infinite;
+    }
+    .api-notice[data-state='failed'] .api-notice-dot {
+      background: #fbbf24;
+      animation: none;
+    }
+    .api-notice-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .api-notice-text strong {
+      display: block;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .api-notice-text p {
+      margin: 0.35rem 0 0;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: rgba(203, 213, 225, 0.8);
+    }
+    .api-notice-close {
+      flex-shrink: 0;
+      width: 2rem;
+      height: 2rem;
+      margin: -0.35rem -0.2rem 0 0;
+      border: 0;
+      border-radius: 6px;
+      background: none;
+      font-size: 1.3rem;
+      line-height: 1;
+      color: rgba(203, 213, 225, 0.7);
+      cursor: pointer;
+    }
+    .api-notice-close:hover,
+    .api-notice-close:focus-visible {
+      background: rgba(96, 165, 250, 0.15);
+      color: #fff;
+    }
+    @keyframes api-notice-in {
+      from { opacity: 0; transform: translate(-50%, 0.75rem); }
+    }
+    @keyframes api-notice-pulse {
+      50% { opacity: 0.35; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .api-notice,
+      .api-notice-dot {
+        animation: none;
+      }
+    }
   </style>
+  <!-- Tailwind compilado (npm run build:css). Va después del <style> para mantener la cascada
+       que tenía el CDN, que insertaba sus estilos al final del <head>. -->
+  <link rel="stylesheet" href="./frontend/css/tailwind.css" />
 
   <!-- Import Map oficial de Three.js r164 -->
   <script type="importmap">
@@ -1684,7 +1729,6 @@
     >
       <h2 class="missions-title menu-enter" style="--i: 0"><span id="missions-heading">Choose a mission</span> · <b id="missions-count"></b></h2>
       <div class="menu-accent missions-accent" aria-hidden="true"></div>
-      <div id="missions-filter" class="mission-filter menu-enter" style="--i: 1" role="group" aria-label="Chosen mission" hidden></div>
       <p id="missions-status" class="sr-only" role="status"></p>
       <ul id="missions-list" class="menu-options" aria-label="Terrains: pick one to see its Earth analogs"></ul>
     </aside>

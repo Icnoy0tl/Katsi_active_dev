@@ -16,6 +16,7 @@ import { loadPhotoTextures } from './textures/photo.js';
 import { setupMainMenu } from './menu.js';
 import { createMenuTour } from './menuTour.js';
 import { setupApiPanel } from './apiPanel.js';
+import { setupApiNotice } from './apiNotice.js';
 import { setupMissionsPanel } from './missions.js';
 import { setupMissionInfo } from './missionInfo.js';
 import { createHologram } from './hologram.js';
@@ -64,12 +65,8 @@ const solarPanel = createSolarPanel({ renderer, anisotropy });
 const antenna = createAntenna({ renderer, anisotropy });
 scene.add(starfield, earth.group, moon.group, mars.group, satellite.group, orion.group, rover.group, solarPanel.group, antenna.group);
 
-// Cuerpo que orbitan el rover, la antena y el panel (mesh de la Luna o Marte); null = la Tierra
-let missionOrbitMesh = null;
-
 // --- Navegación (arranca directamente en la Tierra, sin vista general) ---
 const cameraNavigator = createCameraNavigator({
-  missionOrbitCenter: (out) => (missionOrbitMesh ? missionOrbitMesh.getWorldPosition(out) : out.set(0, 0, 0)),
   camera,
   controls,
   bodies: { earth: earth.group, moon: moon.mesh, mars: mars.anchor, satellite: satellite.model, orion: orion.model, rover: rover.model, solarPanel: solarPanel.model, antenna: antenna.model },
@@ -131,6 +128,9 @@ function applyBodyRegions() {
 const systemRegionId = (savedId) =>
   [...savedByRegion].find(([, entry]) => entry.region.regionId === savedId)?.[0] ?? null;
 
+// Aviso flotante si la API (plan gratuito de Render) tarda en despertar o no responde
+setupApiNotice();
+
 // Vista API (satélite): panel derecho para soltar los JSON; desde él se va a un terreno guardado
 const apiPanel = setupApiPanel({
   onOpenSaved: (savedId) => {
@@ -145,7 +145,11 @@ const missionsPanel = setupMissionsPanel({
   onFilterChange: () => requestRanking(cameraNavigator.currentFocus),
   onRetry: () => requestRanking(cameraNavigator.currentFocus),
   onPreview: (name) => previewMission(name),
-  onChoosingChange: (choosing) => setChoosingMission(choosing)
+  onChoosingChange: (choosing) => setChoosingMission(choosing),
+  onStepChange: (step) => {
+    panelStep = step;
+    updateBackButton();
+  }
 });
 
 let rankingRequest = 0; // petición de terrenos por misión más reciente (las anteriores se descartan)
@@ -189,13 +193,14 @@ function updateMissionsPanel(name) {
     requestRanking(name); // sin misión (o la libre) solo vuelve a mostrar todas las áreas
   } else missionsPanel.hide();
   // Con la lista de misiones visible, el cuerpo se desplaza a la derecha para no pegarse a ella
-  if (!mainMenu.isOpen && !selectedRegionId) viewShift.setTarget(regions ? shiftIfWide(MENU.missionsViewShift) : 0, 0);
+  if (!mainMenu.isOpen && !selectedRegionId) viewShift.setTarget(regions ? shiftIfWide(choosingBody ? MENU.viewShift : MENU.missionsViewShift) : 0, 0);
 }
 
 /** Áreas de terreno: solo en las misiones del cuerpo enfocado, nunca durante el menú */
 function updateTerrainAreas(focus, menuOpen) {
   Object.entries(missionBodies).forEach(([name, mission]) => {
-    if (mission.markers) mission.markers.group.visible = !menuOpen && focus === name;
+    // Tampoco en el plano de elección de misión (solo el planeta y el objeto)
+    if (mission.markers) mission.markers.group.visible = !menuOpen && focus === name && choosingBody !== name;
   });
 }
 
@@ -206,28 +211,39 @@ const earthHologram = createHologram({ container: hologramsContainer, id: 'holo-
 const missionInfo = setupMissionInfo({
   onAnalogChange: (analog) => {
     showAnalog(analog);
-    setBackLabel(analog ? 'Back to analogs' : 'Back to missions');
+    updateBackButton();
   },
   onRetry: () => requestAnalogs()
 });
 
-// En la vista de misión, "Volver al menú" se sustituye por "Volver a misiones"; dentro de un
-// análogo, por "Volver a análogos" (regresa a la lista de análogos de la misión)
+/**
+ * Botón de volver (arriba a la izquierda), según dónde se esté:
+ * - eligiendo tipo de misión o en el menú: "Back to menu"
+ * - en los terrenos de una misión: "Back to missions" (vuelve a elegir tipo de misión)
+ * - en la vista de un terreno: "Back to terrains" (vuelve a la lista de terrenos)
+ * - dentro de un análogo: "Back to analogs" (vuelve a la lista de análogos del terreno)
+ */
 const openMenuButton = document.getElementById('open-menu-btn');
-const backToMissionsButton = document.getElementById('back-to-missions-btn');
-const backToMissionsLabel = document.getElementById('back-to-missions-label');
-function setBackLabel(text) {
-  backToMissionsLabel.textContent = text;
-  backToMissionsButton.setAttribute('aria-label', text);
+const backButton = document.getElementById('back-to-missions-btn');
+const backLabel = document.getElementById('back-to-missions-label');
+let panelStep = null; // paso visible del panel de misiones ('mission' | 'terrains' | null)
+let menuIsOpen = true; // la escena arranca con el menú principal abierto
+
+function updateBackButton() {
+  const inTerrains = panelStep === 'terrains' && !menuIsOpen;
+  const replaced = Boolean(selectedRegionId) || inTerrains;
+  openMenuButton.classList.toggle('is-replaced', replaced);
+  backButton.classList.toggle('is-hidden', !replaced);
+  if (!replaced) return;
+  const text = !selectedRegionId ? 'Back to missions' : missionInfo.inAnalog ? 'Back to analogs' : 'Back to terrains';
+  backLabel.textContent = text;
+  backButton.setAttribute('aria-label', text);
 }
-backToMissionsButton.addEventListener('click', () => {
-  if (missionInfo.inAnalog) missionInfo.backToList();
+backButton.addEventListener('click', () => {
+  if (!selectedRegionId) missionsPanel.chooseMission();
+  else if (missionInfo.inAnalog) missionInfo.backToList();
   else focusBody(missionBodyName);
 });
-function setMissionButtons(inMission) {
-  openMenuButton.classList.toggle('is-replaced', inMission);
-  backToMissionsButton.classList.toggle('is-hidden', !inMission);
-}
 let missionBodyName = null; // cuerpo de la misión abierta ('moon' | 'mars')
 let selectedRegionId = null; // misión mostrada en el holograma
 let analogRegionId = null; // análogo terrestre elegido entre los más parecidos
@@ -247,95 +263,208 @@ const sceneBodies = [earth.group, moon.group, mars.group, satellite.group, orion
  */
 function setAnalysisMode(active, keepVisible = null) {
   sceneBodies.forEach((body) => (body.visible = !active || body === keepVisible));
-  setMissionButtons(active);
+  updateBackButton();
   controls.enabled = !active && !mainMenu.isOpen;
 }
 
 /**
- * Elección del tipo de misión (paso 1 del panel): se ven el planeta y, en órbita a su alrededor,
- * el rover, la antena y el panel solar; el resto de cuerpos se ocultan. Al pasar a los terrenos
- * vuelven a verse todos y, si la cámara se quedó en un objeto de misión, vuela de vuelta al planeta.
+ * Elección del tipo de misión (paso 1 del panel): plano fijo como el de Orión con la Tierra en el
+ * menú (ver MISSION_PREVIEW): el planeta a la derecha y, delante, el objeto de la tarjeta bajo el
+ * puntero. Al pasar a otra tarjeta solo cambia el objeto; la cámara no se mueve. Al pasar a los
+ * terrenos los objetos vuelven a su órbita terrestre y la cámara, al planeta.
  */
 const missionObjects = { rover, antenna, solarPanel };
-const missionObjectGroups = Object.values(missionObjects).map((object) => object.group);
-// Posición y tamaño en su órbita terrestre, para devolverlos al volver al menú
-const missionObjectHomes = Object.values(missionObjects).map(({ model }) => ({
-  model,
-  position: model.position.clone(),
-  scale: model.scale.x
-}));
-let missionObjectScale = 1; // tamaño respecto al terrestre (ver MISSION_PREVIEW.objectScale)
-let choosingBody = null; // planeta cuyas misiones se eligen ('moon' | 'mars'); null = fuera del paso 1
+const WORLD_UP = new THREE.Vector3(0, 1, 0);
+const lookAtMatrix = new THREE.Matrix4();
+const lookQuaternion = (eye, target, out) => out.setFromRotationMatrix(lookAtMatrix.lookAt(eye, target, WORLD_UP));
+const boundingRadius = (object) => new THREE.Box3().setFromObject(object).getBoundingSphere(new THREE.Sphere()).radius;
+
+// Tamaño de Orión respecto a la Tierra: los objetos miden lo mismo respecto al planeta elegido
+const orionSizeRatio = boundingRadius(orion.model) / EARTH.radius;
+
+/**
+ * Estado terrestre de cada objeto, para devolverlo al salir (posición, orientación, tamaño y
+ * radio), y su pose de frente a la cámara en el plano de misión (`front`, respecto a la cámara)
+ */
+const missionObjectHomes = Object.entries(missionObjects).map(([name, { group, model }]) => {
+  group.updateMatrixWorld(true);
+  const { yaw, pitch, roll } = MISSION_PREVIEW.front[name];
+  return {
+    name,
+    group,
+    model,
+    position: model.position.clone(),
+    quaternion: model.quaternion.clone(),
+    scale: model.scale.x,
+    radius: boundingRadius(model),
+    front: new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch, yaw, roll, 'XYZ'))
+  };
+});
+
+let panelChoosing = false; // el panel está en el paso 1 (también durante el recorrido del menú)
+let choosingBody = null; // planeta del plano de misión ('moon' | 'mars'); null = fuera del plano
 let previewed = null; // lo último mostrado por una tarjeta
+let objectsAway = false; // los objetos están en el plano de misión (fuera de su órbita terrestre)
 
 function setChoosingMission(choosing) {
+  panelChoosing = choosing;
   if (selectedRegionId) return; // la vista de misión gestiona su propia visibilidad
-  previewed = null;
-  if (choosing) {
-    choosingBody = cameraNavigator.currentFocus;
-    const planet = missionBodies[choosingBody].group;
-    sceneBodies.forEach((body) => (body.visible = body === planet || missionObjectGroups.includes(body)));
-    placeMissionObjectsAround(choosingBody);
-    return;
-  }
-  sceneBodies.forEach((body) => (body.visible = true));
-  // Solo si el cambio es dentro del panel: al ir al menú u a otro cuerpo el enfoque ya cambió
-  if (missionObjects[cameraNavigator.currentFocus]) cameraNavigator.focus(choosingBody);
-  choosingBody = null;
+  if (choosing) enterMissionStage();
+  else leaveMissionStage();
 }
 
 /**
- * Pone el rover, la antena y el panel en órbita baja alrededor del planeta, en el lado que ve la
- * cámara (ver MISSION_PREVIEW): el viaje entre el planeta y cada objeto es corto y el planeta queda
- * de fondo al enfocarlos. Ahí se quedan hasta la siguiente elección.
+ * Entra en el plano de misión del planeta enfocado si el panel está en el paso 1. Se llama
+ * también al enfocar un planeta: el panel pudo quedarse en el paso 1 durante el recorrido del
+ * menú (ahí no se muestra el plano) y entonces ya no vuelve a avisar.
  */
-const orbitPlanetCenter = new THREE.Vector3();
-const orbitToCamera = new THREE.Vector3();
-const orbitRight = new THREE.Vector3();
-const orbitForward = new THREE.Vector3();
-const orbitPoint = new THREE.Vector3();
-const WORLD_UP = new THREE.Vector3(0, 1, 0);
-function placeMissionObjectsAround(name) {
-  const mission = missionBodies[name];
-  mission.mesh.getWorldPosition(orbitPlanetCenter);
-  // Plano de la órbita: casi el de la pantalla vista desde la cámara del planeta (derecha y
-  // arriba), inclinado un poco hacia ella para que se lea como una órbita alrededor del planeta
-  orbitToCamera.subVectors(cameraNavigator.viewPosition(name), orbitPlanetCenter).normalize();
-  orbitRight.crossVectors(orbitToCamera, WORLD_UP).normalize().negate();
-  orbitForward.crossVectors(orbitToCamera, orbitRight).normalize(); // arriba en pantalla
-  orbitForward.multiplyScalar(Math.cos(MISSION_PREVIEW.orbitTilt)).addScaledVector(orbitToCamera, Math.sin(MISSION_PREVIEW.orbitTilt));
-  const radius = mission.config.radius * MISSION_PREVIEW.orbitRadius;
-  missionObjectScale = MISSION_PREVIEW.objectScale[name];
-  missionObjectHomes.forEach(({ model, scale }) => model.scale.setScalar(scale * missionObjectScale));
-  Object.entries(missionObjects).forEach(([key, object]) => {
-    const angle = MISSION_PREVIEW.orbitAngles[key];
-    orbitPoint.copy(orbitPlanetCenter).addScaledVector(orbitRight, radius * Math.cos(angle)).addScaledVector(orbitForward, radius * Math.sin(angle));
-    object.placeAt(orbitPoint);
-  });
-  missionOrbitMesh = mission.mesh;
-}
-
-/** Devuelve el rover, la antena y el panel a su órbita terrestre (recorrido del menú) */
-function sendMissionObjectsHome() {
-  if (!missionOrbitMesh) return;
-  missionObjectHomes.forEach(({ model, position, scale }) => {
-    model.position.copy(position);
-    model.scale.setScalar(scale);
-  });
-  missionObjectScale = 1;
-  missionOrbitMesh = null;
+function enterMissionStage() {
+  const name = cameraNavigator.currentFocus;
+  if (!panelChoosing || choosingBody || selectedRegionId || mainMenu.isOpen || !missionBodies[name]) return;
+  previewed = null;
+  choosingBody = name;
+  const planet = missionBodies[name].group;
+  sceneBodies.forEach((body) => (body.visible = body === planet));
+  updateTerrainAreas(name, false);
+  showMissionStage(name);
 }
 
 /**
- * Tarjeta de misión bajo el puntero: la cámara viaja hasta lo que muestra, con el planeta y los
- * objetos en órbita a la vista: 'body' (misión libre) = el planeta elegido; 'rover' | 'antenna' |
- * 'solarPanel' = ese objeto, con el planeta de fondo. Al salir de la lista (`null`) se queda donde está.
+ * Sale del plano de misión: todo vuelve a verse y los objetos a su órbita terrestre. Si se sigue
+ * en el mismo planeta (se eligió misión), la cámara vuelve a su vista; al ir al menú o a otro
+ * cuerpo el enfoque ya cambió.
+ */
+function leaveMissionStage() {
+  if (!choosingBody) return;
+  sendMissionObjectsHome();
+  sceneBodies.forEach((body) => (body.visible = true));
+  const stayed = !mainMenu.isOpen && cameraNavigator.currentFocus === choosingBody;
+  choosingBody = null;
+  previewed = null;
+  if (stayed) {
+    cameraNavigator.focus(cameraNavigator.currentFocus);
+    viewShift.setTarget(shiftIfWide(MENU.missionsViewShift), 0);
+  }
+  updateTerrainAreas(cameraNavigator.currentFocus, mainMenu.isOpen);
+}
+
+/**
+ * Coloca la cámara en el plano de misión del planeta y todos los objetos en el mismo punto,
+ * delante de él (ocultos hasta pasar por su tarjeta)
+ */
+const stageCenter = new THREE.Vector3();
+const stageOutward = new THREE.Vector3();
+const stageSide = new THREE.Vector3();
+const stagePoint = new THREE.Vector3();
+const stageCamera = new THREE.Vector3();
+const stageTurn = new THREE.Quaternion();
+const parentTurn = new THREE.Quaternion();
+function showMissionStage(name) {
+  const { mesh, config } = missionBodies[name];
+  const radius = config.radius;
+  const { outward, side, lift } = MISSION_PREVIEW.cameraOffset;
+  mesh.getWorldPosition(stageCenter);
+  // El objeto, en la dirección desde la que se ve el planeta normalmente
+  stageOutward.subVectors(cameraNavigator.viewPosition(name), stageCenter).normalize();
+  stageSide.set(-stageOutward.z, 0, stageOutward.x).normalize();
+  stagePoint.copy(stageCenter).addScaledVector(stageOutward, radius * MISSION_PREVIEW.orbitRadius);
+  stageCamera.copy(stagePoint).addScaledVector(stageOutward, radius * outward).addScaledVector(stageSide, radius * side);
+  stageCamera.y += radius * lift;
+
+  lookQuaternion(stageCamera, stagePoint, stageTurn);
+  missionObjectHomes.forEach((home) => {
+    const { name: key, group, model, scale, radius: homeRadius, front } = home;
+    missionObjects[key].placeAt(stagePoint);
+    missionObjects[key].hold(true);
+    home.stageScale = (scale * orionSizeRatio * radius) / homeRadius;
+    model.scale.setScalar(home.stageScale);
+    // De frente a la cámara (stageTurn lleva el +Z del objeto hacia ella); en mundo, para la entrada
+    home.stageQuaternion = (home.stageQuaternion ?? new THREE.Quaternion()).copy(stageTurn).multiply(front);
+    model.parent.getWorldQuaternion(parentTurn).invert();
+    model.quaternion.copy(parentTurn.multiply(home.stageQuaternion));
+    group.visible = false;
+  });
+  entrance = null;
+  objectsAway = true;
+
+  const distance = stageCamera.distanceTo(stagePoint);
+  cameraNavigator.focusPose(stageCamera, stagePoint, MISSION_PREVIEW.zoom.map((k) => k * distance), MISSION_PREVIEW.near);
+  stageDrift = { time: 0, angle: 0, sign: 0 };
+  viewShift.setTarget(shiftIfWide(MENU.viewShift), 0);
+}
+
+/** Devuelve el rover, la antena y el panel a su órbita terrestre */
+function sendMissionObjectsHome() {
+  if (!objectsAway) return;
+  missionObjectHomes.forEach(({ name, model, position, quaternion, scale }) => {
+    model.position.copy(position);
+    model.quaternion.copy(quaternion);
+    model.scale.setScalar(scale);
+    missionObjects[name].hold(false);
+  });
+  objectsAway = false;
+  entrance = null;
+  stageDrift = null;
+}
+
+/**
+ * Tarjeta de misión bajo el puntero: se ve su objeto ('rover' | 'antenna' | 'solarPanel') delante
+ * del planeta y desaparece el anterior; 'body' (misión libre) = solo el planeta. La cámara no se
+ * mueve. Al salir de la lista (`null`) se queda lo último mostrado.
  */
 function previewMission(name) {
   if (!choosingBody || !name || name === previewed) return;
   previewed = name;
-  const isBody = name === 'body';
-  cameraNavigator.focus(isBody ? choosingBody : name, false, isBody ? 1 : MISSION_PREVIEW.objectDistanceScale * missionObjectScale);
+  missionObjectHomes.forEach(({ name: key, group }) => (group.visible = key === name));
+  const home = missionObjectHomes.find(({ name: key }) => key === name);
+  entrance = home ? { home, t: 0 } : null;
+  if (!home) return;
+  // De frente a la cámara donde esté ahora (la deriva la va girando; durante el vuelo, a su destino)
+  lookQuaternion(cameraNavigator.isFlying ? stageCamera : camera.position, stagePoint, stageTurn);
+  home.stageQuaternion.copy(stageTurn).multiply(home.front);
+  updateEntrance(0);
+}
+
+/**
+ * Deriva de la cámara en el plano de misión (ver MISSION_PREVIEW.drift): gira alrededor del
+ * objeto sobre la vertical, hacia la derecha de la pantalla como en el recorrido del menú, y
+ * frena de forma exponencial hasta pararse a `maxAngle`
+ */
+let stageDrift = null; // { time, angle, sign } mientras se elige misión
+const driftOffset = new THREE.Vector3();
+const driftTangent = new THREE.Vector3();
+const driftRight = new THREE.Vector3();
+function updateStageDrift(delta) {
+  const { speed, maxAngle } = MISSION_PREVIEW.drift;
+  driftOffset.subVectors(camera.position, controls.target);
+  if (stageDrift.sign === 0) {
+    driftTangent.crossVectors(WORLD_UP, driftOffset);
+    driftRight.setFromMatrixColumn(camera.matrixWorld, 0);
+    stageDrift.sign = driftTangent.dot(driftRight) >= 0 ? 1 : -1;
+  }
+  stageDrift.time += delta;
+  const angle = maxAngle * (1 - Math.exp((-speed * stageDrift.time) / maxAngle)); // arranca a `speed`
+  driftOffset.applyAxisAngle(WORLD_UP, stageDrift.sign * (angle - stageDrift.angle));
+  stageDrift.angle = angle;
+  camera.position.copy(controls.target).add(driftOffset);
+}
+
+/**
+ * Entrada del objeto en el plano de misión (ver MISSION_PREVIEW.entrance): gira sobre el eje
+ * vertical y crece hasta su pose, frenando al final (ease-out cúbico)
+ */
+let entrance = null; // { home, t } mientras dura la entrada
+const entranceSpin = new THREE.Quaternion();
+function updateEntrance(delta) {
+  const { duration, turns, fromScale } = MISSION_PREVIEW.entrance;
+  const { home } = entrance;
+  entrance.t = Math.min(1, entrance.t + delta / duration);
+  const eased = 1 - (1 - entrance.t) ** 3;
+  entranceSpin.setFromAxisAngle(WORLD_UP, (1 - eased) * turns * Math.PI * 2);
+  home.model.parent.getWorldQuaternion(parentTurn).invert();
+  home.model.quaternion.copy(parentTurn.multiply(entranceSpin).multiply(home.stageQuaternion));
+  home.model.scale.setScalar(home.stageScale * (fromScale + (1 - fromScale) * eased));
+  if (entrance.t >= 1) entrance = null;
 }
 
 /** Sale de la vista de misión (cualquier cambio de enfoque la cierra) */
@@ -347,8 +476,8 @@ function closeMission() {
   missionBodyName = null;
   selectedRegionId = null;
   analogRegionId = null;
+  updateBackButton();
   missionInfo.hide();
-  setBackLabel('Back to missions');
   bodyHologram.hide();
   earthHologram.hide();
   earthMini.group.visible = false;
@@ -359,10 +488,12 @@ function closeMission() {
 
 /** Vuela hasta un cuerpo y actualiza la lista de misiones y las áreas de terreno */
 function focusBody(name, distanceScale) {
+  if (choosingBody && choosingBody !== name) leaveMissionStage();
   cameraNavigator.focus(name, false, distanceScale);
   closeMission();
   updateMissionsPanel(name);
   updateTerrainAreas(name, mainMenu.isOpen);
+  enterMissionStage();
 }
 
 // --- Menú principal: Orión de fondo, vista desplazada a la derecha ---
@@ -382,11 +513,13 @@ const mainMenu = setupMainMenu({
     api: leaveMenuTo('satellite') // vista del satélite con el panel para soltar los JSON
   },
   onToggle: (isOpen) => {
+    menuIsOpen = isOpen;
+    updateBackButton();
     // En el menú la escena es solo fondo: sin arrastre ni zoom
     controls.enabled = !isOpen;
     viewShift.setTarget(isOpen ? shiftIfWide(MENU.viewShift) : 0, 0);
     if (isOpen) {
-      sendMissionObjectsHome();
+      leaveMissionStage();
       menuTour.reset();
     }
     updateTerrainAreas(cameraNavigator.currentFocus, isOpen);
@@ -399,7 +532,7 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   if (mainMenu.isOpen) viewShift.setTargetX(shiftIfWide(MENU.viewShift));
-  else if (!selectedRegionId && missionBodies[cameraNavigator.currentFocus]?.regions) viewShift.setTargetX(shiftIfWide(MENU.missionsViewShift));
+  else if (!selectedRegionId && missionBodies[cameraNavigator.currentFocus]?.regions) viewShift.setTargetX(shiftIfWide(choosingBody ? MENU.viewShift : MENU.missionsViewShift));
   viewShift.apply(); // también actualiza la proyección
   camera.updateProjectionMatrix();
 });
@@ -688,6 +821,7 @@ renderer.setAnimationLoop(() => {
 
   cameraNavigator.update(delta);
   if (mainMenu.isOpen) menuTour.update(delta);
+  if (stageDrift && !cameraNavigator.isFlying) updateStageDrift(delta);
   starfield.rotation.y += ROTATION.starfieldSpeed * delta;
 
   controls.update();
@@ -697,6 +831,7 @@ renderer.setAnimationLoop(() => {
   rover.update(delta);
   antenna.update(delta);
   solarPanel.update(delta, lighting.direction);
+  if (entrance) updateEntrance(delta);
   if (selectedRegionId) updateMissionView(delta);
 
   renderer.render(scene, camera);

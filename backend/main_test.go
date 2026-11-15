@@ -21,7 +21,8 @@ func newTestServer(t *testing.T) *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/analog", analogHandler(p))
 	mux.HandleFunc("GET /api/filters", filtersHandler)
-	srv := httptest.NewServer(cors("http://localhost:5173", mux))
+	mux.HandleFunc("GET /api/health", healthHandler)
+	srv := httptest.NewServer(cors(parseOrigins(defaultAllowedOrigins), mux))
 	t.Cleanup(srv.Close)
 	return srv
 }
@@ -124,5 +125,73 @@ func TestPreflightAndFilters(t *testing.T) {
 	var reps []map[string]any
 	if err := json.NewDecoder(resp.Body).Decode(&reps); err != nil || len(reps) != len(knn.MissionNames()) {
 		t.Fatalf("/api/filters: %v, %d missions", err, len(reps))
+	}
+}
+
+func TestCORS(t *testing.T) {
+	srv := newTestServer(t)
+	do := func(method, origin string) *http.Response {
+		req, _ := http.NewRequest(method, srv.URL+"/api/filters", nil)
+		req.Header.Set("Origin", origin)
+		if method == http.MethodOptions {
+			req.Header.Set("Access-Control-Request-Method", "POST")
+		}
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		resp.Body.Close()
+		return resp
+	}
+	cases := []struct {
+		origin string
+		ok     bool
+	}{
+		{"https://katsi.onrender.com", true},
+		{"http://localhost:5173", true},
+		{"http://127.0.0.1:8000", true},
+		{"https://katsi-api.onrender.com", false},
+		{"https://katsi.onrender.com.evil.example", false},
+		{"http://katsi.onrender.com", false}, // solo https
+		{"https://evil.example", false},
+	}
+	for _, c := range cases {
+		for _, method := range []string{http.MethodGet, http.MethodOptions} {
+			resp := do(method, c.origin)
+			got := resp.Header.Get("Access-Control-Allow-Origin")
+			if (got == c.origin) != c.ok || (!c.ok && got != "") {
+				t.Errorf("%s %s: Allow-Origin %q, allowed=%v", method, c.origin, got, c.ok)
+			}
+			if resp.Header.Get("Vary") != "Origin" {
+				t.Errorf("%s %s: missing Vary: Origin", method, c.origin)
+			}
+			if method == http.MethodOptions && resp.StatusCode != http.StatusNoContent {
+				t.Errorf("preflight %s: status %d", c.origin, resp.StatusCode)
+			}
+		}
+	}
+}
+
+func TestParseOrigins(t *testing.T) {
+	got := parseOrigins(" https://a.example/ ,, https://b.example ")
+	if len(got) != 2 || got[0] != "https://a.example" || got[1] != "https://b.example" {
+		t.Errorf("parseOrigins: %q", got)
+	}
+}
+
+func TestHealth(t *testing.T) {
+	srv := newTestServer(t)
+	req, _ := http.NewRequest(http.MethodGet, srv.URL+"/api/health", nil)
+	req.Header.Set("Origin", "https://katsi.onrender.com")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusNoContent {
+		t.Errorf("health: status %d, want 204", resp.StatusCode)
+	}
+	if got := resp.Header.Get("Access-Control-Allow-Origin"); got != "https://katsi.onrender.com" {
+		t.Errorf("health CORS: %q", got)
 	}
 }

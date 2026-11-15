@@ -1,0 +1,4 @@
+/* Entrada de Tailwind: `npm run build:css` genera frontend/css/tailwind.css (minificado). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

@@ -21,6 +21,12 @@ export function createRover({ renderer, anisotropy }) {
   pivot.add(model);
 
   let elapsed = 0;
+  let held = false; // en el plano de misión: sin deriva, para que siga de frente
+
+  /** Pausa (true) o reanuda la deriva sobre sí mismo */
+  function hold(on) {
+    held = on;
+  }
 
   const local = new THREE.Vector3();
   /** Lleva el modelo a un punto del mundo (sin cambiar su órbita de referencia) */
@@ -31,10 +37,12 @@ export function createRover({ renderer, anisotropy }) {
 
   function update(delta) {
     elapsed += delta;
-    model.rotation.x += ROVER.spin.x * delta;
-    model.rotation.y += ROVER.spin.y * delta;
+    if (!held) {
+      model.rotation.x += ROVER.spin.x * delta;
+      model.rotation.y += ROVER.spin.y * delta;
+    }
     mastHead.rotation.y = Math.sin(elapsed * ROVER.mastPanSpeed) * ROVER.mastPanAngle;
   }
 
-  return { group: root, model, placeAt, update };
+  return { group: root, model, placeAt, hold, update };
 }
