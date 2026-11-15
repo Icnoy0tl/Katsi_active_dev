@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CAMERA, EARTH, MARS, MENU, MOON, ORION, ROTATION, SATELLITE, distanceForFov } from './config.js';
-import { state } from './state.js';
 import { createLighting } from './lighting.js';
 import { createStarfield } from './bodies/starfield.js';
 import { createEarth } from './bodies/earth.js';
@@ -11,7 +10,6 @@ import { createSatellite } from './satellite/satellite.js';
 import { createOrion } from './orion/orion.js';
 import { createCameraNavigator } from './camera.js';
 import { loadPhotoTextures } from './textures/photo.js';
-import { setupControlPanel } from './ui.js';
 import { setupMainMenu } from './menu.js';
 import { createMenuTour } from './menuTour.js';
 import { setupMissionsPanel } from './missions.js';
@@ -84,11 +82,9 @@ const regionBody = new Map(); // regionId → nombre del cuerpo ('moon' | 'mars'
 
 // Panel de misiones: visible solo mientras se enfoca un cuerpo con misiones ya cargadas
 const missionsPanel = setupMissionsPanel({ onSelect: (region) => goToMission(region) });
-// Modo Prueba: el panel de controles ocupa la izquierda, así que no hay lista de misiones ni áreas
-let isTestMode = false;
 
 function updateMissionsPanel(name) {
-  const regions = isTestMode ? null : missionBodies[name]?.regions;
+  const regions = missionBodies[name]?.regions;
   if (regions) missionsPanel.show(regions);
   else missionsPanel.hide();
   // Con la lista de misiones visible, el cuerpo se desplaza a la derecha para no pegarse a ella
@@ -99,7 +95,7 @@ const missionsShift = () => (window.innerWidth >= MENU.minWidthForShift ? MENU.m
 /** Áreas de terreno: solo en las misiones del cuerpo enfocado, nunca durante el menú */
 function updateTerrainAreas(focus, menuOpen) {
   Object.entries(missionBodies).forEach(([name, mission]) => {
-    if (mission.markers) mission.markers.group.visible = !menuOpen && !isTestMode && focus === name;
+    if (mission.markers) mission.markers.group.visible = !menuOpen && focus === name;
   });
 }
 
@@ -125,7 +121,7 @@ function setBackLabel(text) {
 }
 backToMissionsButton.addEventListener('click', () => {
   if (missionInfo.inAnalog) missionInfo.backToList();
-  else controlPanel.focus(missionBodyName);
+  else focusBody(missionBodyName);
 });
 function setMissionButtons(inMission) {
   openMenuButton.classList.toggle('is-replaced', inMission);
@@ -134,6 +130,7 @@ function setMissionButtons(inMission) {
 let missionBodyName = null; // cuerpo de la misión abierta ('moon' | 'mars')
 let selectedRegionId = null; // misión mostrada en el holograma
 let analogRegionId = null; // análogo terrestre elegido entre los más parecidos
+let isRotating = true; // los cuerpos giran hasta que se abre una misión
 
 // Tierra en miniatura bajo el cuerpo durante la vista de misión (su tamaño depende del cuerpo)
 const earthMini = createEarthMiniature({ earth, radius: MOON.missionView.earth.radius });
@@ -170,21 +167,13 @@ function closeMission() {
   if (!mainMenu.isOpen) setViewShiftTarget(0, 0);
 }
 
-const controlPanel = setupControlPanel({
-  cameraNavigator,
-  onFocus: (name) => {
-    closeMission();
-    updateMissionsPanel(name);
-    updateTerrainAreas(name, mainMenu.isOpen);
-  },
-  onToggleClouds: (visible) => {
-    earth.clouds.visible = visible;
-  },
-  onToggleAtmosphere: (visible) => {
-    earth.atmosphere.visible = visible;
-    mars.atmosphere.visible = visible;
-  }
-});
+/** Vuela hasta un cuerpo y actualiza la lista de misiones y las áreas de terreno */
+function focusBody(name, distanceScale) {
+  cameraNavigator.focus(name, false, distanceScale);
+  closeMission();
+  updateMissionsPanel(name);
+  updateTerrainAreas(name, mainMenu.isOpen);
+}
 
 // --- Menú principal: Orión de fondo, vista desplazada a la derecha ---
 // Desplazamiento de la vista (fracciones del ancho/alto): x > 0 mueve la escena a la derecha, y > 0 hacia arriba
@@ -193,7 +182,7 @@ const setViewShiftTarget = (x, y) => {
   viewShift.targetX = x;
   viewShift.targetY = y;
 };
-const menuTour = createMenuTour({ camera, controls, cameraNavigator, focus: controlPanel.focus });
+const menuTour = createMenuTour({ camera, controls, cameraNavigator, focus: focusBody });
 
 function applyViewShift() {
   const width = window.innerWidth;
@@ -207,27 +196,17 @@ function applyViewShift() {
 
 const menuTarget = () => (window.innerWidth >= MENU.minWidthForShift ? MENU.viewShift : 0);
 
-// Botón y panel de controles: solo en el modo Prueba
-const testOnlyUi = document.querySelectorAll('.is-test-only');
-const setTestMode = (active) => {
-  isTestMode = active;
-  testOnlyUi.forEach((el) => el.classList.toggle('is-test-mode', active));
-};
-
-const leaveMenuTo = (name, testMode = false) => () => {
-  setTestMode(testMode);
+const leaveMenuTo = (name) => () => {
   mainMenu.close();
-  controlPanel.focus(name);
+  focusBody(name);
 };
 
 const mainMenu = setupMainMenu({
   actions: {
     moon: leaveMenuTo('moon'),
     mars: leaveMenuTo('mars'),
-    docs: () => {
-      // TODO: pantalla de documentación
-    },
-    test: leaveMenuTo('earth', true)
+    // TODO: pantalla de documentación; por ahora lleva a la vista del satélite
+    docs: leaveMenuTo('satellite')
   },
   onToggle: (isOpen) => {
     // En el menú la escena es solo fondo: sin arrastre ni zoom
@@ -245,7 +224,7 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   if (mainMenu.isOpen) viewShift.targetX = menuTarget();
-  else if (!selectedRegionId && !isTestMode && missionBodies[cameraNavigator.currentFocus]?.regions) viewShift.targetX = missionsShift();
+  else if (!selectedRegionId && missionBodies[cameraNavigator.currentFocus]?.regions) viewShift.targetX = missionsShift();
   applyViewShift(); // también actualiza la proyección
   camera.updateProjectionMatrix();
 });
@@ -337,8 +316,8 @@ function goToMission(region) {
   const view = mission.config.missionView;
 
   // Se pausa la rotación para que el área no se escape del haz
-  controlPanel.setRotating(false);
-  controlPanel.focus(name); // cierra la misión anterior; la nueva se abre después
+  isRotating = false;
+  focusBody(name); // cierra la misión anterior; la nueva se abre después
   missionsPanel.hide();
 
   missionBodyName = name;
@@ -404,8 +383,8 @@ renderer.setAnimationLoop(() => {
   const delta = clock.getDelta();
 
   // Solo rotación sobre su propio eje, a la misma velocidad para todos (los cuerpos no se trasladan)
-  if (state.isRotating) {
-    const spin = ROTATION.baseSpeed * state.rotationSpeed * delta;
+  if (isRotating) {
+    const spin = ROTATION.baseSpeed * delta;
     spinningBodies.forEach((body) => {
       body.rotation.y += spin;
     });

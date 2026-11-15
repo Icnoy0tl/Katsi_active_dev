@@ -135,7 +135,7 @@ export const MENU = {
 
 /** Rotación sobre su propio eje (rad/s a velocidad 1x) */
 export const ROTATION = {
-  baseSpeed: 0.16,
+  baseSpeed: 0.08, // rad/s
   cloudsFactor: 1.35, // las nubes avanzan algo más rápido que la superficie
   starfieldSpeed: 0.0018
 };

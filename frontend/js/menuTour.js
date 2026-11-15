@@ -11,7 +11,7 @@ const cameraRight = new THREE.Vector3();
  * gira muy despacio alrededor del cuerpo, siempre hacia su derecha, y pasado un tiempo
  * vuela a la siguiente parada (Orión → Luna → Marte → Orión …).
  *
- * @param focus(name, distanceScale)  enfoca un cuerpo con vuelo (mantiene sincronizado el panel)
+ * @param focus(name, distanceScale)  enfoca un cuerpo con vuelo (y actualiza misiones y áreas)
  * @returns { reset, update(delta) }
  */
 export function createMenuTour({ camera, controls, cameraNavigator, focus }) {
