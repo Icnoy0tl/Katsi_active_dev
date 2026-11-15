@@ -31,8 +31,6 @@
   <meta property="og:url" content="https://katsi.onrender.com/" />
   <meta property="og:image" content="https://katsi.onrender.com/frontend/icons/og-image.jpg" />
   <meta name="twitter:image" content="https://katsi.onrender.com/frontend/icons/og-image.jpg" />
-  <!-- Tailwind CSS para la interfaz flotante -->
-  <script src="https://cdn.tailwindcss.com"></script>
   <!-- Fuente Inter -->
   <!-- API en otro dominio: abrir la conexión antes del primer fetch -->
   <link rel="preconnect" href="https://katsi-api.onrender.com" crossorigin />
@@ -1627,6 +1625,9 @@
       }
     }
   </style>
+  <!-- Tailwind compilado (npm run build:css). Va después del <style> para mantener la cascada
+       que tenía el CDN, que insertaba sus estilos al final del <head>. -->
+  <link rel="stylesheet" href="./frontend/css/tailwind.css" />
 
   <!-- Import Map oficial de Three.js r164 -->
   <script type="importmap">

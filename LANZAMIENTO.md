@@ -13,7 +13,7 @@
 - [x] `<title>` descriptivo: "Katsí · Earth analogs for Moon and Mars base sites".
 
 
-- [ ] **Quitar `cdn.tailwindcss.com`**: es el Play CDN, que compila en el navegador y no está pensado para producción (bloquea el render y pesa ~300 KB de JS). Generar un CSS estático con el CLI de Tailwind.
+- [x] **Quitar `cdn.tailwindcss.com`**: sustituido por `frontend/css/tailwind.css` (Tailwind 3.4.17, 8.6 KB, 2.4 KB con gzip) en vez de 407 KB de JS que compilaba en el navegador. Se regenera con `npm run build:css` si se añaden clases de Tailwind (ver `tailwind.config.js`).
 - [x] **Comprimir texturas** a WebP (−34 %: 8.6 → 5.7 MB). Calidad 82 general, 92 en el normal map, 75 en Luna y nubes (error medio < 4/255).
 - [ ] Versiones 2K para móvil: las 4K de la Luna (1.9 MB) y las nubes (1.6 MB) siguen siendo las más pesadas.
 - [x] Carga por prioridad: primero la Tierra (0.8 MB) y después nubes, Luna y Marte. No se difieren hasta la misión porque el recorrido del menú las muestra a los pocos segundos.
