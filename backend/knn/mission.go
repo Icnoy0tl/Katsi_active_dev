@@ -1,36 +1,36 @@
 package knn
 
-// MODELO DE PESOS POR TIPO DE VARIABLE Y TIPO DE MISIÓN
-// (port de pesos_mision.py, con la decisión sobre la pregunta pendiente aplicada)
+// WEIGHT MODEL BY VARIABLE TYPE AND MISSION TYPE
+// (port of pesos_mision.py, with the decision on the pending question applied)
 //
-// No usa los valores de las regiones, solo:
-//   (a) Mu[j]: el TIPO de la variable j, un reparto de probabilidad sobre las
-//       categorías (cada fila suma 1);
-//   (b) d: el PERFIL de demanda de la misión (≥ 0, suma > 0, se normaliza solo).
+// It does not use regional values, only:
+//   (a) Mu[j]: the TYPE of variable j, a probability distribution over the
+//       categories (each row sums to 1);
+//   (b) d: the mission demand PROFILE (≥ 0, sum > 0, normalized automatically).
 //
-// F1  afinidad   r_j = Σ_c μ_jc d_c = |μ_j||d| cos θ_j        (diagnóstico)
-// F2′ peso       w_j = Σ_c μ_jc d̃_c / n_c,   n_c = Σ_i μ_ic
+// F1  affinity   r_j = Σ_c μ_jc d_c = |μ_j||d| cos θ_j        (diagnostic)
+// F2′ weight     w_j = Σ_c μ_jc d̃_c / n_c,   n_c = Σ_i μ_ic
 //
-// F2′ es F1 con la demanda de cada categoría repartida entre sus n_c
-// variables. Responde a la pregunta pendiente del README: la categoría recibe
-// exactamente el peso que pide la misión, sin importar cuántas variables
-// medimos de ella.
+// F2′ is F1 with the demand of each category distributed among its n_c
+// variables. It answers the pending question from the README: the category receives
+// exactly the weight requested by the mission, regardless of how many variables
+// we measure from it.
 //
-// Derivación. Cada variable j se divide en porciones (j, c) con masa a priori
-// μ_jc. Se busca el reparto q que se aleja menos de esa masa a priori (mínima
-// divergencia KL) sujeto a que cada categoría reciba su demanda:
+// Derivation. Each variable j is divided into portions (j, c) with a priori mass
+// μ_jc. We look for the distribution q that deviates the least from that a priori mass (minimum
+// KL divergence) subject to each category receiving its demand:
 //
-//	min Σ q_jc ln(q_jc / μ_jc)   s.a.  Σ_j q_jc = d̃_c  ∀c
-//	∂L/∂q_jc = ln(q_jc/μ_jc) + 1 − λ_c = 0  ⇒  q_jc = μ_jc e^{λ_c − 1}
-//	Σ_j q_jc = d̃_c  ⇒  e^{λ_c − 1} = d̃_c / n_c  ⇒  q_jc = μ_jc d̃_c / n_c
+//  min Σ q_jc ln(q_jc / μ_jc)   s.t.  Σ_j q_jc = d̃_c  ∀c
+//  ∂L/∂q_jc = ln(q_jc/μ_jc) + 1 − λ_c = 0  ⇒  q_jc = μ_jc e^{λ_c − 1}
+//  Σ_j q_jc = d̃_c  ⇒  e^{λ_c − 1} = d̃_c / n_c  ⇒  q_jc = μ_jc d̃_c / n_c
 //
-// La KL es estrictamente convexa, así que el óptimo es único. w_j = Σ_c q_jc.
+// KL is strictly convex, so the optimum is unique. w_j = Σ_c q_jc.
 //
-// Relación con F2/F3 del README (softmax + β calibrado a N* = n e^{H(d)}/C):
-// con categorías balanceadas (n_c = n/C) y tipos puros,
-// N_ef(F2′) = e^{H(d)} Π n_c^{d_c} = n e^{H(d)}/C = N*. F2′ alcanza el mismo
-// objetivo de concentración sin parámetro libre: no hay β, bisección,
-// BETA_MAX ni piso_aplicado.
+// Relation to F2/F3 from the README (softmax + β calibrated to N* = n e^{H(d)}/C):
+// with balanced categories (n_c = n/C) and pure types,
+// N_ef(F2′) = e^{H(d)} Π n_c^{d_c} = n e^{H(d)}/C = N*. F2′ achieves the same
+// concentration objective without a free parameter: there is no β, bisection,
+// BETA_MAX, or floor_applied.
 
 import (
 	"errors"
@@ -41,8 +41,9 @@ import (
 
 var Categories = []string{"GEO", "MEC", "VOL", "TER", "ENE", "ATM", "NAV"}
 
-// GEO geometría del terreno | MEC mecánica de suelo | VOL volátiles/química/bio
-// TER térmico | ENE energía/iluminación | ATM atmósfera/viento | NAV navegación/comms
+// GEO terrain geometry | MEC soil mechanics | VOL volatiles/chemistry/bio
+// TER thermal | ENE energy/illumination | ATM atmosphere/wind | NAV navigation/comms
+
 var Mu = map[string]map[string]float64{
 	"slope":                    {"GEO": 1},
 	"radar_roughness":          {"GEO": .7, "MEC": .3},
@@ -57,7 +58,7 @@ var Mu = map[string]map[string]float64{
 	"rock_abundance_pct":       {"GEO": .6, "MEC": .4},
 	"grain_size_um":            {"MEC": 1},
 	"angle_of_repose_deg":      {"MEC": 1},
-	"depth_to_bedrock":         {"MEC": .8, "GEO": .2}, // agrupa _min_m y _max_m
+	"depth_to_bedrock":         {"MEC": .8, "GEO": .2}, 
 	"vrm_microrelief":          {"GEO": 1},
 	"dielectric_constant":      {"VOL": .7, "MEC": .3},
 	"salinity_wt_pct":          {"VOL": 1},
@@ -68,8 +69,7 @@ var Mu = map[string]map[string]float64{
 	"wind_typical_ms":          {"ATM": 1},
 	"wind_gust_ms":             {"ATM": 1},
 	"abrasive_mohs":            {"MEC": 1},
-	// Hielo somero: sobre todo volátil (recurso de agua) y en parte mecánico
-	// (el suelo cementado por hielo cambia la excavación y la capacidad portante).
+
 	"ground_ice_index": {"VOL": .7, "MEC": .3},
 }
 
@@ -83,22 +83,21 @@ var Missions = map[string]map[string]float64{
 var ErrUnknownFilter = errors.New("filtro desconocido")
 
 type VariableWeight struct {
-	Affinity float64 `json:"affinity"` // F1: r_j = μ_j · d̃ (diagnóstico, en [0, 1])
-	Weight   float64 `json:"weight"`   // F2′: w_j (Σ = 1)
-	Factor   float64 `json:"factor"`   // n · w_j (media 1: >1 sube, <1 baja)
+	Affinity float64 `json:"affinity"` 
+	Weight   float64 `json:"weight"`   
+	Factor   float64 `json:"factor"`   
 }
 
 type WeightReport struct {
 	Mission    string                    `json:"mission"`
-	Profile    map[string]float64        `json:"profile"` // d̃: demanda renormalizada sobre las categorías usadas
-	NEf        float64                   `json:"nEf"`     // e^{H(w)}: entre cuántas variables "parece" repartirse el peso
-	NStar      float64                   `json:"nStar"`   // N* del README (referencia)
+	Profile    map[string]float64        `json:"profile"`
+	NEf        float64                   `json:"nEf"`     
+	NStar      float64                   `json:"nStar"`   
 	AngleDeg   float64                   `json:"angleDeg"`
-	NoAffinity bool                      `json:"noAffinity"` // la misión solo pide categorías sin variables → pesos parejos
+	NoAffinity bool                      `json:"noAffinity"` 
 	Variables  map[string]VariableWeight `json:"variables"`
 }
 
-// ---------------------------------------------------------------- validación
 
 func validateVector(vec map[string]float64, ok map[string]bool, name string, sumOne bool) error {
 	keys := make([]string, 0, len(vec))
@@ -108,21 +107,21 @@ func validateVector(vec map[string]float64, ok map[string]bool, name string, sum
 	sort.Strings(keys)
 	s := 0.0
 	for _, c := range keys {
-		// Una clave mal escrita ("GEOO") se ignoraría en silencio → error.
+		// Handle so typos ("GEOO") wont ignore, now raises error.
 		if !ok[c] {
-			return fmt.Errorf("%s: categoría desconocida %q", name, c)
+			return fmt.Errorf("%s: category unknown %q", name, c)
 		}
 		x := vec[c]
 		if math.IsNaN(x) || math.IsInf(x, 0) || x < 0 {
-			return fmt.Errorf("%s[%s]=%v: debe ser finito y >= 0", name, c, x)
+			return fmt.Errorf("%s[%s]=%v: must be finite y >= 0", name, c, x)
 		}
 		s += x
 	}
 	if sumOne && math.Abs(s-1) > 1e-9 {
-		return fmt.Errorf("%s: suma %v, debe sumar 1", name, s)
+		return fmt.Errorf("%s: sum %v, must be 1", name, s)
 	}
 	if !sumOne && !(s > 0) {
-		return fmt.Errorf("%s: suma 0, la misión no demanda nada", name)
+		return fmt.Errorf("%s: sum 0, mission is not demanding nothing", name)
 	}
 	return nil
 }
@@ -131,22 +130,22 @@ func validateModel(mu map[string]map[string]float64, profile map[string]float64,
 	ok := make(map[string]bool, len(cats))
 	for _, c := range cats {
 		if ok[c] {
-			return errors.New("categorías con duplicados")
+			return errors.New("Duplicated categories")
 		}
 		ok[c] = true
 	}
 	if len(cats) == 0 {
-		return errors.New("categorías vacías")
+		return errors.New("Empty Categorys")
 	}
 	if len(mu) == 0 {
-		return errors.New("Mu no tiene variables")
+		return errors.New("Mu has no vars")
 	}
 	for _, v := range sortedKeys(mu) {
 		if err := validateVector(mu[v], ok, "Mu["+v+"]", true); err != nil {
 			return err
 		}
 	}
-	return validateVector(profile, ok, "perfil de misión", false)
+	return validateVector(profile, ok, "Mision profile", false)
 }
 
 func sortedKeys[T any](m map[string]T) []string {
@@ -168,7 +167,6 @@ func entropy(p []float64) float64 {
 	return h
 }
 
-// ---------------------------------------------------------------- F1 + F2′
 
 func ComputeWeights(profile map[string]float64, mu map[string]map[string]float64, cats []string) (WeightReport, error) {
 	if err := validateModel(mu, profile, cats); err != nil {
@@ -178,8 +176,8 @@ func ComputeWeights(profile map[string]float64, mu map[string]map[string]float64
 	n := len(vars)
 	rep := WeightReport{Profile: map[string]float64{}, Variables: make(map[string]VariableWeight, n)}
 
-	// n_c = Σ_j μ_jc. Solo cuentan las categorías que alguna variable usa: una
-	// categoría vacía no puede influir (invariancia del README).
+	// n_c = Σ_j μ_jc.
+
 	nc := map[string]float64{}
 	for _, v := range vars {
 		for _, c := range cats {
@@ -197,8 +195,7 @@ func ComputeWeights(profile map[string]float64, mu map[string]map[string]float64
 
 	w := make([]float64, n)
 	if !(mass > 0) {
-		// La misión solo demanda categorías que ninguna variable cubre:
-		// no hay información para priorizar → pesos parejos (no se inventa nada).
+		
 		for i, v := range vars {
 			w[i] = 1 / float64(n)
 			rep.Variables[v] = VariableWeight{Weight: w[i], Factor: 1}
@@ -227,8 +224,7 @@ func ComputeWeights(profile map[string]float64, mu map[string]map[string]float64
 
 	rep.NEf = math.Exp(entropy(w))
 	rep.NStar = float64(n) * math.Exp(entropy(d)) / float64(len(used))
-	// Ángulo de Hellinger respecto del reparto parejo: √w está en la esfera
-	// unidad; cos θ = Σ √(w_j / n). θ = 0 → parejo; mayor θ → más concentrado.
+
 	cos := 0.0
 	for _, x := range w {
 		cos += math.Sqrt(x / float64(n))
@@ -237,32 +233,27 @@ func ComputeWeights(profile map[string]float64, mu map[string]map[string]float64
 	return rep, nil
 }
 
-// ---------------------------------------------------------------- arranque
 
-// validateFeatureMapping comprueba que el vector del KNN y Mu describan
-// exactamente las mismas variables: cada dimensión apunta a una variable de Mu,
-// cada variable de Mu tiene al menos una dimensión y sus Share suman 1.
 func validateFeatureMapping() error {
 	shares := map[string]float64{}
 	for _, f := range features {
 		if _, ok := Mu[f.MuVar]; !ok {
-			return fmt.Errorf("la dimensión %q apunta a %q, que no está en Mu", f.Name, f.MuVar)
+			return fmt.Errorf("Dimension %q points to %q, which is not in mu", f.Name, f.MuVar)
 		}
 		if !(f.Share > 0 && f.Share <= 1) {
-			return fmt.Errorf("la dimensión %q tiene Share=%v fuera de (0, 1]", f.Name, f.Share)
+			return fmt.Errorf("Dimension %q has share = %f outside from (0, 1]", f.Name, f.Share)
 		}
 		shares[f.MuVar] += f.Share
 	}
 	for _, v := range sortedKeys(Mu) {
 		if math.Abs(shares[v]-1) > 1e-12 {
-			return fmt.Errorf("la variable %q de Mu tiene Share total %v (debe ser 1; 0 = no está en el vector)", v, shares[v])
+			return fmt.Errorf(" %q Mu has a Share total %v (Must be 1; 0 = not in vector)", v, shares[v])
 		}
 	}
 	return nil
 }
 
-// Se calcula una vez al arrancar; si el modelo es inválido el servidor no
-// arranca (es configuración en código: mejor fallar temprano).
+
 var missionReports = func() map[string]WeightReport {
 	if err := validateFeatureMapping(); err != nil {
 		panic("knn: " + err.Error())
@@ -289,8 +280,7 @@ func MissionReports() []WeightReport {
 	return out
 }
 
-// expand reparte el peso de cada variable de Mu entre sus dimensiones del
-// vector (según Share), alineado con names.
+
 func expand(perVar map[string]float64, names []string) (Vector, error) {
 	byName := make(map[string]feature, len(features))
 	for _, f := range features {
@@ -300,8 +290,8 @@ func expand(perVar map[string]float64, names []string) (Vector, error) {
 	for i, n := range names {
 		f, ok := byName[n]
 		if !ok {
-			// Antes esto daba peso 0 en silencio y la variable se ignoraba.
-			return nil, fmt.Errorf("la dimensión %q no está en el modelo de pesos", n)
+			
+			return nil, fmt.Errorf("Dimension %q is not in the model of weights", n)
 		}
 		w[i] = perVar[f.MuVar] * f.Share
 	}
@@ -324,9 +314,7 @@ func reportPerVar(rep WeightReport) map[string]float64 {
 	return out
 }
 
-// WeightsFor devuelve el vector de pesos (Σ = 1) alineado con names.
-// Sin filtro: peso parejo 1/25 por VARIABLE (no por dimensión), así que las dos
-// columnas de depth_to_bedrock se reparten 1/50 cada una.
+
 func WeightsFor(filter string, names []string) (Vector, error) {
 	if filter == "" {
 		return expand(uniformPerVar(), names)
