@@ -11,7 +11,7 @@
 services:
   # ------------------------------------------------------------- backend
   - type: web
-    name: nasa-space-app-api
+    name: Katsi-api
     runtime: go
     plan: free
     branch: main
@@ -30,7 +30,7 @@ services:
 
   # ------------------------------------------------------------ frontend
   - type: web
-    name: nasa-space-app
+    name: Katsi
     runtime: static
     branch: main
     # Publish only what the browser needs, keeping the repo paths:
