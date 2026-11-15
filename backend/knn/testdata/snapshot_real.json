@@ -1,0 +1,152 @@
+{
+ "MARS-001/(parejo)": [
+  "EARTH-003",
+  "EARTH-004",
+  "EARTH-005"
+ ],
+ "MARS-001/agua_bio": [
+  "EARTH-003",
+  "EARTH-006",
+  "EARTH-005"
+ ],
+ "MARS-001/edl": [
+  "EARTH-003",
+  "EARTH-004",
+  "EARTH-005"
+ ],
+ "MARS-001/habitat": [
+  "EARTH-003",
+  "EARTH-004",
+  "EARTH-005"
+ ],
+ "MARS-001/rover": [
+  "EARTH-005",
+  "EARTH-004",
+  "EARTH-003"
+ ],
+ "MARS-002/(parejo)": [
+  "EARTH-005",
+  "EARTH-003",
+  "EARTH-004"
+ ],
+ "MARS-002/agua_bio": [
+  "EARTH-005",
+  "EARTH-003",
+  "EARTH-001"
+ ],
+ "MARS-002/edl": [
+  "EARTH-003",
+  "EARTH-004",
+  "EARTH-005"
+ ],
+ "MARS-002/habitat": [
+  "EARTH-003",
+  "EARTH-005",
+  "EARTH-004"
+ ],
+ "MARS-002/rover": [
+  "EARTH-005",
+  "EARTH-003",
+  "EARTH-004"
+ ],
+ "MARS-003/(parejo)": [
+  "EARTH-001",
+  "EARTH-002",
+  "EARTH-005"
+ ],
+ "MARS-003/agua_bio": [
+  "EARTH-001",
+  "EARTH-006",
+  "EARTH-005"
+ ],
+ "MARS-003/edl": [
+  "EARTH-001",
+  "EARTH-002",
+  "EARTH-004"
+ ],
+ "MARS-003/habitat": [
+  "EARTH-001",
+  "EARTH-002",
+  "EARTH-006"
+ ],
+ "MARS-003/rover": [
+  "EARTH-001",
+  "EARTH-002",
+  "EARTH-005"
+ ],
+ "MOON-001/(parejo)": [
+  "EARTH-005",
+  "EARTH-006",
+  "EARTH-003"
+ ],
+ "MOON-001/agua_bio": [
+  "EARTH-005",
+  "EARTH-006",
+  "EARTH-003"
+ ],
+ "MOON-001/edl": [
+  "EARTH-003",
+  "EARTH-004",
+  "EARTH-005"
+ ],
+ "MOON-001/habitat": [
+  "EARTH-005",
+  "EARTH-006",
+  "EARTH-003"
+ ],
+ "MOON-001/rover": [
+  "EARTH-005",
+  "EARTH-006",
+  "EARTH-003"
+ ],
+ "MOON-002/(parejo)": [
+  "EARTH-001",
+  "EARTH-005",
+  "EARTH-003"
+ ],
+ "MOON-002/agua_bio": [
+  "EARTH-005",
+  "EARTH-001",
+  "EARTH-003"
+ ],
+ "MOON-002/edl": [
+  "EARTH-001",
+  "EARTH-002",
+  "EARTH-005"
+ ],
+ "MOON-002/habitat": [
+  "EARTH-001",
+  "EARTH-005",
+  "EARTH-003"
+ ],
+ "MOON-002/rover": [
+  "EARTH-001",
+  "EARTH-005",
+  "EARTH-002"
+ ],
+ "MOON-003/(parejo)": [
+  "EARTH-005",
+  "EARTH-003",
+  "EARTH-001"
+ ],
+ "MOON-003/agua_bio": [
+  "EARTH-005",
+  "EARTH-003",
+  "EARTH-006"
+ ],
+ "MOON-003/edl": [
+  "EARTH-003",
+  "EARTH-004",
+  "EARTH-005"
+ ],
+ "MOON-003/habitat": [
+  "EARTH-005",
+  "EARTH-003",
+  "EARTH-001"
+ ],
+ "MOON-003/rover": [
+  "EARTH-005",
+  "EARTH-003",
+  "EARTH-006"
+ ]
+}
