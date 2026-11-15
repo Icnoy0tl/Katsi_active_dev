@@ -18,6 +18,8 @@ import { createHologram } from './hologram.js';
 import { findClosestAnalogs } from './analogs.js';
 import { createEarthMiniature } from './bodies/earthMiniature.js';
 import { createTerrainMarkers, loadRegions, setupMarkerTooltip } from './bodies/terrainMarkers.js';
+import { createViewShift, shiftIfWide } from './viewShift.js';
+import { approach } from './utils/smoothing.js';
 
 // --- Renderizador, escena, cámara y controles ---
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
@@ -43,7 +45,7 @@ controls.enablePan = false;
 
 // --- Contenido de la escena ---
 const lighting = createLighting(scene);
-const lightDirectionUniform = lighting.directionUniform;
+const lightDirectionUniform = lighting.directionUniform; // compartido por las atmósferas
 
 const starfield = createStarfield();
 const earth = createEarth({ anisotropy, lightDirectionUniform });
@@ -88,9 +90,8 @@ function updateMissionsPanel(name) {
   if (regions) missionsPanel.show(regions);
   else missionsPanel.hide();
   // Con la lista de misiones visible, el cuerpo se desplaza a la derecha para no pegarse a ella
-  if (!mainMenu.isOpen && !selectedRegionId) setViewShiftTarget(regions ? missionsShift() : 0, 0);
+  if (!mainMenu.isOpen && !selectedRegionId) viewShift.setTarget(regions ? shiftIfWide(MENU.missionsViewShift) : 0, 0);
 }
-const missionsShift = () => (window.innerWidth >= MENU.minWidthForShift ? MENU.missionsViewShift : 0);
 
 /** Áreas de terreno: solo en las misiones del cuerpo enfocado, nunca durante el menú */
 function updateTerrainAreas(focus, menuOpen) {
@@ -165,7 +166,7 @@ function closeMission() {
   earthMini.group.visible = false;
   missionVignette.classList.remove('is-visible');
   targetFov = CAMERA.fov;
-  if (!mainMenu.isOpen) setViewShiftTarget(0, 0);
+  if (!mainMenu.isOpen) viewShift.setTarget(0, 0);
 }
 
 /** Vuela hasta un cuerpo y actualiza la lista de misiones y las áreas de terreno */
@@ -177,25 +178,8 @@ function focusBody(name, distanceScale) {
 }
 
 // --- Menú principal: Orión de fondo, vista desplazada a la derecha ---
-// Desplazamiento de la vista (fracciones del ancho/alto): x > 0 mueve la escena a la derecha, y > 0 hacia arriba
-const viewShift = { x: 0, y: 0, targetX: 0, targetY: 0 };
-const setViewShiftTarget = (x, y) => {
-  viewShift.targetX = x;
-  viewShift.targetY = y;
-};
+const viewShift = createViewShift(camera);
 const menuTour = createMenuTour({ camera, controls, cameraNavigator, focus: focusBody });
-
-function applyViewShift() {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-  if (Math.abs(viewShift.x) < 1e-4 && Math.abs(viewShift.y) < 1e-4) {
-    camera.clearViewOffset();
-  } else {
-    camera.setViewOffset(width, height, -viewShift.x * width, viewShift.y * height, width, height);
-  }
-}
-
-const menuTarget = () => (window.innerWidth >= MENU.minWidthForShift ? MENU.viewShift : 0);
 
 const leaveMenuTo = (name) => () => {
   mainMenu.close();
@@ -212,21 +196,20 @@ const mainMenu = setupMainMenu({
   onToggle: (isOpen) => {
     // En el menú la escena es solo fondo: sin arrastre ni zoom
     controls.enabled = !isOpen;
-    setViewShiftTarget(isOpen ? menuTarget() : 0, 0);
+    viewShift.setTarget(isOpen ? shiftIfWide(MENU.viewShift) : 0, 0);
     if (isOpen) menuTour.reset();
     updateTerrainAreas(cameraNavigator.currentFocus, isOpen);
   }
 });
-viewShift.x = viewShift.targetX; // sin transición en la carga inicial
-applyViewShift();
+viewShift.snap(); // sin transición en la carga inicial
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  if (mainMenu.isOpen) viewShift.targetX = menuTarget();
-  else if (!selectedRegionId && missionBodies[cameraNavigator.currentFocus]?.regions) viewShift.targetX = missionsShift();
-  applyViewShift(); // también actualiza la proyección
+  if (mainMenu.isOpen) viewShift.setTargetX(shiftIfWide(MENU.viewShift));
+  else if (!selectedRegionId && missionBodies[cameraNavigator.currentFocus]?.regions) viewShift.setTargetX(shiftIfWide(MENU.missionsViewShift));
+  viewShift.apply(); // también actualiza la proyección
   camera.updateProjectionMatrix();
 });
 
@@ -270,6 +253,9 @@ let earthAppear = 0;
 const missionZoom = { current: 1, target: 1 };
 const missionCameraDir = new THREE.Vector3();
 
+/** Distancia de la cámara dentro de un análogo: compensa el campo de visión estrecho de la misión */
+const missionCameraDistance = (view) => view.distance * distanceForFov(CAMERA.missionFov);
+
 /**
  * Análogo terrestre en el que se ha entrado: Tierra en miniatura bajo el cuerpo con solo su área
  * y su propio holograma, y el cuerpo sube para dejarle sitio. Con `null` (lista de análogos) la
@@ -282,7 +268,7 @@ function showAnalog(analog) {
     analogRegionId = null;
     earthHologram.hide();
     earthMini.group.visible = false;
-    setViewShiftTarget(...view.soloViewShift);
+    viewShift.setTarget(...view.soloViewShift);
     missionZoom.target = view.soloDistanceScale;
     return;
   }
@@ -293,7 +279,7 @@ function showAnalog(analog) {
   analogFrame = earthMarkers.localFrame(analogRegionId);
   earthMarkers.showOnly(analogRegionId);
   earthMini.group.visible = true;
-  setViewShiftTarget(...view.viewShift);
+  viewShift.setTarget(...view.viewShift);
   if (!changed) return;
   earthHologram.show(analog.region, earthMarkers.outline(analogRegionId), EARTH.realRadiusKm, {
     kicker: `Earth analog · ${analogRegionId}`,
@@ -333,14 +319,14 @@ function goToMission(region) {
   analogRegionId = null;
 
   missionVignette.classList.add('is-visible');
-  setViewShiftTarget(...view.soloViewShift);
+  viewShift.setTarget(...view.soloViewShift);
   missionZoom.current = missionZoom.target = view.soloDistanceScale;
   setAnalysisMode(true, mission.group);
 
   mission.markers.worldPosition(region.regionId, missionArea);
   // Campo de visión estrecho y cámara más lejos: mismo encuadre, sin deformar los bordes
   targetFov = CAMERA.missionFov;
-  const fullDistance = view.distance * distanceForFov(CAMERA.missionFov);
+  const fullDistance = missionCameraDistance(view);
   // Llega a la distancia de la lista de análogos; el límite admite la de dentro de un análogo
   cameraNavigator.focusFrom(name, missionViewDirection(mission, missionArea), fullDistance * missionZoom.current, fullDistance);
 }
@@ -376,6 +362,36 @@ Promise.all([loadRegions('./backend/data/moon.json'), loadRegions('./backend/dat
   })
   .catch((err) => console.warn('Could not load terrains from backend/data.', err));
 
+/**
+ * Por fotograma con una misión abierta: acercamiento entre la lista de análogos y un análogo,
+ * hologramas pegados a su cuerpo y Tierra en miniatura bajo el cuerpo
+ */
+function updateMissionView(delta) {
+  const mission = missionBodies[missionBodyName];
+  const view = mission.config.missionView;
+
+  // Acercamiento suave entre la lista de análogos y un análogo (tras el vuelo de llegada)
+  if (missionZoom.current !== missionZoom.target && !cameraNavigator.isFlying) {
+    missionZoom.current = approach(missionZoom.current, missionZoom.target, CAMERA.missionZoomSpeed, delta, 1e-4);
+    missionCameraDir.subVectors(camera.position, controls.target).normalize();
+    camera.position.copy(controls.target).addScaledVector(missionCameraDir, missionCameraDistance(view) * missionZoom.current);
+  }
+  camera.updateMatrixWorld(); // OrbitControls ya movió la cámara en este fotograma
+  mission.mesh.getWorldPosition(bodyCenter);
+  mission.markers.worldPosition(selectedRegionId, missionArea);
+  bodyHologram.update(camera, bodyCenter, mission.config.radius, missionArea);
+
+  if (!analogRegionId) return;
+  if (earthAppear < 1) {
+    earthAppear = Math.min(1, earthAppear + EARTH_APPEAR_SPEED * delta);
+    earthMini.setRadius(view.earth.radius * (1 - (1 - earthAppear) ** 3)); // ease-out cúbico
+  }
+  // Separación cuerpo → Tierra proporcional a la distancia de la vista (mantiene la composición)
+  earthMini.place(camera, bodyCenter, view.earth.drop * view.distance, analogFrame, view.faceCamera);
+  earthMarkers.worldPosition(analogRegionId, analogArea);
+  earthHologram.update(camera, earthMini.group.position, earthMini.radius, analogArea);
+}
+
 // --- Bucle principal ---
 const clock = new THREE.Clock();
 const spinningBodies = [earth.surface, moon.mesh, mars.mesh];
@@ -392,20 +408,10 @@ renderer.setAnimationLoop(() => {
     earth.clouds.rotation.y += spin * ROTATION.cloudsFactor;
   }
 
-  // Transición suave del desplazamiento de vista (menú y vista de misión)
-  if (viewShift.x !== viewShift.targetX || viewShift.y !== viewShift.targetY) {
-    const ease = Math.min(1, MENU.shiftSpeed * delta);
-    const stepX = viewShift.targetX - viewShift.x;
-    const stepY = viewShift.targetY - viewShift.y;
-    viewShift.x = Math.abs(stepX) < 1e-4 ? viewShift.targetX : viewShift.x + stepX * ease;
-    viewShift.y = Math.abs(stepY) < 1e-4 ? viewShift.targetY : viewShift.y + stepY * ease;
-    applyViewShift();
-  }
-
-  // Transición suave del campo de visión (entrar y salir de la vista de misión)
+  // Transiciones suaves del desplazamiento de vista (menú y misión) y del campo de visión
+  viewShift.update(delta);
   if (camera.fov !== targetFov) {
-    const step = targetFov - camera.fov;
-    camera.fov = Math.abs(step) < 0.01 ? targetFov : camera.fov + step * Math.min(1, CAMERA.fovSpeed * delta);
+    camera.fov = approach(camera.fov, targetFov, CAMERA.fovSpeed, delta, 0.01);
     camera.updateProjectionMatrix();
   }
 
@@ -417,36 +423,7 @@ renderer.setAnimationLoop(() => {
   lighting.update(camera, controls.target);
   satellite.update(delta, clock.elapsedTime, lighting.direction);
   orion.update(delta, lighting.direction);
-  if (selectedRegionId) {
-    const mission = missionBodies[missionBodyName];
-    const view = mission.config.missionView;
-
-    // Acercamiento suave entre la lista de análogos y un análogo (tras el vuelo de llegada)
-    if (missionZoom.current !== missionZoom.target && !cameraNavigator.isFlying) {
-      const step = missionZoom.target - missionZoom.current;
-      missionZoom.current = Math.abs(step) < 1e-4 ? missionZoom.target : missionZoom.current + step * Math.min(1, CAMERA.missionZoomSpeed * delta);
-      missionCameraDir.subVectors(camera.position, controls.target);
-      camera.position.copy(controls.target).addScaledVector(
-        missionCameraDir.normalize(),
-        view.distance * distanceForFov(CAMERA.missionFov) * missionZoom.current
-      );
-    }
-    camera.updateMatrixWorld(); // OrbitControls ya movió la cámara en este fotograma
-    mission.mesh.getWorldPosition(bodyCenter);
-    mission.markers.worldPosition(selectedRegionId, missionArea);
-    bodyHologram.update(camera, bodyCenter, mission.config.radius, missionArea);
-
-    if (analogRegionId) {
-      if (earthAppear < 1) {
-        earthAppear = Math.min(1, earthAppear + EARTH_APPEAR_SPEED * delta);
-        earthMini.setRadius(view.earth.radius * (1 - (1 - earthAppear) ** 3)); // ease-out cúbico
-      }
-      // Separación cuerpo → Tierra proporcional a la distancia de la vista (mantiene la composición)
-      earthMini.place(camera, bodyCenter, view.earth.drop * view.distance, analogFrame, view.faceCamera);
-      earthMarkers.worldPosition(analogRegionId, analogArea);
-      earthHologram.update(camera, earthMini.group.position, earthMini.radius, analogArea);
-    }
-  }
+  if (selectedRegionId) updateMissionView(delta);
 
   renderer.render(scene, camera);
 });
