@@ -31,13 +31,12 @@ func main() {
 	filters := append([]string{""}, knn.MissionNames()...)
 
 	for _, planet := range []string{"mars", "moon"} {
-		ids := map[string][]string{"mars": {"MARS-001", "MARS-002", "MARS-003"}, "moon": {"MOON-001", "MOON-002", "MOON-003"}}[planet]
-		for _, id := range ids {
-			info, err := p.GetRegion(planet, id)
-			if err != nil {
-				log.Fatal(err)
-			}
-			sel := info.Regions[0]
+		regions, err := p.GetRegions(planet)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, sel := range regions {
+			id := sel.RegionId
 			target, pool, err := knn.Prepare(sel, earth)
 			if err != nil {
 				log.Fatal(err)
@@ -46,14 +45,13 @@ func main() {
 			for _, f := range filters {
 				w, _ := knn.WeightsFor(f, names)
 				ms, _ := knn.FindMostSimilar(target, pool, w, 3)
-				rob, _ := knn.AnalyzeRobustness(target, pool, f, 3, 0.2, 200, 2026)
 				var parts []string
 				for _, m := range ms {
 					parts = append(parts, fmt.Sprintf("%s %.3f (cov %.2f)", short(m.Name), m.Similarity, m.Coverage))
 				}
 				label := f
 				if label == "" {
-					label = "(parejo)"
+					label = "(uniform)"
 				}
 				// Contribution by var
 				var top1 knn.Candidate
@@ -79,10 +77,10 @@ func main() {
 				}
 				sort.Slice(cs, func(i, j int) bool { return cs[i].v > cs[j].v })
 				var why []string
-				for _, c := range cs[:3] {
+				for _, c := range cs[:min(3, len(cs))] {
 					why = append(why, fmt.Sprintf("%s %.0f%%", c.k, 100*c.v/tot))
 				}
-				fmt.Printf("  %-9s %s | top1 stable %.2f | d² from top1: %s\n", label, strings.Join(parts, " · "), rob.Top1Stability, strings.Join(why, ", "))
+				fmt.Printf("  %-9s %s | d² from top1: %s\n", label, strings.Join(parts, " · "), strings.Join(why, ", "))
 			}
 		}
 	}

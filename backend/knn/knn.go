@@ -6,7 +6,6 @@ import (
 	"sort"
 )
 
-
 type Vector []float64
 
 type Candidate struct {
@@ -23,14 +22,14 @@ type Match struct {
 	Coverage   float64 `json:"coverage"` // fracción del peso total con datos en ambas regiones
 }
 
-
 const MinCoverage = 0.5
+
 // WeightedDistance: weighted Euclidean distance with missing data.
 //
 // Let O be the set of dimensions observed in both regions, W = Σ_i w_i, and
 // W_O = Σ_{i∈O} w_i. Then:
 //
-//  d = sqrt( W · Σ_{i∈O} w_i (a_i − b_i)² / W_O )      coverage = W_O / W
+//	d = sqrt( W · Σ_{i∈O} w_i (a_i − b_i)² / W_O )      coverage = W_O / W
 //
 // Missing dimensions are omitted and the weight is renormalized over the
 // present ones; this is the same treatment as Gower's distance (1971).
@@ -67,7 +66,6 @@ func WeightedDistance(a, b, w Vector) (dist, coverage float64, err error) {
 	}
 	return math.Sqrt(total * sum / obs), obs / total, nil
 }
-
 
 func FindMostSimilar(target Candidate, pool []Candidate, w Vector, k int) ([]Match, error) {
 	if k <= 0 {

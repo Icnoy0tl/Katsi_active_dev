@@ -72,17 +72,24 @@ var features = []feature{
 	one("ground_ice_index", func(r *jsonParser.Region) *float64 { return r.AuditVariables.GroundIceIndex }),
 }
 
-func FeatureNames() []string {
-	names := make([]string, len(features))
-	for i, f := range features {
+// FeatureNames: dimensions of the built-in model (no custom variables).
+func FeatureNames() []string { return Default.FeatureNames() }
+
+// FeatureNames: dimensions of this model, in vector order.
+func (m *Model) FeatureNames() []string {
+	names := make([]string, len(m.features))
+	for i, f := range m.features {
 		names[i] = f.Name
 	}
 	return names
 }
 
-func ToVector(r jsonParser.Region) (Vector, error) {
-	v := make(Vector, len(features))
-	for i, f := range features {
+func ToVector(r jsonParser.Region) (Vector, error) { return Default.ToVector(r) }
+
+// ToVector: region → raw vector in this model's dimension order (nil → NaN).
+func (m *Model) ToVector(r jsonParser.Region) (Vector, error) {
+	v := make(Vector, len(m.features))
+	for i, f := range m.features {
 		p := f.Get(&r)
 		if p == nil {
 			v[i] = math.NaN()
@@ -101,9 +108,12 @@ type Stats struct {
 	Max []float64
 }
 
-// ComputeStats computes min and max ignoreing empty columns
-func ComputeStats(vectors []Vector) Stats {
-	n := len(features)
+// ComputeStats computes min and max ignoring missing values (built-in model).
+func ComputeStats(vectors []Vector) Stats { return Default.ComputeStats(vectors) }
+
+// ComputeStats computes min and max per dimension, ignoring missing values.
+func (m *Model) ComputeStats(vectors []Vector) Stats {
+	n := len(m.features)
 	stat := Stats{Min: make([]float64, n), Max: make([]float64, n)}
 	for i := 0; i < n; i++ {
 		stat.Min[i] = math.Inf(1)
@@ -121,7 +131,7 @@ func ComputeStats(vectors []Vector) Stats {
 	return stat
 }
 
-// Normalize min-max a [0, 1]. 
+// Normalize min-max a [0, 1].
 func (stat Stats) Apply(v Vector) Vector {
 	out := make(Vector, len(v))
 	for i, val := range v {
@@ -138,13 +148,14 @@ func (stat Stats) Apply(v Vector) Vector {
 	}
 	return out
 }
+
 // Prepare normalizes the target and the terrestrial catalog.
 //
 // Projection to the terrestrial range. If for a variable the target falls outside the
 // range of the entire catalog (e.g., pressure: Mars 0.8 kPa, Earth 68–99.5),
 // no analog can get closer than the boundary. For x > max and a site e:
 //
-//  (x − e)² = (x − max)² + 2(x − max)(max − e) + (max − e)²
+//	(x − e)² = (x − max)² + 2(x − max)(max − e) + (max − e)²
 //
 // The 1st term is equal for all sites (it does not order anything) and the 2nd
 // amplifies the differences between sites in proportion to how far the target is.
@@ -157,7 +168,11 @@ func (stat Stats) Apply(v Vector) Vector {
 // statistics come solely from the terrestrial catalog: the target no longer compresses
 // the Earth's scale
 func Prepare(target jsonParser.Region, earth []jsonParser.Region) (Candidate, []Candidate, error) {
-	t, pool, _, err := PrepareWithStats(target, earth)
+	return Default.Prepare(target, earth)
+}
+
+func (m *Model) Prepare(target jsonParser.Region, earth []jsonParser.Region) (Candidate, []Candidate, error) {
+	t, pool, _, err := m.PrepareWithStats(target, earth)
 	return t, pool, err
 }
 
@@ -165,21 +180,25 @@ func Prepare(target jsonParser.Region, earth []jsonParser.Region) (Candidate, []
 // terrestrial catalog, to be able to explain the comparison (breakdown.go) with
 // exactly the same scale used by the KNN.
 func PrepareWithStats(target jsonParser.Region, earth []jsonParser.Region) (Candidate, []Candidate, Stats, error) {
-	targetVec, err := ToVector(target)
+	return Default.PrepareWithStats(target, earth)
+}
+
+func (m *Model) PrepareWithStats(target jsonParser.Region, earth []jsonParser.Region) (Candidate, []Candidate, Stats, error) {
+	targetVec, err := m.ToVector(target)
 	if err != nil {
 		return Candidate{}, nil, Stats{}, fmt.Errorf("región %s: %w", target.RegionId, err)
 	}
 
 	earthVecs := make([]Vector, len(earth))
 	for i, r := range earth {
-		v, err := ToVector(r)
+		v, err := m.ToVector(r)
 		if err != nil {
 			return Candidate{}, nil, Stats{}, fmt.Errorf("región tierra %s: %w", r.RegionId, err)
 		}
 		earthVecs[i] = v
 	}
 
-	stats := ComputeStats(earthVecs)
+	stats := m.ComputeStats(earthVecs)
 	normTarget := Candidate{ID: target.RegionId, Name: target.Name, Vector: stats.Apply(stats.Clamp(targetVec))}
 	pool := make([]Candidate, len(earth))
 	for i, r := range earth {
@@ -187,7 +206,6 @@ func PrepareWithStats(target jsonParser.Region, earth []jsonParser.Region) (Cand
 	}
 	return normTarget, pool, stats, nil
 }
-
 
 func (stat Stats) Clamp(v Vector) Vector {
 	out := make(Vector, len(v))
@@ -208,13 +226,13 @@ type OutOfRangeVar struct {
 	Value    float64 `json:"value"`
 	EarthMin float64 `json:"earthMin"`
 	EarthMax float64 `json:"earthMax"`
-	Weight   float64 `json:"weight"` 
+	Weight   float64 `json:"weight"`
 }
 
 type Extrapolation struct {
 	Variables []OutOfRangeVar `json:"variables"`
-	Weight    float64         `json:"weight"`   
-	Dominant  bool            `json:"dominant"` 
+	Weight    float64         `json:"weight"`
+	Dominant  bool            `json:"dominant"`
 }
 
 const OutOfRangeTolerance = 0.10
@@ -222,31 +240,35 @@ const OutOfRangeTolerance = 0.10
 const DominantExtrapolation = 0.5
 
 func CheckExtrapolation(target jsonParser.Region, earth []jsonParser.Region, w Vector) (Extrapolation, error) {
-	tv, err := ToVector(target)
+	return Default.CheckExtrapolation(target, earth, w)
+}
+
+func (m *Model) CheckExtrapolation(target jsonParser.Region, earth []jsonParser.Region, w Vector) (Extrapolation, error) {
+	tv, err := m.ToVector(target)
 	if err != nil {
 		return Extrapolation{}, err
 	}
-	if len(w) != len(features) {
-		return Extrapolation{}, fmt.Errorf("pesos de longitud %d, esperaba %d", len(w), len(features))
+	if len(w) != len(m.features) {
+		return Extrapolation{}, fmt.Errorf("pesos de longitud %d, esperaba %d", len(w), len(m.features))
 	}
 	vecs := make([]Vector, 0, len(earth))
 	for _, r := range earth {
-		v, err := ToVector(r)
+		v, err := m.ToVector(r)
 		if err != nil {
 			return Extrapolation{}, err
 		}
 		vecs = append(vecs, v)
 	}
-	st := ComputeStats(vecs)
+	st := m.ComputeStats(vecs)
 	out := Extrapolation{Variables: []OutOfRangeVar{}}
 	total := 0.0
 	for _, x := range w {
 		total += x
 	}
-	for i, f := range features {
+	for i, f := range m.features {
 		x, lo, hi := tv[i], st.Min[i], st.Max[i]
 		if math.IsNaN(x) || math.IsInf(lo, 0) || math.IsInf(hi, 0) {
-			continue 
+			continue
 		}
 		tol := OutOfRangeTolerance * (hi - lo)
 		if x < lo-tol || x > hi+tol {
