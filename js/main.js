@@ -17,7 +17,7 @@ import { createMenuTour } from './menuTour.js';
 import { setupMissionsPanel } from './missions.js';
 import { setupMissionInfo } from './missionInfo.js';
 import { createHologram } from './hologram.js';
-import { findClosestAnalog } from './analogs.js';
+import { findClosestAnalogs } from './analogs.js';
 import { createEarthMiniature } from './bodies/earthMiniature.js';
 import { createTerrainMarkers, loadRegions, setupMarkerTooltip } from './bodies/terrainMarkers.js';
 
@@ -107,19 +107,33 @@ const missionVignette = document.getElementById('mission-vignette');
 const hologramsContainer = document.getElementById('holograms');
 const bodyHologram = createHologram({ container: hologramsContainer, id: 'holo-body' });
 const earthHologram = createHologram({ container: hologramsContainer, id: 'holo-earth' });
-const missionInfo = setupMissionInfo();
+const missionInfo = setupMissionInfo({
+  onAnalogChange: (analog) => {
+    showAnalog(analog);
+    setBackLabel(analog ? 'Volver a análogos' : 'Volver a misiones');
+  }
+});
 
-// En la vista de misión, "Volver al menú" se sustituye por "Volver a misiones"
+// En la vista de misión, "Volver al menú" se sustituye por "Volver a misiones"; dentro de un
+// análogo, por "Volver a análogos" (regresa a la lista de análogos de la misión)
 const openMenuButton = document.getElementById('open-menu-btn');
 const backToMissionsButton = document.getElementById('back-to-missions-btn');
-backToMissionsButton.addEventListener('click', () => controlPanel.focus(missionBodyName));
+const backToMissionsLabel = document.getElementById('back-to-missions-label');
+function setBackLabel(text) {
+  backToMissionsLabel.textContent = text;
+  backToMissionsButton.setAttribute('aria-label', text);
+}
+backToMissionsButton.addEventListener('click', () => {
+  if (missionInfo.inAnalog) missionInfo.backToList();
+  else controlPanel.focus(missionBodyName);
+});
 function setMissionButtons(inMission) {
   openMenuButton.classList.toggle('is-replaced', inMission);
   backToMissionsButton.classList.toggle('is-hidden', !inMission);
 }
 let missionBodyName = null; // cuerpo de la misión abierta ('moon' | 'mars')
 let selectedRegionId = null; // misión mostrada en el holograma
-let analogRegionId = null; // su análogo terrestre
+let analogRegionId = null; // análogo terrestre elegido entre los más parecidos
 
 // Tierra en miniatura bajo el cuerpo durante la vista de misión (su tamaño depende del cuerpo)
 const earthMini = createEarthMiniature({ earth, radius: MOON.missionView.earth.radius });
@@ -147,6 +161,7 @@ function closeMission() {
   selectedRegionId = null;
   analogRegionId = null;
   missionInfo.hide();
+  setBackLabel('Volver a misiones');
   bodyHologram.hide();
   earthHologram.hide();
   earthMini.group.visible = false;
@@ -264,6 +279,52 @@ let earthRegions = null;
 let earthMarkers = null;
 let analogFrame = null; // base local del área del análogo en la miniatura
 
+/** Aparición de la Tierra en miniatura al entrar en un análogo (0 → 1, crece desde el centro) */
+const EARTH_APPEAR_SPEED = 3; // 1/s (≈ 0.33 s)
+let earthAppear = 0;
+
+/**
+ * Distancia de la cámara en la vista de misión, como factor de `missionView.distance`:
+ * más cerca en la lista de análogos (cuerpo más grande) y la normal dentro de un análogo
+ */
+const missionZoom = { current: 1, target: 1 };
+const missionCameraDir = new THREE.Vector3();
+
+/**
+ * Análogo terrestre en el que se ha entrado: Tierra en miniatura bajo el cuerpo con solo su área
+ * y su propio holograma, y el cuerpo sube para dejarle sitio. Con `null` (lista de análogos) la
+ * Tierra desaparece y el cuerpo vuelve al centro con su holograma.
+ */
+function showAnalog(analog) {
+  const mission = missionBodies[missionBodyName];
+  const view = mission.config.missionView;
+  if (!analog) {
+    analogRegionId = null;
+    earthHologram.hide();
+    earthMini.group.visible = false;
+    setViewShiftTarget(...view.soloViewShift);
+    missionZoom.target = view.soloDistanceScale;
+    return;
+  }
+  missionZoom.target = 1;
+  const changed = analogRegionId !== analog.region.regionId;
+  if (!analogRegionId) earthAppear = 0; // solo crece si no estaba ya a la vista
+  analogRegionId = analog.region.regionId;
+  analogFrame = earthMarkers.localFrame(analogRegionId);
+  earthMarkers.showOnly(analogRegionId);
+  earthMini.group.visible = true;
+  setViewShiftTarget(...view.viewShift);
+  if (!changed) return;
+  earthHologram.show(analog.region, earthMarkers.outline(analogRegionId), EARTH.realRadiusKm, {
+    kicker: `Análogo terrestre · ${analogRegionId}`,
+    tag: `${Math.round(analog.similarity * 100)}\u00a0%` // espacio sin salto: "59 %" no se parte
+  }, {
+    // La forma del análogo se adapta hacia la del terreno de la misión según la similitud
+    target: mission.markers.outline(selectedRegionId),
+    similarity: analog.similarity
+  });
+}
+
 /**
  * Misma acción desde una tarjeta del panel o al hacer clic en un área del cuerpo:
  * información a la izquierda, cuerpo más pequeño y holograma del terreno a su derecha,
@@ -282,42 +343,36 @@ function goToMission(region) {
 
   missionBodyName = name;
   selectedRegionId = region.regionId;
-  const analog = findClosestAnalog(region, earthRegions);
   mission.markers.showOnly(region.regionId); // solo el área de esta misión
-  missionInfo.show(region, analog, name);
   bodyHologram.show(region, mission.markers.outline(region.regionId), mission.config.realRadiusKm, {
     kicker: mission.kicker,
     tag: region.regionId
   });
-
-  // Análogo terrestre: solo su área en la miniatura, con su propio holograma
-  if (analog) {
-    analogRegionId = analog.region.regionId;
-    analogFrame = earthMarkers.localFrame(analogRegionId);
-    earthMarkers.showOnly(analogRegionId);
-    earthMini.setRadius(view.earth.radius);
-    earthMini.group.visible = true;
-    earthHologram.show(analog.region, earthMarkers.outline(analogRegionId), EARTH.realRadiusKm, {
-      kicker: `Análogo terrestre · ${analogRegionId}`,
-      tag: `${Math.round(analog.similarity * 100)}\u00a0%` // espacio sin salto: "59 %" no se parte
-    }, {
-      // La forma del análogo se adapta hacia la del terreno de la misión según la similitud
-      target: mission.markers.outline(region.regionId),
-      similarity: analog.similarity
-    });
-  }
+  // Los 3 análogos más parecidos; la Tierra no aparece hasta entrar en uno de ellos
+  missionInfo.show(region, findClosestAnalogs(region, earthRegions), name);
+  analogRegionId = null;
 
   missionVignette.classList.add('is-visible');
-  setViewShiftTarget(...view.viewShift);
+  setViewShiftTarget(...view.soloViewShift);
+  missionZoom.current = missionZoom.target = view.soloDistanceScale;
   setAnalysisMode(true, mission.group);
 
   mission.markers.worldPosition(region.regionId, missionArea);
   // Campo de visión estrecho y cámara más lejos: mismo encuadre, sin deformar los bordes
   targetFov = CAMERA.missionFov;
-  cameraNavigator.focusFrom(name, missionViewDirection(mission, missionArea), view.distance * distanceForFov(CAMERA.missionFov));
+  const fullDistance = view.distance * distanceForFov(CAMERA.missionFov);
+  // Llega a la distancia de la lista de análogos; el límite admite la de dentro de un análogo
+  cameraNavigator.focusFrom(name, missionViewDirection(mission, missionArea), fullDistance * missionZoom.current, fullDistance);
 }
 
-Promise.all(['moon', 'mars', 'earth'].map((name) => loadRegions(`./backend/data/${name}.json`)))
+// Los terrenos de la Tierra son opcionales: sin ellos las misiones se abren igual, sin análogos
+const loadEarthRegions = () =>
+  loadRegions('./backend/data/earth.json').catch((err) => {
+    console.warn('Sin terrenos terrestres: las misiones se mostrarán sin análogos.', err);
+    return [];
+  });
+
+Promise.all([loadRegions('./backend/data/moon.json'), loadRegions('./backend/data/mars.json'), loadEarthRegions()])
   .then(([moonRegions, marsRegions, terrestrialRegions]) => {
     earthRegions = terrestrialRegions;
     earthMarkers = createTerrainMarkers({ body: earthMini.surface, radius: earthMini.areaRadius, regions: earthRegions });
@@ -385,12 +440,27 @@ renderer.setAnimationLoop(() => {
   if (selectedRegionId) {
     const mission = missionBodies[missionBodyName];
     const view = mission.config.missionView;
+
+    // Acercamiento suave entre la lista de análogos y un análogo (tras el vuelo de llegada)
+    if (missionZoom.current !== missionZoom.target && !cameraNavigator.isFlying) {
+      const step = missionZoom.target - missionZoom.current;
+      missionZoom.current = Math.abs(step) < 1e-4 ? missionZoom.target : missionZoom.current + step * Math.min(1, CAMERA.missionZoomSpeed * delta);
+      missionCameraDir.subVectors(camera.position, controls.target);
+      camera.position.copy(controls.target).addScaledVector(
+        missionCameraDir.normalize(),
+        view.distance * distanceForFov(CAMERA.missionFov) * missionZoom.current
+      );
+    }
     camera.updateMatrixWorld(); // OrbitControls ya movió la cámara en este fotograma
     mission.mesh.getWorldPosition(bodyCenter);
     mission.markers.worldPosition(selectedRegionId, missionArea);
     bodyHologram.update(camera, bodyCenter, mission.config.radius, missionArea);
 
     if (analogRegionId) {
+      if (earthAppear < 1) {
+        earthAppear = Math.min(1, earthAppear + EARTH_APPEAR_SPEED * delta);
+        earthMini.setRadius(view.earth.radius * (1 - (1 - earthAppear) ** 3)); // ease-out cúbico
+      }
       // Separación cuerpo → Tierra proporcional a la distancia de la vista (mantiene la composición)
       earthMini.place(camera, bodyCenter, view.earth.drop * view.distance, analogFrame, view.faceCamera);
       earthMarkers.worldPosition(analogRegionId, analogArea);

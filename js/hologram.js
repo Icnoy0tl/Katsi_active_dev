@@ -156,7 +156,8 @@ export function createHologram({ container, id }) {
       return;
     }
     dom.shape.setAttribute('points', profileToPoints(from, to, 0));
-    const start = performance.now() + MORPH.delay;
+    // Si la tarjeta ya estaba abierta (cambio de análogo) no hay animación de apertura que esperar
+    const start = performance.now() + (visible ? 0 : MORPH.delay);
     const step = (now) => {
       const t = THREE.MathUtils.clamp((now - start) / MORPH.duration, 0, 1);
       if (now >= start) {

@@ -50,9 +50,13 @@ function mergeDepth(variables) {
   return entries;
 }
 
+/** Número de análogos terrestres que se ofrecen por misión */
+const ANALOG_SLOTS = 3;
+
 /**
  * Valores del análogo terrestre para la comparación.
- * TODO: de momento todos son null; aquí se conectarán los datos de la Tierra.
+ * TODO: aún no hay datos reales de la Tierra; cuando lleguen, devolver aquí
+ * `mergeDepth({ ...analog.region.coreVariables, ...analog.region.auditVariables })`.
  */
 function earthValues(analog, keys) {
   return Object.fromEntries(keys.map((key) => [key, null]));
@@ -79,66 +83,143 @@ function comparisonGroup(title, variables, labels, analog) {
     </tbody>`;
 }
 
-/** Análogo terrestre: nombre y coordenadas a la izquierda, anillo de similitud a la derecha */
-function analogCard(analog) {
-  const { name, coordinates } = analog.region;
+// Mismos trazos que los iconos del menú principal y de la lista de misiones
+const EARTH_ICON =
+  '<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.1 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.1-3.6-8.5S9.6 5.8 12 3.5Z"/></svg>';
+
+/** Tarjeta de análogo: igual que las de misiones (icono | divisor | nombre y datos) con el % al final */
+function analogCard(analog, index) {
+  const { name, regionId, coordinates } = analog.region;
   const percent = Math.round(analog.similarity * 100);
-  return `<section class="cmp-analog menu-enter" style="--i: 4">
-      <div>
-        <h3 class="info-section">Análogo terrestre</h3>
-        <p class="info-analog">${name}</p>
-        <p class="info-coords">${formatCoord(coordinates.latitude, 'N', 'S')} · ${formatCoord(coordinates.longitude, 'E', 'O')}</p>
+  return `<li class="menu-enter" style="--i: ${index + 5}">
+      <button type="button" class="menu-tag menu-tag--mission" data-index="${index}">
+        <span class="menu-icon-box">${EARTH_ICON}</span>
+        <span class="menu-divider"></span>
+        <span class="menu-label">
+          <span>${name}</span>
+          <span class="mission-meta">${regionId} · ${formatCoord(coordinates.latitude, 'N', 'S')}, ${formatCoord(coordinates.longitude, 'E', 'O')}</span>
+        </span>
+        <span class="menu-score" style="--score: ${percent}" aria-label="${percent} % de similitud"><b>${percent}&nbsp;%</b></span>
+      </button>
+    </li>`;
+}
+
+/** Hueco reservado mientras no haya terrenos terrestres con los que comparar */
+function pendingCard(index) {
+  return `<li class="menu-enter" style="--i: ${index + 5}">
+      <div class="menu-tag menu-tag--mission is-pending">
+        <span class="menu-icon-box">${EARTH_ICON}</span>
+        <span class="menu-divider"></span>
+        <span class="menu-label">
+          <span>Pendiente</span>
+          <span class="mission-meta">Sin datos terrestres todavía</span>
+        </span>
+        <span class="menu-score" style="--score: 0"><b>—</b></span>
       </div>
-      <div class="cmp-score" style="--score: ${percent}">
-        <b>${percent}&nbsp;%</b><span>similitud</span>
-      </div>
-    </section>`;
+    </li>`;
 }
 
 /**
- * Panel izquierdo con la información de un terreno seleccionado y su comparación con el
- * análogo terrestre.
+ * Panel izquierdo de la misión con dos apartados:
+ *  - Lista: el terreno seleccionado y sus análogos terrestres más parecidos (hasta 3 tarjetas).
+ *  - Comparación: al pulsar una tarjeta, la tabla del terreno frente a ese análogo. Se vuelve a
+ *    la lista con `backToList()` (lo llama el botón superior «Volver a análogos»).
  *
- * @returns { show(region, analog, bodyName), hide() } — `analog`: { region, similarity } o null
+ * @param onAnalogChange(analog | null) se llama al entrar en un análogo (con él) y al volver a la
+ *        lista (con null): la Tierra solo se muestra mientras se está dentro de un análogo
+ * @returns { show(region, analogs, bodyName), hide(), backToList(), inAnalog }
  */
-export function setupMissionInfo() {
+export function setupMissionInfo({ onAnalogChange } = {}) {
   const panel = $('mission-info');
   const body = $('mission-info-body');
   const updateScrollEnd = setupScrollFade(panel);
 
+  let region = null;
+  let bodyLabel = '';
+  let analogs = [];
+  let shown = -1; // análogo en el que se ha entrado (-1 = lista)
+
+  function render(html) {
+    body.innerHTML = html;
+    panel.scrollTop = 0;
+    updateScrollEnd();
+  }
+
+  function renderList() {
+    const { latitude, longitude } = region.coordinates;
+    const cards = Array.from({ length: ANALOG_SLOTS }, (_, i) =>
+      analogs[i] ? analogCard(analogs[i], i) : pendingCard(i)
+    ).join('');
+    render(`
+      <p class="info-section info-lead menu-enter" style="--i: 1">Análogos terrestres más parecidos a</p>
+      <h2 class="info-name menu-enter" style="--i: 2">${region.name}</h2>
+      <p class="info-coords menu-enter" style="--i: 3">${region.regionId} · ${formatCoord(latitude, 'N', 'S')} · ${formatCoord(longitude, 'E', 'O')}</p>
+      <div class="menu-accent missions-accent" aria-hidden="true"></div>
+      <section class="cmp-analogs">
+        <ol class="menu-options" aria-label="Análogos terrestres: elige uno para ver la comparación">${cards}</ol>
+      </section>`);
+  }
+
+  function renderComparison(index) {
+    const analog = analogs[index];
+    const { name, regionId, coordinates } = analog.region;
+    const percent = Math.round(analog.similarity * 100);
+    render(`
+      <h2 class="info-name menu-enter" style="--i: 2">${name}</h2>
+      <p class="info-coords menu-enter" style="--i: 3">${regionId} · ${formatCoord(coordinates.latitude, 'N', 'S')} · ${formatCoord(coordinates.longitude, 'E', 'O')} · ${percent}&nbsp;% de similitud</p>
+      <div class="menu-accent missions-accent" aria-hidden="true"></div>
+      <section class="cmp-detail menu-enter" style="--i: 4">
+        <table class="cmp-table">
+          <caption class="sr-only">Comparación de variables entre ${region.name} (${bodyLabel}) y ${name} (Tierra)</caption>
+          <thead>
+            <tr>
+              <th scope="col">Variable</th>
+              <th scope="col" class="cmp-col-body">${bodyLabel}<span class="cmp-col-sub">${region.regionId}</span></th>
+              <th scope="col" class="cmp-col-earth">Tierra<span class="cmp-col-sub">${regionId}</span></th>
+            </tr>
+          </thead>
+          ${comparisonGroup('Variables principales', region.coreVariables ?? {}, CORE_VARIABLES, analog)}
+          ${comparisonGroup('Variables de auditoría', region.auditVariables ?? {}, AUDIT_VARIABLES, analog)}
+        </table>
+      </section>`);
+  }
+
+  body.addEventListener('click', (event) => {
+    const card = event.target.closest('button[data-index]');
+    if (!card) return;
+    const index = Number(card.dataset.index);
+    shown = index;
+    onAnalogChange?.(analogs[index]);
+    renderComparison(index);
+  });
+
   return {
-    show(region, analog, bodyName) {
-      const { latitude, longitude } = region.coordinates;
-      const bodyLabel = BODY_LABELS[bodyName] ?? bodyName;
-
-      const analogHtml = analog ? analogCard(analog) : '';
-
-      body.innerHTML = `
-        <p class="info-id menu-enter" style="--i: 1">${region.regionId}</p>
-        <h2 class="info-name menu-enter" style="--i: 2">${region.name}</h2>
-        <p class="info-coords menu-enter" style="--i: 3">${formatCoord(latitude, 'N', 'S')} · ${formatCoord(longitude, 'E', 'O')}</p>
-        <div class="menu-accent missions-accent" aria-hidden="true"></div>
-        ${analogHtml}
-        <section class="menu-enter" style="--i: 5">
-          <table class="cmp-table">
-            <caption class="sr-only">Comparación de variables entre ${bodyLabel} y la Tierra</caption>
-            <thead>
-              <tr>
-                <th scope="col">Variable</th>
-                <th scope="col" class="cmp-col-body">${bodyLabel}</th>
-                <th scope="col" class="cmp-col-earth">Tierra</th>
-              </tr>
-            </thead>
-            ${comparisonGroup('Variables principales', region.coreVariables ?? {}, CORE_VARIABLES, analog)}
-            ${comparisonGroup('Variables de auditoría', region.auditVariables ?? {}, AUDIT_VARIABLES, analog)}
-          </table>
-        </section>`;
-      panel.scrollTop = 0;
-      updateScrollEnd();
+    /** true mientras se ve la comparación de un análogo */
+    get inAnalog() {
+      return shown !== -1;
+    },
+    /** De la comparación a la lista de análogos; el foco vuelve a la tarjeta de la que se salió */
+    backToList() {
+      if (shown === -1) return;
+      const from = shown;
+      shown = -1;
+      onAnalogChange?.(null);
+      renderList();
+      body.querySelector(`[data-index="${from}"]`)?.focus({ preventScroll: true });
+    },
+    show(selectedRegion, foundAnalogs, bodyName) {
+      region = selectedRegion;
+      bodyLabel = BODY_LABELS[bodyName] ?? bodyName;
+      analogs = foundAnalogs.slice(0, ANALOG_SLOTS);
+      shown = -1;
+      renderList();
       panel.classList.remove('is-hidden');
       panel.setAttribute('aria-hidden', 'false');
     },
     hide() {
+      region = null;
+      analogs = [];
+      shown = -1;
       panel.classList.add('is-hidden');
       panel.setAttribute('aria-hidden', 'true');
     }

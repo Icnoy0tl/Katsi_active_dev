@@ -522,13 +522,6 @@
       transform-origin: left center;
       animation: menu-accent-grow 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
     }
-    .info-id {
-      margin: 0 0 0.3rem;
-      font-family: 'Montserrat', 'Inter', sans-serif;
-      font-size: 0.72rem;
-      letter-spacing: 0.2em;
-      color: #60a5fa;
-    }
     .info-name {
       margin: 0;
       font-family: 'Montserrat', 'Inter', sans-serif;
@@ -560,50 +553,70 @@
       margin-top: 1.2rem;
     }
 
-    /* Análogo terrestre: nombre a la izquierda, similitud destacada a la derecha (sin recuadro) */
-    .cmp-analog {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      margin-top: 1.3rem;
+    /* Análogos terrestres: tarjetas como las de misiones (.menu-tag--mission) con el % al final */
+    .cmp-analogs {
+      margin-top: 2.6rem;
     }
-    .info-analog {
-      margin: 0 0 0.3rem;
-      font-size: 0.9rem;
-      color: #a5f3fc;
+    .cmp-analogs .menu-options {
+      gap: 1.6rem;
     }
-    .cmp-analog .info-coords {
-      margin-top: 0.15rem;
-      font-size: 0.72rem;
+    /* Coordenadas bajo el nombre del terreno: más tenues que el título */
+    #mission-info-body > .info-coords {
+      color: rgba(203, 213, 225, 0.5);
     }
-    .cmp-score {
-      flex: none;
+    /* Frase que antecede al nombre del terreno («Análogos terrestres más parecidos a») */
+    .info-lead {
+      margin-bottom: 0.6rem;
+      color: rgba(203, 213, 225, 0.75);
+    }
+    /* Similitud: anillo del color del texto de la tarjeta (sigue su resaltado); el número va en cian */
+    .menu-score {
+      position: relative;
+      flex-shrink: 0;
       display: grid;
       place-items: center;
-      align-content: center;
-      gap: 0.25rem;
-      width: 5rem;
-      height: 5rem;
-      border-radius: 50%;
-      /* Anillo que se llena según la similitud */
-      background:
-        radial-gradient(closest-side, rgba(6, 18, 32, 0.95) 80%, transparent 81%),
-        conic-gradient(#67e8f9 calc(var(--score) * 1%), rgba(148, 163, 184, 0.2) 0);
-      text-align: center;
-      line-height: 1;
+      width: 3.2rem;
+      height: 3.2rem;
+      margin-left: 1rem;
     }
-    .cmp-score b {
-      font-size: 1rem;
+    .menu-score::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(currentColor calc(var(--score) * 1%), rgba(148, 163, 184, 0.2) 0);
+      /* Solo el aro: el centro queda transparente sobre la tarjeta */
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+    }
+    .menu-score b {
+      position: relative;
+      font-size: 0.72rem;
       font-weight: 600;
-      color: #ecfeff;
+      letter-spacing: 0.02em;
+      color: #a5f3fc;
       font-variant-numeric: tabular-nums;
     }
-    .cmp-score span {
-      font-size: 0.5rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(203, 213, 225, 0.7);
+    /* Hueco sin datos: misma tarjeta, apagada y sin interacción */
+    .menu-tag.is-pending {
+      cursor: default;
+      opacity: 0.45;
+    }
+    .menu-tag.is-pending:hover {
+      color: rgba(203, 213, 225, 0.65);
+      filter: none;
+      transform: none;
+    }
+    .menu-tag.is-pending:hover::before,
+    .menu-tag.is-pending:hover::after {
+      opacity: 0;
+    }
+    .menu-tag.is-pending:hover .menu-icon {
+      color: rgba(203, 213, 225, 0.6);
+    }
+
+    .cmp-detail {
+      margin-top: 1.3rem;
     }
 
     /* Tabla comparativa: variable | cuerpo | Tierra */
@@ -637,6 +650,15 @@
     }
     .cmp-table thead .cmp-col-earth {
       color: #a5f3fc;
+    }
+    /* Terreno concreto bajo el nombre de cada columna */
+    .cmp-col-sub {
+      display: block;
+      margin-top: 0.25rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      color: rgba(148, 163, 184, 0.8);
     }
     .cmp-group th {
       padding: 1.4rem 0 0.6rem;
@@ -1195,7 +1217,7 @@
       <path d="m10 6-6 6 6 6"></path>
     </svg>
     <span class="hud-divider hidden sm:block"></span>
-    <span class="hidden sm:inline">Volver a misiones</span>
+    <span id="back-to-missions-label" class="hidden sm:inline">Volver a misiones</span>
   </button>
 
   <!-- Botón flotante para mostrar/ocultar el panel de controles -->

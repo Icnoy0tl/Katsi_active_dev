@@ -31,10 +31,15 @@ export const MOON = {
    * (0 = de perfil en el borde derecho, mayor = más de frente).
    * `earth`: Tierra en miniatura (no a escala) bajo la Luna; `drop` es la separación vertical
    * entre centros como fracción de `distance` (así se mantiene la composición).
+   * `soloViewShift`: desplazamiento mientras no se ha entrado en un análogo (sin Tierra debajo,
+   * la Luna queda centrada en vertical). `soloDistanceScale` < 1 acerca entonces la cámara para
+   * que la Luna se vea más grande; al entrar en un análogo vuelve a `distance`.
    */
   missionView: {
     distance: 4.6,
     viewShift: [0.03, 0.2],
+    soloViewShift: [0.03, 0],
+    soloDistanceScale: 0.75,
     faceCamera: 0.55,
     earth: { radius: 0.62, drop: 0.37 }
   }
@@ -60,6 +65,8 @@ export const MARS = {
   missionView: {
     distance: 4.6 * (MARS_RADIUS / MOON_RADIUS),
     viewShift: [0.03, 0.2],
+    soloViewShift: [0.03, 0],
+    soloDistanceScale: 0.75,
     faceCamera: 0.55,
     earth: { radius: 0.62 * (MARS_RADIUS / MOON_RADIUS), drop: 0.37 }
   }
@@ -98,7 +105,8 @@ export const ORION = {
 export const CAMERA = {
   fov: 45,
   missionFov: 22,
-  fovSpeed: 3.5 // rapidez de la transición entre ambos
+  fovSpeed: 3.5, // rapidez de la transición entre ambos
+  missionZoomSpeed: 3.5 // rapidez del acercamiento al entrar o salir de un análogo
 };
 
 /** Factor de distancia que mantiene el tamaño en pantalla al pasar de `CAMERA.fov` a `fov` */
