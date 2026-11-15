@@ -89,6 +89,13 @@ function updateMissionsPanel(name) {
   else missionsPanel.hide();
 }
 
+/** Áreas de terreno: solo en las misiones del cuerpo enfocado, nunca durante el menú */
+function updateTerrainAreas(focus, menuOpen) {
+  Object.entries(missionBodies).forEach(([name, mission]) => {
+    if (mission.markers) mission.markers.group.visible = !menuOpen && focus === name;
+  });
+}
+
 const missionVignette = document.getElementById('mission-vignette');
 const hologramsContainer = document.getElementById('holograms');
 const bodyHologram = createHologram({ container: hologramsContainer, id: 'holo-body' });
@@ -128,6 +135,7 @@ function setAnalysisMode(active, keepVisible = null) {
 function closeMission() {
   if (!selectedRegionId) return;
   setAnalysisMode(false);
+  missionBodies[missionBodyName].markers.showOnly(null);
   missionBodyName = null;
   selectedRegionId = null;
   analogRegionId = null;
@@ -144,6 +152,7 @@ const controlPanel = setupControlPanel({
   onFocus: (name) => {
     closeMission();
     updateMissionsPanel(name);
+    updateTerrainAreas(name, mainMenu.isOpen);
   },
   onToggleClouds: (visible) => {
     earth.clouds.visible = visible;
@@ -194,6 +203,7 @@ const mainMenu = setupMainMenu({
     controls.enabled = !isOpen;
     setViewShiftTarget(isOpen ? menuTarget() : 0, 0);
     if (isOpen) menuTour.reset();
+    updateTerrainAreas(cameraNavigator.currentFocus, isOpen);
   }
 });
 viewShift.x = viewShift.targetX; // sin transición en la carga inicial
@@ -256,6 +266,7 @@ function goToMission(region) {
   missionBodyName = name;
   selectedRegionId = region.regionId;
   const analog = findClosestAnalog(region, earthRegions);
+  mission.markers.showOnly(region.regionId); // solo el área de esta misión
   missionInfo.show(region, analog);
   bodyHologram.show(region, mission.markers.outline(region.regionId), mission.config.realRadiusKm, {
     kicker: mission.kicker,
@@ -303,6 +314,7 @@ Promise.all(['moon', 'mars', 'earth'].map((name) => loadRegions(`./backend/data/
       onSelect: goToMission
     });
     updateMissionsPanel(cameraNavigator.currentFocus);
+    updateTerrainAreas(cameraNavigator.currentFocus, mainMenu.isOpen);
   })
   .catch((err) => console.warn('No se pudieron cargar los terrenos de backend/data.', err));
 

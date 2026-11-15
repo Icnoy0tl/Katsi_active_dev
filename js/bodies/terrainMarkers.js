@@ -26,10 +26,30 @@ const AREA = {
   outlineWidth: 0.006,
   lift: 1.0025, // separación sobre la superficie (evita parpadeo con el terreno)
   badgeSize: 0.075,
-  fillColor: 0xd9cb98,
   fillOpacity: 0.5,
-  outlineColor: 0xf6eab0
+  // Color de cada área: tonos repartidos con el ángulo áureo (dos misiones seguidas nunca se parecen)
+  hueStep: 0.618034,
+  fill: { saturation: 0.65, lightness: 0.6 },
+  outline: { saturation: 0.85, lightness: 0.8 }
 };
+
+/** Materiales de relleno y borde con un tono propio para el área número `index` */
+function createAreaMaterials(index) {
+  const hue = (index * AREA.hueStep) % 1;
+  const common = { transparent: true, depthWrite: false, side: THREE.DoubleSide };
+  return {
+    fill: new THREE.MeshBasicMaterial({
+      ...common,
+      color: new THREE.Color().setHSL(hue, AREA.fill.saturation, AREA.fill.lightness),
+      opacity: AREA.fillOpacity
+    }),
+    border: new THREE.MeshBasicMaterial({
+      ...common,
+      color: new THREE.Color().setHSL(hue, AREA.outline.saturation, AREA.outline.lightness),
+      opacity: 0.95
+    })
+  };
+}
 
 /** Semilla numérica estable a partir del ID de la región */
 function hashString(text) {
@@ -195,41 +215,28 @@ function createBadgeTexture() {
 
 /**
  * Dibuja un área de terreno irregular por cada región sobre la superficie de `body` (se
- * añaden como hijos, así giran con él). Los materiales y la textura del distintivo se
+ * añaden como hijos, así giran con él), cada una con su propio color. El distintivo se
  * comparten; la geometría se genera una vez por región.
  */
 export function createTerrainMarkers({ body, radius, regions }) {
   const group = new THREE.Group();
   group.name = 'terrain-areas';
 
-  const fillMaterial = new THREE.MeshBasicMaterial({
-    color: AREA.fillColor,
-    transparent: true,
-    opacity: AREA.fillOpacity,
-    depthWrite: false,
-    side: THREE.DoubleSide
-  });
-  const borderMaterial = new THREE.MeshBasicMaterial({
-    color: AREA.outlineColor,
-    transparent: true,
-    opacity: 0.95,
-    depthWrite: false,
-    side: THREE.DoubleSide
-  });
   const badgeMaterial = new THREE.SpriteMaterial({ map: createBadgeTexture(), depthWrite: false });
 
   const hitTargets = [];
   const areas = new Map(); // regionId → { normal, outline, group }
 
-  regions.forEach((region) => {
+  regions.forEach((region, index) => {
     const { latitude, longitude } = region.coordinates;
     const normal = latLonToVector3(latitude, longitude, 1);
     const outline = createOutline(hashString(region.regionId), radius * AREA.size);
     const { fill, border } = createAreaGeometries(outline, surfaceFrame(normal), radius, radius * AREA.outlineWidth);
 
-    const fillMesh = new THREE.Mesh(fill, fillMaterial);
+    const materials = createAreaMaterials(index);
+    const fillMesh = new THREE.Mesh(fill, materials.fill);
     fillMesh.userData.region = region;
-    const borderMesh = new THREE.Mesh(border, borderMaterial);
+    const borderMesh = new THREE.Mesh(border, materials.border);
     borderMesh.renderOrder = 1;
 
     const badge = new THREE.Sprite(badgeMaterial);
@@ -289,7 +296,6 @@ export function setupMarkerTooltip({ camera, domElement, markerSets, occluders, 
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  const targets = [...occluders, ...markerSets.flatMap((set) => set.hitTargets)];
   let current = null;
   let pending = false;
   let lastEvent = null;
@@ -301,6 +307,12 @@ export function setupMarkerTooltip({ camera, domElement, markerSets, occluders, 
     const rect = domElement.getBoundingClientRect();
     pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
+    // El raycaster no respeta `visible`: las áreas ocultas (menú, otro cuerpo, otras misiones) no cuentan
+    const areaTargets = markerSets
+      .filter((set) => set.group.visible)
+      .flatMap((set) => set.hitTargets)
+      .filter((target) => target.parent.visible);
+    const targets = [...occluders, ...areaTargets];
     return raycaster.intersectObjects(targets, false)[0]?.object.userData.region ?? null;
   }
 
