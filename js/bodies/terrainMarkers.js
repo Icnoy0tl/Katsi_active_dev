@@ -26,6 +26,8 @@ const AREA = {
   outlineWidth: 0.006,
   lift: 1.0025, // separación sobre la superficie (evita parpadeo con el terreno)
   badgeSize: 0.075,
+  gap: 0.008, // separación mínima entre áreas vecinas (fracción del radio)
+  maxSegment: 0.02, // longitud máxima de un lado tras recortar (el borde sigue la curvatura)
   fillOpacity: 0.5,
   // Color de cada área: tonos repartidos con el ángulo áureo (dos misiones seguidas nunca se parecen)
   hueStep: 0.618034,
@@ -158,6 +160,69 @@ function createAreaGeometries(outline, frame, radius, outlineWidth) {
   return { fill, border };
 }
 
+/**
+ * Recorta el contorno del área `i` para que no invada a ninguna vecina: cada par de áreas se
+ * reparte el terreno por el círculo máximo que equidista de sus centros (un Voronoi esférico).
+ * En el plano tangente (proyección gnomónica, la misma que usa `createAreaGeometries`) ese
+ * círculo máximo es una recta, así que basta un recorte de polígono por semiplano.
+ * El área sigue siendo estrellada respecto a su centro (intersección con conjuntos convexos
+ * que lo contienen), así que el abanico del relleno sigue siendo válido.
+ */
+function clipToNeighbors(outline, frame, radius, neighbors) {
+  let polygon = outline;
+  const w = new THREE.Vector3();
+
+  neighbors.forEach((other) => {
+    // Lado propio: (R·n + x·e + y·u) · (n − m) ≥ margen
+    w.subVectors(frame.normal, other);
+    const a = frame.east.dot(w);
+    const b = frame.north.dot(w);
+    const c = radius * (1 - frame.normal.dot(other));
+    const length = Math.hypot(a, b);
+    if (length < 1e-12) return; // mismo punto: nada que repartir
+    // Distancia del centro a la recta de reparto; el margen nunca deja fuera el propio centro
+    const margin = Math.min(radius * AREA.gap, (c / length) * 0.4) * length;
+    const side = (p) => c + a * p.x + b * p.y - margin;
+    const farthest = Math.max(...polygon.map((p) => -side(p)));
+    if (farthest <= 0) return; // la vecina está lejos: el contorno no llega a la recta
+
+    const clipped = [];
+    polygon.forEach((p, k) => {
+      const q = polygon[(k + 1) % polygon.length];
+      const sp = side(p);
+      const sq = side(q);
+      if (sp >= 0) clipped.push(p);
+      if (sp >= 0 !== sq >= 0) clipped.push(p.clone().lerp(q, sp / (sp - sq)));
+    });
+    polygon = clipped;
+  });
+
+  // Los cortes dejan lados largos y rectos: se subdividen para que no se hundan en el terreno
+  const maxSegment = radius * AREA.maxSegment;
+  const dense = [];
+  polygon.forEach((p, k) => {
+    const q = polygon[(k + 1) % polygon.length];
+    const steps = Math.max(1, Math.ceil(p.distanceTo(q) / maxSegment));
+    for (let s = 0; s < steps; s++) dense.push(p.clone().lerp(q, s / steps));
+  });
+  return dense;
+}
+
+/** Centroide (por superficie) de un polígono plano */
+function polygonCentroid(polygon) {
+  let area = 0;
+  let x = 0;
+  let y = 0;
+  polygon.forEach((p, k) => {
+    const q = polygon[(k + 1) % polygon.length];
+    const cross = p.x * q.y - q.x * p.y;
+    area += cross;
+    x += (p.x + q.x) * cross;
+    y += (p.y + q.y) * cross;
+  });
+  return Math.abs(area) < 1e-12 ? new THREE.Vector2() : new THREE.Vector2(x / (3 * area), y / (3 * area));
+}
+
 /** Base local de la superficie en un punto: normal hacia fuera, este y norte */
 function surfaceFrame(normal) {
   const east = new THREE.Vector3(0, 1, 0).cross(normal);
@@ -225,13 +290,28 @@ export function createTerrainMarkers({ body, radius, regions }) {
   const badgeMaterial = new THREE.SpriteMaterial({ map: createBadgeTexture(), depthWrite: false });
 
   const hitTargets = [];
-  const areas = new Map(); // regionId → { normal, outline, group }
+  const areas = new Map(); // regionId → { normal, outline, anchor, group }
+  const normals = regions.map(({ coordinates }) => latLonToVector3(coordinates.latitude, coordinates.longitude, 1));
+
+  // Distintivos en el centro visible de cada área (si dos regiones casi coinciden, cada una
+  // queda en su mitad) y de un tamaño que no los solape
+  const anchors = [];
 
   regions.forEach((region, index) => {
-    const { latitude, longitude } = region.coordinates;
-    const normal = latLonToVector3(latitude, longitude, 1);
-    const outline = createOutline(hashString(region.regionId), radius * AREA.size);
-    const { fill, border } = createAreaGeometries(outline, surfaceFrame(normal), radius, radius * AREA.outlineWidth);
+    const normal = normals[index];
+    const frame = surfaceFrame(normal);
+    const neighbors = normals.filter((other) => other !== normal);
+    const outline = clipToNeighbors(createOutline(hashString(region.regionId), radius * AREA.size), frame, radius, neighbors);
+    const { fill, border } = createAreaGeometries(outline, frame, radius, radius * AREA.outlineWidth);
+
+    const center = polygonCentroid(outline);
+    const anchor = frame.normal
+      .clone()
+      .multiplyScalar(radius)
+      .addScaledVector(frame.east, center.x)
+      .addScaledVector(frame.north, center.y)
+      .normalize();
+    anchors.push(anchor);
 
     const materials = createAreaMaterials(index);
     const fillMesh = new THREE.Mesh(fill, materials.fill);
@@ -240,8 +320,7 @@ export function createTerrainMarkers({ body, radius, regions }) {
     borderMesh.renderOrder = 1;
 
     const badge = new THREE.Sprite(badgeMaterial);
-    badge.position.copy(normal).multiplyScalar(radius * 1.02);
-    badge.scale.setScalar(radius * AREA.badgeSize);
+    badge.position.copy(anchor).multiplyScalar(radius * 1.02);
     badge.renderOrder = 2;
     badge.userData.region = region;
 
@@ -249,7 +328,13 @@ export function createTerrainMarkers({ body, radius, regions }) {
     area.add(fillMesh, borderMesh, badge);
     group.add(area);
     hitTargets.push(fillMesh, badge);
-    areas.set(region.regionId, { normal, outline, group: area });
+    areas.set(region.regionId, { normal, outline, anchor, group: area, badge });
+  });
+
+  // Tamaño de cada distintivo: el normal, salvo que la vecina más próxima esté más cerca
+  areas.forEach((entry) => {
+    const nearest = Math.min(...anchors.filter((a) => a !== entry.anchor).map((a) => a.distanceTo(entry.anchor)));
+    entry.badge.scale.setScalar(radius * Math.min(AREA.badgeSize, nearest * 0.9));
   });
 
   body.add(group);
@@ -277,7 +362,7 @@ export function createTerrainMarkers({ body, radius, regions }) {
     worldPosition(regionId, out = new THREE.Vector3()) {
       const entry = areas.get(regionId);
       if (!entry) return null;
-      return body.localToWorld(out.copy(entry.normal).multiplyScalar(radius));
+      return body.localToWorld(out.copy(entry.anchor).multiplyScalar(radius));
     }
   };
 }

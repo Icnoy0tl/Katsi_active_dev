@@ -1,3 +1,4 @@
+import { setupScrollFade } from './utils/scrollFade.js';
 const $ = (id) => document.getElementById(id);
 
 // Mismos trazos que los iconos del menú principal
@@ -21,6 +22,7 @@ export function setupMissionsPanel({ onSelect }) {
   const list = $('missions-list');
   const count = $('missions-count');
   let shownRegions = null;
+  const updateScrollEnd = setupScrollFade(panel);
 
   function render(regions) {
     count.textContent = String(regions.length);
@@ -47,6 +49,7 @@ export function setupMissionsPanel({ onSelect }) {
     });
     list.replaceChildren(fragment);
     panel.scrollTop = 0;
+    updateScrollEnd();
   }
 
   function setVisible(visible) {
@@ -62,6 +65,7 @@ export function setupMissionsPanel({ onSelect }) {
         render(regions);
       }
       setVisible(true);
+      updateScrollEnd(); // el tamaño del panel puede haber cambiado mientras estaba oculto
     },
     hide() {
       setVisible(false);

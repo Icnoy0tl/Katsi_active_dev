@@ -1,3 +1,5 @@
+import { setupScrollFade } from './utils/scrollFade.js';
+
 const $ = (id) => document.getElementById(id);
 
 /** Etiqueta y unidad de cada variable del JSON (las no listadas se muestran con su clave) */
@@ -31,49 +33,86 @@ const AUDIT_VARIABLES = {
   abrasive_mohs: ['Abrasividad (Mohs)', '']
 };
 
-const formatCoord = (value, pos, neg) => `${Math.abs(value).toFixed(2)}° ${value >= 0 ? pos : neg}`;
-const formatValue = (value, unit) => (value === null || value === undefined ? '—' : `${value}${unit ? ` ${unit}` : ''}`);
+const BODY_LABELS = { moon: 'Luna', mars: 'Marte' };
 
-/** Filas <dt>/<dd> de un grupo de variables */
-function rows(variables, labels) {
+const formatCoord = (value, pos, neg) => `${Math.abs(value).toFixed(2)}° ${value >= 0 ? pos : neg}`;
+const formatValue = (value) => (value === null || value === undefined ? '<span class="cmp-empty">—</span>' : value);
+
+/** Profundidad a roca madre: un solo rango en lugar de dos valores */
+function mergeDepth(variables) {
   const entries = { ...variables };
-  // Profundidad a roca madre: un solo rango en lugar de dos filas
   if ('depth_to_bedrock_min_m' in entries || 'depth_to_bedrock_max_m' in entries) {
     const { depth_to_bedrock_min_m: min, depth_to_bedrock_max_m: max } = entries;
     delete entries.depth_to_bedrock_min_m;
     delete entries.depth_to_bedrock_max_m;
     entries.depth_to_bedrock = min === null && max === null ? null : `${min ?? '?'}–${max ?? '?'}`;
   }
-  return Object.entries(entries)
-    .map(([key, value]) => {
-      const [label, unit] = labels[key] ?? [key, ''];
-      return `<div class="info-row"><dt>${label}</dt><dd>${formatValue(value, unit)}</dd></div>`;
-    })
-    .join('');
+  return entries;
 }
 
 /**
- * Panel izquierdo con la información de un terreno seleccionado.
+ * Valores del análogo terrestre para la comparación.
+ * TODO: de momento todos son null; aquí se conectarán los datos de la Tierra.
+ */
+function earthValues(analog, keys) {
+  return Object.fromEntries(keys.map((key) => [key, null]));
+}
+
+/** Bloque de la tabla: fila de título del grupo + una fila por variable (cuerpo | Tierra) */
+function comparisonGroup(title, variables, labels, analog) {
+  const own = mergeDepth(variables);
+  const keys = Object.keys(own);
+  const earth = earthValues(analog, keys);
+  const rows = keys
+    .map((key) => {
+      const [label, unit] = labels[key] ?? [key, ''];
+      return `<tr>
+        <th scope="row">${label}${unit ? `<span class="cmp-unit">${unit}</span>` : ''}</th>
+        <td>${formatValue(own[key])}</td>
+        <td class="cmp-earth">${formatValue(earth[key])}</td>
+      </tr>`;
+    })
+    .join('');
+  return `<tbody>
+      <tr class="cmp-group"><th colspan="3" scope="colgroup">${title}</th></tr>
+      ${rows}
+    </tbody>`;
+}
+
+/** Análogo terrestre: nombre y coordenadas a la izquierda, anillo de similitud a la derecha */
+function analogCard(analog) {
+  const { name, coordinates } = analog.region;
+  const percent = Math.round(analog.similarity * 100);
+  return `<section class="cmp-analog menu-enter" style="--i: 4">
+      <div>
+        <h3 class="info-section">Análogo terrestre</h3>
+        <p class="info-analog">${name}</p>
+        <p class="info-coords">${formatCoord(coordinates.latitude, 'N', 'S')} · ${formatCoord(coordinates.longitude, 'E', 'O')}</p>
+      </div>
+      <div class="cmp-score" style="--score: ${percent}">
+        <b>${percent}&nbsp;%</b><span>similitud</span>
+      </div>
+    </section>`;
+}
+
+/**
+ * Panel izquierdo con la información de un terreno seleccionado y su comparación con el
+ * análogo terrestre.
  *
- * @returns { show(region, analog), hide() } — `analog`: { region, similarity } o null
+ * @returns { show(region, analog, bodyName), hide() } — `analog`: { region, similarity } o null
  */
 export function setupMissionInfo() {
   const panel = $('mission-info');
   const body = $('mission-info-body');
+  const updateScrollEnd = setupScrollFade(panel);
 
   return {
-    show(region, analog) {
+    show(region, analog, bodyName) {
       const { latitude, longitude } = region.coordinates;
-      const analogHtml = analog
-        ? `<section class="menu-enter" style="--i: 4">
-            <h3 class="info-section">Análogo terrestre</h3>
-            <p class="info-analog">${analog.region.name}</p>
-            <dl>
-              <div class="info-row"><dt>Similitud (variables principales)</dt><dd>${Math.round(analog.similarity * 100)} %</dd></div>
-              <div class="info-row"><dt>Coordenadas</dt><dd>${formatCoord(analog.region.coordinates.latitude, 'N', 'S')} · ${formatCoord(analog.region.coordinates.longitude, 'E', 'O')}</dd></div>
-            </dl>
-          </section>`
-        : '';
+      const bodyLabel = BODY_LABELS[bodyName] ?? bodyName;
+
+      const analogHtml = analog ? analogCard(analog) : '';
+
       body.innerHTML = `
         <p class="info-id menu-enter" style="--i: 1">${region.regionId}</p>
         <h2 class="info-name menu-enter" style="--i: 2">${region.name}</h2>
@@ -81,14 +120,21 @@ export function setupMissionInfo() {
         <div class="menu-accent missions-accent" aria-hidden="true"></div>
         ${analogHtml}
         <section class="menu-enter" style="--i: 5">
-          <h3 class="info-section">Variables principales</h3>
-          <dl>${rows(region.coreVariables ?? {}, CORE_VARIABLES)}</dl>
-        </section>
-        <section class="menu-enter" style="--i: 6">
-          <h3 class="info-section">Variables de auditoría</h3>
-          <dl>${rows(region.auditVariables ?? {}, AUDIT_VARIABLES)}</dl>
+          <table class="cmp-table">
+            <caption class="sr-only">Comparación de variables entre ${bodyLabel} y la Tierra</caption>
+            <thead>
+              <tr>
+                <th scope="col">Variable</th>
+                <th scope="col" class="cmp-col-body">${bodyLabel}</th>
+                <th scope="col" class="cmp-col-earth">Tierra</th>
+              </tr>
+            </thead>
+            ${comparisonGroup('Variables principales', region.coreVariables ?? {}, CORE_VARIABLES, analog)}
+            ${comparisonGroup('Variables de auditoría', region.auditVariables ?? {}, AUDIT_VARIABLES, analog)}
+          </table>
         </section>`;
       panel.scrollTop = 0;
+      updateScrollEnd();
       panel.classList.remove('is-hidden');
       panel.setAttribute('aria-hidden', 'false');
     },

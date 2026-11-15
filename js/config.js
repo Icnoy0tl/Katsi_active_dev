@@ -34,7 +34,7 @@ export const MOON = {
    */
   missionView: {
     distance: 4.6,
-    viewShift: [-0.07, 0.2],
+    viewShift: [0.03, 0.2],
     faceCamera: 0.55,
     earth: { radius: 0.62, drop: 0.37 }
   }
@@ -59,7 +59,7 @@ export const MARS = {
    */
   missionView: {
     distance: 4.6 * (MARS_RADIUS / MOON_RADIUS),
-    viewShift: [-0.07, 0.2],
+    viewShift: [0.03, 0.2],
     faceCamera: 0.55,
     earth: { radius: 0.62 * (MARS_RADIUS / MOON_RADIUS), drop: 0.37 }
   }
@@ -92,6 +92,7 @@ export const ORION = {
  */
 export const MENU = {
   viewShift: 0.22,
+  missionsViewShift: 0.08, // lista de misiones (Luna/Marte): separa el cuerpo de las tarjetas
   minWidthForShift: 700, // px
   shiftSpeed: 4, // velocidad de la transición del desplazamiento
   /**

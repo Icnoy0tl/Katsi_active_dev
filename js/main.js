@@ -87,7 +87,10 @@ function updateMissionsPanel(name) {
   const regions = missionBodies[name]?.regions;
   if (regions) missionsPanel.show(regions);
   else missionsPanel.hide();
+  // Con la lista de misiones visible, el cuerpo se desplaza a la derecha para no pegarse a ella
+  if (!mainMenu.isOpen && !selectedRegionId) setViewShiftTarget(regions ? missionsShift() : 0, 0);
 }
+const missionsShift = () => (window.innerWidth >= MENU.minWidthForShift ? MENU.missionsViewShift : 0);
 
 /** Áreas de terreno: solo en las misiones del cuerpo enfocado, nunca durante el menú */
 function updateTerrainAreas(focus, menuOpen) {
@@ -184,7 +187,12 @@ function applyViewShift() {
 
 const menuTarget = () => (window.innerWidth >= MENU.minWidthForShift ? MENU.viewShift : 0);
 
-const leaveMenuTo = (name) => () => {
+// Botón y panel de controles: solo en el modo Prueba
+const testOnlyUi = document.querySelectorAll('.is-test-only');
+const setTestMode = (active) => testOnlyUi.forEach((el) => el.classList.toggle('is-test-mode', active));
+
+const leaveMenuTo = (name, testMode = false) => () => {
+  setTestMode(testMode);
   mainMenu.close();
   controlPanel.focus(name);
 };
@@ -196,7 +204,7 @@ const mainMenu = setupMainMenu({
     docs: () => {
       // TODO: pantalla de documentación
     },
-    test: leaveMenuTo('earth')
+    test: leaveMenuTo('earth', true)
   },
   onToggle: (isOpen) => {
     // En el menú la escena es solo fondo: sin arrastre ni zoom
@@ -214,6 +222,7 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   if (mainMenu.isOpen) viewShift.targetX = menuTarget();
+  else if (!selectedRegionId && missionBodies[cameraNavigator.currentFocus]?.regions) viewShift.targetX = missionsShift();
   applyViewShift(); // también actualiza la proyección
   camera.updateProjectionMatrix();
 });
@@ -267,7 +276,7 @@ function goToMission(region) {
   selectedRegionId = region.regionId;
   const analog = findClosestAnalog(region, earthRegions);
   mission.markers.showOnly(region.regionId); // solo el área de esta misión
-  missionInfo.show(region, analog);
+  missionInfo.show(region, analog, name);
   bodyHologram.show(region, mission.markers.outline(region.regionId), mission.config.realRadiusKm, {
     kicker: mission.kicker,
     tag: region.regionId
