@@ -1,0 +1,16 @@
+{
+  "missions": [
+    {
+      "id": "sonda_penetradora",
+      "name": "Sonda penetradora (ejemplo)",
+      "description": "Impacta y se entierra: importan la mecánica del suelo, los volátiles y que el terreno no tenga rocas.",
+      "demand": { "MEC": 0.4, "VOL": 0.3, "GEO": 0.2, "ATM": 0.1 }
+    },
+    {
+      "id": "estacion_satelite",
+      "name": "Estación terrena para un satélite (ejemplo)",
+      "description": "No toca el suelo de forma crítica: importan la línea de vista, la energía y el clima.",
+      "demand": { "NAV": 0.5, "ENE": 0.25, "ATM": 0.15, "TER": 0.1 }
+    }
+  ]
+}

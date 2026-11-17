@@ -1,11 +1,17 @@
-// Package API: HTTP endpoints of the backend.
+// Package API: every HTTP endpoint of the backend. main.go only wraps it
+// (flags, environment, CORS, http.Server).
 //
+//	GET    /api/health                          204, no body (wakes the Render free plan)
 //	GET    /api/status                          HTML page: message + status image
 //	GET    /api/status/image                    data/status.png
 //	GET    /api/catalog                         categories, variables, missions, capabilities
-//	GET    /api/regions?planet=mars             built-in + custom regions ({ regions: [...] })
-//	GET    /api/analog?planet=&regionId=&filter= top-3 Earth analogs (used by the frontend)
+//	GET    /api/filters                         weight report of each built-in mission
+//	GET    /api/missions                        weight model: categories, missions, KNN variables
+//	GET    /api/regions?planet=&filter=         Moon/Mars terrains ranked for a mission (frontend)
+//	GET    /api/regions/all?planet=             raw built-in + custom regions ({ regions: [...] })
+//	GET    /api/analog?planet=&regionId=&filter= top-3 Earth analogs (frontend)
 //	POST   /api/calculate                       same, JSON body (AnalogRequest)
+//	POST   /api/analog/custom                   analogs of the user's own region(s), no upload
 //
 // Only with --own-regions (otherwise 403):
 //
@@ -35,6 +41,14 @@ import (
 
 const TopK = 3
 
+// Sensitivity analysis of GET /api/analog: ±20 % on each component of the
+// mission profile, 200 trials, fixed seed (reproducible).
+const (
+	RobustEps    = 0.20
+	RobustTrials = 200
+	RobustSeed   = 2026
+)
+
 // MaxUploadBytes bounds the body of an upload.
 const MaxUploadBytes = 5 << 20
 
@@ -45,20 +59,67 @@ type Server struct {
 	Custom *custom.Store
 }
 
-// Routes registers every endpoint.
-func (s *Server) Routes() *http.ServeMux {
+// Routes registers every endpoint. Errors produced by the mux itself
+// (unknown route 404, wrong method 405) are also returned as JSON.
+func (s *Server) Routes() http.Handler {
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /api/health", Health)
 	mux.HandleFunc("GET /api/status", Status)
 	mux.HandleFunc("GET /api/status/image", s.StatusImage)
 	mux.HandleFunc("GET /api/catalog", s.Catalog)
-	mux.HandleFunc("GET /api/regions", s.Regions)
+	mux.HandleFunc("GET /api/filters", Filters)
+	mux.HandleFunc("GET /api/missions", Missions)
+	mux.HandleFunc("GET /api/regions", s.RankedRegions)
+	mux.HandleFunc("GET /api/regions/all", s.Regions)
 	mux.HandleFunc("GET /api/analog", s.AnalogGET)
 	mux.HandleFunc("POST /api/calculate", s.Calculate)
+	mux.HandleFunc("POST /api/analog/custom", s.CustomAnalog)
 	mux.HandleFunc("POST /api/custom/regions", s.ownOnly(s.UploadRegions))
 	mux.HandleFunc("POST /api/custom/missions", s.ownOnly(s.UploadMissions))
 	mux.HandleFunc("GET /api/custom", s.ownOnly(s.CustomState))
 	mux.HandleFunc("DELETE /api/custom", s.ownOnly(s.ClearCustom))
-	return mux
+	return jsonErrors(mux)
+}
+
+// jsonErrors rewrites the plain-text 404/405 replies of http.ServeMux as
+// {"error": "..."}; handlers that already answer JSON are left untouched.
+func jsonErrors(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(&errorRewriter{ResponseWriter: w}, r)
+	})
+}
+
+type errorRewriter struct {
+	http.ResponseWriter
+	swallow bool
+}
+
+func (e *errorRewriter) WriteHeader(code int) {
+	if (code == http.StatusNotFound || code == http.StatusMethodNotAllowed) &&
+		!strings.HasPrefix(e.Header().Get("Content-Type"), "application/json") {
+		e.swallow = true
+		e.Header().Del("X-Content-Type-Options")
+		msg := "Route not found"
+		if code == http.StatusMethodNotAllowed {
+			msg = "Method not allowed (allowed: " + e.Header().Get("Allow") + ")"
+		}
+		WriteJSON(e.ResponseWriter, code, map[string]string{"error": msg})
+		return
+	}
+	e.ResponseWriter.WriteHeader(code)
+}
+
+func (e *errorRewriter) Write(b []byte) (int, error) {
+	if e.swallow {
+		return len(b), nil // drop the original plain-text body
+	}
+	return e.ResponseWriter.Write(b)
+}
+
+// Health: 204 with no body. The frontend calls it on load to wake the service
+// (Render stops the free plan after ~15 min without traffic and takes 30–50 s to start).
+func Health(w http.ResponseWriter, _ *http.Request) {
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // ---------------------------------------------------------------- responses
@@ -90,6 +151,7 @@ type AnalogResponse struct {
 	Mission        *MissionView      `json:"mission"` // null = no filter (every variable weighs the same)
 	SelectedRegion RegionView        `json:"selectedRegion"`
 	Matches        []MatchResponse   `json:"matches"`
+	Robustness     knn.Robustness    `json:"robustness"`
 	Extrapolation  knn.Extrapolation `json:"extrapolation"`
 }
 
@@ -267,6 +329,10 @@ func (s *Server) analyze(planet, regionID, filter string) (AnalogResponse, *apiE
 	if err != nil {
 		return AnalogResponse{}, internal("Error running KNN: %v", err)
 	}
+	rob, err := model.AnalyzeRobustness(target, cands, profile, TopK, RobustEps, RobustTrials, RobustSeed)
+	if err != nil {
+		return AnalogResponse{}, internal("Error in sensitivity analysis: %v", err)
+	}
 	extra, err := model.CheckExtrapolation(selected.Region, pool, weights)
 	if err != nil {
 		return AnalogResponse{}, internal("Error checking extrapolation: %v", err)
@@ -279,7 +345,7 @@ func (s *Server) analyze(planet, regionID, filter string) (AnalogResponse, *apiE
 	}
 	resp := AnalogResponse{
 		Planet: planet, Filter: filter, Mission: mission,
-		SelectedRegion: selected, Matches: []MatchResponse{}, Extrapolation: extra,
+		SelectedRegion: selected, Matches: []MatchResponse{}, Robustness: rob, Extrapolation: extra,
 	}
 	for _, m := range matches {
 		i := idx[m.RegionID]
@@ -358,7 +424,7 @@ func (s *Server) Catalog(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// Regions: { planet, regions: [...] } — same shape as data/*.json, so the
+// Regions (GET /api/regions/all): { planet, regions: [...] } — same shape as data/*.json, so the
 // frontend's loadRegions(url) can point here instead of the static file.
 func (s *Server) Regions(w http.ResponseWriter, r *http.Request) {
 	planet := strings.ToLower(strings.TrimSpace(r.URL.Query().Get("planet")))
