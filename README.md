@@ -195,8 +195,8 @@ Ready-to-use example files are in `frontend/examples/`.
 `backend/python` contains an independent reference implementation of the weighting, so anyone can compute and audit the weights for their own mission profile without running the server:
 
 - **`weights_mision.py`** computes, for any profile and set of variable types, the affinity of each variable (dot product and cosine between its type and the mission profile), the Shannon entropy and effective number of variables $N_{\text{ef}}=e^{H(w)}$, and the weights from a numerically stable softmax whose inverse temperature $\beta$ is calibrated by bisection so that $N_{\text{ef}}$ reaches the maximum-entropy target $N^*=n\,e^{H(d)}/C$. Only the standard library is needed.
-- **`tests_weights.py`** runs 4,000 random cases plus degenerate and invalid inputs, checks the identity $dH/d\beta=-\beta\,\mathrm{Var}_w(r)$, and verifies the properties of the deployed F2$'$ allocation (weights sum to 1, category fidelity, scale and permutation invariance, empty categories).
-- The Go test suite reads `golden_python.json`, produced by the Python code, and fails if the two implementations ever disagree on affinities, $N^*$ or F2$'$ weights.
+- **`tests_weights.py`** runs 4,000 random cases plus degenerate and invalid inputs, checks the identity $dH/d\beta=-\beta\,\mathrm{Var}_w(r)$, and verifies the properties of the deployed F2' allocation (weights sum to 1, category fidelity, scale and permutation invariance, empty categories).
+- The Go test suite reads `golden_python.json`, produced by the Python code, and fails if the two implementations ever disagree on affinities, $N^*$ or F2' weights.
 
 ```python
 from weights_mision import factors
