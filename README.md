@@ -61,7 +61,7 @@ $$
 
 **Extrapolation.** A variable is flagged when the target lies more than 10 % of the Earth range outside it; the result is *dominated* when flagged variables carry at least half of the mission weight.
 
-Full derivations, proofs and limitations are in the [technical documentation](docs/Ixmati_documentacion.pdf).
+Full derivations, proofs and limitations are in the [technical documentation](./katsi_documentacion.pdf).
 
 ## Data and verification
 
