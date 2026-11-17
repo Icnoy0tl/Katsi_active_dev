@@ -4,7 +4,7 @@
 NASA Space Apps Challenge 2026 · Local event: Puebla, Mexico · Team **Hackanenes**
 Challenge: *Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars*
 
-> A terrestrial site is an analog only for a specific engineering test, and every analog fails somewhere. Ixmati ranks Earth sites against a lunar or Martian target **for one test at a time** and reports where each analogy breaks and in which direction.
+> A terrestrial site is an analog only for a specific engineering test, and every analog fails somewhere. Katsi ranks Earth sites against a lunar or Martian target **for one test at a time** and reports where each analogy breaks and in which direction.
 
 ---
 
@@ -21,7 +21,7 @@ Teams test hardware at Earth analog sites before flying it, but a site's own con
 
 ## What it does
 
-Pick a Moon or Mars region and a mission. Ixmati returns:
+Pick a Moon or Mars region and a mission. Katsi returns:
 
 - the **three closest Earth sites** out of 15 analog sites;
 - a **per-variable breakdown**: how compatible each variable is and how much of the distance it explains;
